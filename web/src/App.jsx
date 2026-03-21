@@ -1,47 +1,25 @@
 // App will have all context providers. will also have all the pages and currentPage state. navbar always visible at the bottom
 import { useState } from "react";
+import gameProvider from "./context/gameContext";
+import Game from "./pages/Game.jsx";
+import HomePage from "./pages/HomePage.jsx";
+import SettingsPage from "./pages/Settings.jsx";
+import ProfilePage from "./pages/Profile.jsx";
+import Nav from "./components/shared/Nav.jsx";
 import "./App.css";
-import { searchFoods, scaleNutrients } from "./services/getUSDA";
-import analyzeFood from "./services/analyzeFood";
-import analyzeFoodDesc from "./services/analyzeFoodDesc";
 function App() {
-  const [foodImage, setFoodImage] = useState(null);
-  const [foodInput, setFoodInput] = useState("");
-  async function food(input) {
-    const foods = await searchFoods(input);
-    console.log(
-      foods,
-      "Search results:",
-      scaleNutrients(foods[0].nutrients, foods[0].servingSize, 150),
-    );
-  }
+  const [currentPage, setCurrentPage] = useState("home");
+  const pages = {
+    home: <HomePage />,
+    settings: <SettingsPage />,
+    profile: <ProfilePage />,
+  };
   return (
-    <>
+    <gameProvider>
       <h1>Kalori</h1>
-      <div className="card">
-        <input
-          type="text"
-          placeholder="give food name"
-          value={foodInput}
-          onChange={(e) => {
-            setFoodInput(e.target.value);
-          }}
-        />
-        <input
-          type="file"
-          accept="image/*"
-          placeholder="give food name"
-          onChange={(e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            setFoodImage(file);
-          }}
-        />
-        <button onClick={() => analyzeFood(foodImage)}>Photo analyze</button>
-        <button onClick={() => analyzeFoodDesc(foodInput)}>Desc analyze</button>
-        <button onClick={() => food(foodInput)}>USDA</button>
-      </div>
-    </>
+      {pages[currentPage]}
+      <Nav />
+    </gameProvider>
   );
 }
 

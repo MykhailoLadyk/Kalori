@@ -105,8 +105,8 @@ describe("fetchMeals", () => {
     await fetchMeals("2025-02-27");
 
     expect(supabase.from).toHaveBeenCalledWith("meals");
-    expect(chain.eq).toHaveBeenCalledWith("user_id", "user-123");
-    expect(chain.eq).toHaveBeenCalledWith("date", "2025-02-27");
+    expect(chain.eq).toHaveBeenNthCalledWith(1, "user_id", "user-123");
+    expect(chain.eq).toHaveBeenNthCalledWith(2, "date", "2025-02-27");
   });
 
   it("returns empty array when no meals for that date", async () => {
@@ -224,8 +224,8 @@ describe("updateMeal", () => {
 
     await updateMeal("meal-1", { calories: 480 });
 
-    expect(chain.eq).toHaveBeenCalledWith("id", "meal-1");
-    expect(chain.eq).toHaveBeenCalledWith("user_id", "user-123");
+    expect(chain.eq).toHaveBeenNthCalledWith(1, "id", "meal-1");
+    expect(chain.eq).toHaveBeenNthCalledWith(2, "user_id", "user-123");
   });
 
   it("throws if not authenticated", async () => {

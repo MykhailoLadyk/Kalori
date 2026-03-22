@@ -9,14 +9,14 @@ export const fetchMeals = async (date) => {
   const { data, error } = await supabase
     .from("meals")
     .select("*")
-    .eq("id", user.id)
+    .eq("user_id", user.id)
     .eq("date", date)
     .order("created_at", { ascending: true });
 
   if (error) throw new Error(error.message);
   return data;
 };
-export const updateMeal = async (date, updates) => {
+export const updateMeal = async (id, updates) => {
   const {
     data: { user },
     error: authError,
@@ -26,8 +26,8 @@ export const updateMeal = async (date, updates) => {
   const { data, error } = await supabase
     .from("meals")
     .update(updates)
-    .eq("id", user.id)
-    .eq("date", date)
+    .eq("id", id)
+    .eq("user_id", user.id)
     .select()
     .single();
   if (error) throw new Error(error.message);
@@ -91,8 +91,8 @@ export async function fetchMealsByRange(startDate, endDate) {
     .from("meals")
     .select("*")
     .eq("user_id", user.id)
-    .gte("date", startDate) // greater than or equal
-    .lte("date", endDate) // less than or equal
+    .gte("date", startDate)
+    .lte("date", endDate)
     .order("date", { ascending: true });
 
   if (error) throw new Error(error.message);

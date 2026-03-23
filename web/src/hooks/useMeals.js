@@ -1,4 +1,5 @@
-  // - takes logs[] as input
-  // - returns avgCalories, streak, deficit, daysOnGoal
-  // - all pure calculations, no fetch
-  // - uses useMemo so recalcs only when logs change
+import { useContext } from "react";
+import { MealContext } from "../context/MealContext";
+export function useMeals() {
+  return useContext(MealContext);
+}

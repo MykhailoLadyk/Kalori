@@ -3,6 +3,10 @@
 // - XP_VALUES { mealLogged, questComplete, streakDay }
 // - QUEST_DEFINITIONS[]
 // - ACHIEVEMENT_DEFINITIONS[]
+
+// ══════════════════════════════════════════════════
+// COLORS AND FONTS
+// ══════════════════════════════════════════════════
 export const C = {
   bg: "#0B0B12",
   panel: "#111118",

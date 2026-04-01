@@ -5,6 +5,8 @@ import { Modal } from "../components/modals/Modal";
 import { useState } from "react";
 import { DateModal } from "../components/modals/home/DateModal";
 import { HomeMacros } from "../components/home/HomeMacros";
+import { StreakBanner } from "../components/home/StreakBanner";
+import { WaterTracker } from "../components/home/WaterTracker";
 export default function Home() {
   const [modal, setModal] = useState(null);
   const modals = {
@@ -72,6 +74,8 @@ export default function Home() {
       </div>
       <CalorieRing consumed={1700} goal={2000}></CalorieRing>
       <HomeMacros macros={macros} />
+      <StreakBanner streak={7} shields={3} />
+      <WaterTracker current={2.5} goal={3} onAdd={() => {}} />
       <Modal id={modal} close={() => setModal(null)}>
         {modals[modal]}
       </Modal>

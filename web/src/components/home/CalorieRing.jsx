@@ -1,8 +1,8 @@
 import { C, F } from "../../lib/constans";
 import { useState, useEffect } from "react";
 import CountUp from "../shared/CountUp";
-import Mono from "../shared/Mono";
-export default function CalorieRing({ consumed, goal }) {
+import { Mono } from "../shared/Mono";
+export function CalorieRing({ consumed, goal }) {
   const [ringAnimated, setRingAnimated] = useState(false);
   useEffect(() => {
     const t = setTimeout(() => setRingAnimated(true), 150);

@@ -1,14 +1,20 @@
-import CalorieRing from "../components/home/CalorieRing";
+import { CalorieRing } from "../components/home/CalorieRing";
 import { IconCalendar } from "../components/shared/DuoIcon";
 import { C, F } from "../lib/constans";
 import { Modal } from "../components/modals/Modal";
 import { useState } from "react";
 import { DateModal } from "../components/modals/home/DateModal";
+import { HomeMacros } from "../components/home/HomeMacros";
 export default function Home() {
   const [modal, setModal] = useState(null);
   const modals = {
     datepicker: <DateModal handleClose={() => setModal(null)} />,
   };
+  const macros = [
+    { label: "Protein", val: 94, max: 150, color: C.blue },
+    { label: "Carbs", val: 148, max: 250, color: C.gold },
+    { label: "Fat", val: 44, max: 70, color: C.pink },
+  ];
   return (
     <>
       <div
@@ -65,6 +71,7 @@ export default function Home() {
         </div>
       </div>
       <CalorieRing consumed={1700} goal={2000}></CalorieRing>
+      <HomeMacros macros={macros} />
       <Modal id={modal} close={() => setModal(null)}>
         {modals[modal]}
       </Modal>

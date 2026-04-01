@@ -569,3 +569,136 @@ export const IconPencil = ({ size = 14, color = "currentColor" }) => (
     <path d="M192,96.68,159.31,64,176,47.31,208.68,80Z" />
   </DuoIcon>
 );
+export const QuestMealIcon = ({ color }) => (
+  <svg width="20" height="20" viewBox="0 0 32 32" fill="none">
+    {/* Fork */}
+    <rect x="7" y="4" width="2" height="8" rx="1" fill={color} opacity="0.2" />
+    <rect x="11" y="4" width="2" height="8" rx="1" fill={color} opacity="0.2" />
+    <rect
+      x="7"
+      y="12"
+      width="6"
+      height="3"
+      rx="1.5"
+      fill={color}
+      opacity="0.2"
+    />
+    <rect x="9" y="15" width="2" height="13" rx="1" fill={color} />
+    {/* Plate */}
+    <circle cx="20" cy="18" r="10" fill={color} opacity="0.15" />
+    <circle
+      cx="20"
+      cy="18"
+      r="10"
+      stroke={color}
+      strokeWidth="1.5"
+      fill="none"
+    />
+    <circle cx="20" cy="18" r="6" fill={color} opacity="0.3" />
+    <circle cx="20" cy="18" r="2.5" fill={color} />
+  </svg>
+);
+
+export const QuestWaterIcon = ({ color }) => (
+  <svg width="20" height="20" viewBox="0 0 32 32" fill="none">
+    <path
+      d="M16 4L8 14C6 17 6 19 8 22C10 25 12 26 16 26C20 26 22 25 24 22C26 19 26 17 24 14Z"
+      fill={color}
+      opacity="0.2"
+    />
+    <path
+      d="M16 4L8 14C6 17 6 19 8 22C10 25 12 26 16 26C20 26 22 25 24 22C26 19 26 17 24 14Z"
+      stroke={color}
+      strokeWidth="1.5"
+      fill="none"
+    />
+    <path
+      d="M12 20C13 22 14.5 23 16 23"
+      stroke={color}
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      opacity="0.6"
+    />
+    <circle cx="22" cy="9" r="2" fill={color} opacity="0.4" />
+    <circle cx="25" cy="5" r="1" fill={color} opacity="0.3" />
+  </svg>
+);
+
+export const QuestProteinIcon = ({ color }) => (
+  <svg width="20" height="20" viewBox="0 0 32 32" fill="none">
+    <rect x="4" y="12" width="6" height="8" rx="3" fill={color} opacity="0.2" />
+    <rect
+      x="4"
+      y="12"
+      width="6"
+      height="8"
+      rx="3"
+      stroke={color}
+      strokeWidth="1.5"
+    />
+    <rect
+      x="22"
+      y="12"
+      width="6"
+      height="8"
+      rx="3"
+      fill={color}
+      opacity="0.2"
+    />
+    <rect
+      x="22"
+      y="12"
+      width="6"
+      height="8"
+      rx="3"
+      stroke={color}
+      strokeWidth="1.5"
+    />
+    <rect x="10" y="14" width="12" height="4" fill={color} opacity="0.15" />
+    <rect
+      x="10"
+      y="14"
+      width="12"
+      height="4"
+      stroke={color}
+      strokeWidth="1.5"
+    />
+    <rect x="13" y="9" width="2" height="5" rx="1" fill={color} opacity="0.3" />
+    <rect x="17" y="9" width="2" height="5" rx="1" fill={color} opacity="0.3" />
+    <rect
+      x="13"
+      y="18"
+      width="2"
+      height="5"
+      rx="1"
+      fill={color}
+      opacity="0.3"
+    />
+    <rect
+      x="17"
+      y="18"
+      width="2"
+      height="5"
+      rx="1"
+      fill={color}
+      opacity="0.3"
+    />
+  </svg>
+);
+
+export const QuestFireIcon = ({ color }) => (
+  <svg width="20" height="20" viewBox="0 0 32 32" fill="none">
+    <path
+      d="M18 4C18 4 22 9 22 14C22 16 21 17.5 20 18C20 18 21 14 18 12C18 16 15 17 14 19C12 17 14 12 14 12C10 15 10 20 12 23C13.5 25 15.5 26 18 26C22 26 26 23 26 18C26 11 18 4 18 4Z"
+      fill={color}
+      opacity="0.2"
+    />
+    <path
+      d="M18 4C18 4 22 9 22 14C22 16 21 17.5 20 18C20 18 21 14 18 12C18 16 15 17 14 19C12 17 14 12 14 12C10 15 10 20 12 23C13.5 25 15.5 26 18 26C22 26 26 23 26 18C26 11 18 4 18 4Z"
+      stroke={color}
+      strokeWidth="1.2"
+      strokeLinejoin="round"
+    />
+    <circle cx="18" cy="21" r="3" fill={color} opacity="0.4" />
+  </svg>
+);

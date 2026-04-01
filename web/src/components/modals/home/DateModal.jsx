@@ -1,5 +1,5 @@
 import { C, F } from "../../../lib/constans";
-import { Mono } from "../../../components/shared/Mono";
+import { Mono } from "../../shared/Primitives";
 
 export function DateModal({ handleClose }) {
   return (

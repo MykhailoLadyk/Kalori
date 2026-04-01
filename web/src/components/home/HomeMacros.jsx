@@ -1,4 +1,4 @@
-import { Mono } from "../shared/Mono";
+import { Mono } from "../shared/Primitives";
 import { C } from "../../lib/constans";
 import { AnimBar } from "../shared/AnimBar";
 export function HomeMacros({ macros }) {

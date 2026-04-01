@@ -1,3 +1,7 @@
-// - props: quests[]
-// - maps over quests, renders QuestCard per item
-// - purely presentational
+import { Quest } from "./Quest";
+
+export function QuestList({ quests }) {
+  return quests.map((q, i) => {
+    return <Quest key={i} {...q} />;
+  });
+}

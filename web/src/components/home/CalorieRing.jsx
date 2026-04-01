@@ -1,7 +1,7 @@
 import { C, F } from "../../lib/constans";
 import { useState, useEffect } from "react";
 import CountUp from "../shared/CountUp";
-import { Mono } from "../shared/Mono";
+import { Mono } from "../shared/Primitives";
 export function CalorieRing({ consumed, goal }) {
   const [ringAnimated, setRingAnimated] = useState(false);
   useEffect(() => {

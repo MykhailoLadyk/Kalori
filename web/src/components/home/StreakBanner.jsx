@@ -1,5 +1,5 @@
 import { C, F } from "../../lib/constans";
-import { Mono } from "../shared/Mono";
+import { Mono } from "../shared/Primitives";
 import { IconFire, IconShield } from "../shared/DuoIcon";
 export function StreakBanner({ streak, shields }) {
   return (

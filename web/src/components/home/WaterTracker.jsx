@@ -1,5 +1,5 @@
 import { IconDrop } from "../../components/shared/DuoIcon";
-import { Mono } from "../../components/shared/Mono";
+import { Mono } from "../shared/Primitives";
 import { AnimBar } from "../../components/shared/AnimBar";
 import { C } from "../../lib/constans";
 export function WaterTracker({ current, goal, onAdd }) {

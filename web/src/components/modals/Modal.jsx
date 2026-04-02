@@ -9,6 +9,16 @@ export function Modal({ id, close, children }) {
       requestAnimationFrame(() => setVisible(true));
     } else setVisible(false);
   }, [id]);
+  useEffect(() => {
+    if (id) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [id]);
   const handleClose = () => {
     setClosing(true);
     setTimeout(() => {
@@ -20,7 +30,7 @@ export function Modal({ id, close, children }) {
   return (
     <div
       style={{
-        position: "absolute",
+        position: "fixed",
         inset: 0,
         zIndex: 100,
         background: closing ? "transparent" : "#00000070",

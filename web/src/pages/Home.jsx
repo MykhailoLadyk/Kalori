@@ -14,6 +14,7 @@ import {
   QuestProteinIcon,
   QuestWaterIcon,
 } from "../components/shared/DuoIcon";
+import { Meals } from "../components/home/Meals";
 export default function Home() {
   const [modal, setModal] = useState(null);
   const modals = {
@@ -50,6 +51,15 @@ export default function Home() {
       color: C.gold,
     },
   ];
+  const meals = {
+    Breakfast: [{ n: "Oat Porridge", cal: 320, p: 12, c: 58, f: 6, id: 1 }],
+    Lunch: [
+      { n: "Chicken & Rice", cal: 520, p: 42, c: 55, f: 8, id: 2 },
+      { n: "Greek Yogurt", cal: 120, p: 10, c: 12, f: 3, id: 3 },
+    ],
+    Dinner: [],
+    Snacks: [{ n: "Protein Bar", cal: 210, p: 20, c: 22, f: 7, id: 4 }],
+  };
   return (
     <>
       <div
@@ -115,6 +125,21 @@ export default function Home() {
         </Stagger>
       </div>
       <WaterTracker current={2.5} goal={3} onAdd={() => {}} />
+      <div style={{ padding: "10px 22px 0" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 10,
+            animation: "fadeUp 0.4s ease 0.64s both",
+          }}
+        >
+          <SectionLabel>Today's Meals</SectionLabel>
+        </div>
+        <Meals meals={meals} />
+      </div>
+
       <Modal id={modal} close={() => setModal(null)}>
         {modals[modal]}
       </Modal>

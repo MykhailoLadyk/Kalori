@@ -1,19 +1,23 @@
 import { useState } from "react";
+
 import { C, F } from "../lib/constans";
-import { Modal } from "../components/modals/Modal";
-import { CalorieRing } from "../components/home/CalorieRing";
-import { IconCalendar } from "../components/shared/DuoIcon";
-import { DateModal } from "../components/modals/home/DateModal";
-import { HomeMacros } from "../components/home/HomeMacros";
-import { StreakBanner } from "../components/home/StreakBanner";
-import { WaterTracker } from "../components/home/WaterTracker";
-import { QuestList } from "../components/shared/QuestList";
-import { SectionLabel, Stagger } from "../components/shared/Primitives";
+
 import {
   QuestMealIcon,
   QuestProteinIcon,
   QuestWaterIcon,
+  IconCalendar,
 } from "../components/shared/DuoIcon";
+import { SectionLabel, Stagger } from "../components/shared/Primitives";
+import { QuestList } from "../components/shared/QuestList";
+
+import { Modal } from "../components/modals/Modal";
+import { DateModal } from "../components/modals/home/DateModal";
+
+import { CalorieRing } from "../components/home/CalorieRing";
+import { HomeMacros } from "../components/home/HomeMacros";
+import { StreakBanner } from "../components/home/StreakBanner";
+import { WaterTracker } from "../components/home/WaterTracker";
 import { Meals } from "../components/home/Meals";
 export default function Home() {
   const [modal, setModal] = useState(null);
@@ -116,6 +120,7 @@ export default function Home() {
         </div>
       </div>
       <CalorieRing consumed={1700} goal={2000}></CalorieRing>
+
       <HomeMacros macros={macros} />
       <StreakBanner streak={7} shields={3} />
       <div style={{ padding: "10px 22px 0" }}>

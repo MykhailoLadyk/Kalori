@@ -1,32 +1,39 @@
 import { C, F } from "../../lib/constans";
 import { Tag } from "./Primitives";
+import { IconStar } from "./DuoIcon";
 
-export function Quest({ Icon, name, xp, pct: qpct, type, color, done }) {
+export function Quest({
+  Icon,
+  name,
+  xp,
+  pct: qpct,
+  type,
+  color = C.accent,
+  done = false,
+}) {
   return (
     <div
       key={name}
       className="hover-card"
       style={{
-        background: C.card,
+        background: done ? color + "12" : C.card,
         borderRadius: 13,
-        padding: "10px 13px",
-        border: `1px solid ${C.border}`,
+        padding: "11px 13px",
+        border: `1px solid ${done ? color + "40" : C.border}`,
         display: "flex",
         alignItems: "center",
         gap: 10,
         marginBottom: 7,
       }}
     >
-      <div style={{ flexShrink: 0 }}>
-        <Icon color={color} />
-      </div>
+      <div style={{ flexShrink: 0 }}>{Icon && <Icon color={color} />}</div>
       <div style={{ flex: 1 }}>
         <div
           style={{
             display: "flex",
             alignItems: "center",
             gap: 6,
-            marginBottom: 5,
+            marginBottom: done ? 0 : 5,
           }}
         >
           <span
@@ -39,34 +46,42 @@ export function Quest({ Icon, name, xp, pct: qpct, type, color, done }) {
           >
             {name}
           </span>
-          <Tag color={type === "Weekly" ? C.gold : C.accent}>{type}</Tag>
+          <Tag color={color}>{type}</Tag>
         </div>
-        <div style={{ height: 3, background: C.border, borderRadius: 3 }}>
-          <div
-            style={{
-              height: "100%",
-              background: color,
-              borderRadius: 3,
-              width: `${qpct}%`,
-              transition: "width 0.9s cubic-bezier(0.22,1,0.36,1) 0.7s",
-            }}
-          />
+        {!done && (
+          <div style={{ height: 3, background: C.border, borderRadius: 3 }}>
+            <div
+              style={{
+                height: "100%",
+                background: color,
+                borderRadius: 3,
+                width: `${qpct}%`,
+                transition: "width 0.9s cubic-bezier(0.22,1,0.36,1) 0.6s",
+              }}
+            />
+          </div>
+        )}
+      </div>
+      {done ? (
+        <div style={{ color: C.accent }}>
+          <IconStar size={18} color={C.accent} />
         </div>
-      </div>
-      <div
-        style={{
-          background: C.accentDim,
-          border: `1px solid ${C.accentMid}`,
-          borderRadius: 7,
-          padding: "3px 7px",
-          fontFamily: F.mono,
-          fontSize: 9,
-          color: color,
-          fontWeight: 700,
-        }}
-      >
-        +{xp}
-      </div>
+      ) : (
+        <div
+          style={{
+            background: color + "18",
+            border: `1px solid ${color}35`,
+            borderRadius: 7,
+            padding: "3px 7px",
+            fontFamily: F.mono,
+            fontSize: 9,
+            color,
+            fontWeight: 700,
+          }}
+        >
+          +{xp}
+        </div>
+      )}
     </div>
   );
 }

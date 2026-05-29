@@ -18,12 +18,19 @@ import { CalorieRing } from "../components/home/CalorieRing";
 import { HomeMacros } from "../components/home/HomeMacros";
 import { StreakBanner } from "../components/home/StreakBanner";
 import { WaterTracker } from "../components/home/WaterTracker";
+import { DateSection } from "../components/home/DateSection";
 import { Meals } from "../components/home/Meals";
 export default function Home() {
+  /// State
   const [modal, setModal] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  /// Modals
   const modals = {
-    datepicker: <DateModal handleClose={() => setModal(null)} />,
+    datepicker: (
+      <DateModal globalDate={selectedDate} setGlobalDate={setSelectedDate} />
+    ),
   };
+  /// Mock Data
   const macros = [
     { label: "Protein", val: 94, max: 150, color: C.blue },
     { label: "Carbs", val: 148, max: 250, color: C.gold },
@@ -56,69 +63,39 @@ export default function Home() {
     },
   ];
   const meals = {
-    Breakfast: [{ n: "Oat Porridge", cal: 320, p: 12, c: 58, f: 6, id: 1 }],
+    Breakfast: [
+      {
+        n: "Oat Porridge",
+        cal: 320,
+        p: 12,
+        c: 58,
+        f: 6,
+        id: 1,
+        type: "Breakfast",
+      },
+    ],
     Lunch: [
-      { n: "Chicken & Rice", cal: 520, p: 42, c: 55, f: 8, id: 2 },
-      { n: "Greek Yogurt", cal: 120, p: 10, c: 12, f: 3, id: 3 },
+      {
+        n: "Chicken & Rice",
+        cal: 520,
+        p: 42,
+        c: 55,
+        f: 8,
+        id: 2,
+        type: "Lunch",
+      },
+      { n: "Greek Yogurt", cal: 120, p: 10, c: 12, f: 3, id: 3, type: "Lunch" },
     ],
     Dinner: [],
-    Snacks: [{ n: "Protein Bar", cal: 210, p: 20, c: 22, f: 7, id: 4 }],
+    Snacks: [
+      { n: "Protein Bar", cal: 210, p: 20, c: 22, f: 7, id: 4, type: "Snacks" },
+    ],
   };
+  const water = { current: 2500, goal: 3000 };
+
   return (
     <>
-      <div
-        style={{
-          padding: "8px 22px 12px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          position: "relative",
-          animation: "fadeUp 0.4s ease both",
-        }}
-      >
-        <div
-          onClick={() => setModal("datepicker")}
-          className="hover-btn press"
-          style={{
-            position: "absolute",
-            left: 22,
-            width: 36,
-            height: 36,
-            background: C.card,
-            border: `1px solid ${C.border}`,
-            borderRadius: 11,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <IconCalendar size={18} color={C.soft} />
-        </div>
-        <div style={{ textAlign: "center" }}>
-          <div
-            style={{
-              fontFamily: F.mono,
-              fontSize: 8,
-              color: C.mutedLight,
-              letterSpacing: 2,
-              textTransform: "uppercase",
-            }}
-          >
-            Thursday
-          </div>
-          <div
-            style={{
-              fontFamily: F.head,
-              fontSize: 20,
-              fontWeight: 900,
-              color: C.text,
-              marginTop: 2,
-            }}
-          >
-            February 27, 2025
-          </div>
-        </div>
-      </div>
+      <DateSection setModal={setModal} date={selectedDate} />
       <CalorieRing consumed={1700} goal={2000}></CalorieRing>
 
       <HomeMacros macros={macros} />
@@ -129,8 +106,12 @@ export default function Home() {
           <QuestList quests={quests} />
         </Stagger>
       </div>
-      <WaterTracker current={2.5} goal={3} onAdd={() => {}} />
-      <div style={{ padding: "10px 22px 0" }}>
+      <WaterTracker
+        current={water.current}
+        goal={water.goal}
+        onAdd={() => {}}
+      />
+      <div style={{ padding: "12px 22px 0" }}>
         <div
           style={{
             display: "flex",
@@ -141,7 +122,46 @@ export default function Home() {
           }}
         >
           <SectionLabel>Today's Meals</SectionLabel>
+
+          <div
+            onClick={() => setModal("add_meal")}
+            className="hover-btn press"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              background: C.accentDim,
+              border: `1px solid ${C.accentMid}`,
+              borderRadius: 9,
+              padding: "5px 10px",
+              cursor: "pointer",
+            }}
+          >
+            <span
+              style={{
+                fontFamily: F.mono,
+                fontSize: 14,
+                fontWeight: 300,
+                color: C.accent,
+                lineHeight: 1,
+              }}
+            >
+              +
+            </span>
+            <span
+              style={{
+                fontFamily: F.mono,
+                fontSize: 8,
+                fontWeight: 700,
+                color: C.accent,
+                letterSpacing: 1,
+              }}
+            >
+              ADD MEAL
+            </span>
+          </div>
         </div>
+
         <Meals meals={meals} />
       </div>
 

@@ -13,6 +13,7 @@ export function UserProvider({ children }) {
     const loadUser = async () => {
       try {
         setLoading(true);
+        setError(null);
         const userData = await fetchUser();
         setUser(userData);
       } catch (error) {
@@ -29,6 +30,7 @@ export function UserProvider({ children }) {
   const handleUpdateUser = async (updates) => {
     try {
       setUpdating(true);
+      setError(null);
       const updatedUser = await updateUser(updates);
       setUser(updatedUser);
     } catch (error) {

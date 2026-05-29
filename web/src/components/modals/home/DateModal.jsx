@@ -1,7 +1,19 @@
 import { C, F } from "../../../lib/constans";
 import { Mono } from "../../shared/Primitives";
-
-export function DateModal({ handleClose }) {
+import { useState } from "react";
+import { getNumberOfDaysInMonth } from "../../../lib/utils";
+export function DateModal({ handleClose, globalDate, setGlobalDate }) {
+  const daysInMonth = getNumberOfDaysInMonth(
+    globalDate.getFullYear(),
+    globalDate.getMonth(),
+  );
+  const firstDayOfMonth = new Date(
+    globalDate.getFullYear(),
+    globalDate.getMonth(),
+    1,
+  ).getDay();
+  const leadingEmptyDays = (firstDayOfMonth + 6) % 7;
+  const [date, setDate] = useState(globalDate.getDate());
   return (
     <div>
       <div
@@ -30,15 +42,16 @@ export function DateModal({ handleClose }) {
             </Mono>
           </div>
         ))}
-        {[...Array(4)].map((_, i) => (
+        {[...Array(leadingEmptyDays)].map((_, i) => (
           <div key={"e" + i} />
         ))}
-        {[...Array(28)].map((_, i) => {
-          const d = i + 1,
-            today = d === 27,
-            past = d < 27;
+        {[...Array(daysInMonth)].map((_, i) => {
+          const d = i + 1;
           return (
             <div
+              onClick={() => {
+                setDate(d);
+              }}
               key={d}
               className="press"
               style={{
@@ -47,19 +60,18 @@ export function DateModal({ handleClose }) {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                background: today ? C.accent : "transparent",
-                border: `1px solid ${today ? C.accent : past ? C.border : "transparent"}`,
-                opacity: d > 27 ? 0.2 : 1,
+                background: date === d ? C.accent : "transparent",
+                border: `1px solid ${date === d ? C.accent : C.border}`,
                 transition: "all 0.15s",
-                animation: today ? "pulse 2s ease infinite" : "none",
+                animation: date === d ? "pulse 2s ease infinite" : "none",
               }}
             >
               <span
                 style={{
                   fontFamily: F.body,
                   fontSize: 13,
-                  fontWeight: today ? 800 : 500,
-                  color: today ? "#000" : past ? C.text : C.muted,
+                  fontWeight: date === d ? 800 : 500,
+                  color: date === d ? "#000" : C.text,
                 }}
               >
                 {d}
@@ -69,7 +81,12 @@ export function DateModal({ handleClose }) {
         })}
       </div>
       <div
-        onClick={handleClose}
+        onClick={() => {
+          setGlobalDate(
+            new Date(globalDate.getFullYear(), globalDate.getMonth(), date),
+          );
+          handleClose();
+        }}
         className="hover-btn press"
         style={{
           background: C.accent,

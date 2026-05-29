@@ -1,25 +1,38 @@
-import { IconDrop } from "../../components/shared/DuoIcon";
+import { useState } from "react";
+import { C, F } from "../../lib/constans";
 import { Mono } from "../shared/Primitives";
-import { AnimBar } from "../../components/shared/AnimBar";
-import { C } from "../../lib/constans";
+import { AnimBar } from "../shared/AnimBar";
+import { IconDrop } from "../shared/DuoIcon";
+
 export function WaterTracker({ current, goal, onAdd }) {
+  const [inputValue, setInputValue] = useState("");
+
+  const handleCustomAdd = () => {
+    const amount = parseInt(inputValue);
+    if (!amount || amount <= 0) return;
+    onAdd(amount);
+    setInputValue("");
+  };
+
+  const pct = Math.min((current / goal) * 100, 100);
   return (
     <div
+      className="hover-card"
       style={{
-        padding: "10px 22px 0",
-        animation: "fadeUp 0.5s ease 0.62s both",
+        background: C.card,
+        borderRadius: 14,
+        padding: "11px 14px",
+        border: `1px solid ${C.border}`,
+        width: "90%",
+        margin: "0 auto",
       }}
     >
       <div
-        className="hover-card"
         style={{
-          background: C.card,
-          borderRadius: 14,
-          padding: "11px 14px",
-          border: `1px solid ${C.border}`,
           display: "flex",
           alignItems: "center",
-          gap: 12,
+          gap: 10,
+          marginBottom: 8,
         }}
       >
         <div style={{ animation: "float 3s ease infinite", flexShrink: 0 }}>
@@ -37,28 +50,95 @@ export function WaterTracker({ current, goal, onAdd }) {
               Water
             </Mono>
             <Mono size={8} color={C.blue}>
-              {current} / {goal}L
+              {current}ml / {goal}ml
             </Mono>
           </div>
-          <AnimBar pct={(current / goal) * 100} color={C.blue} delay={900} />
+          <AnimBar pct={pct} color={C.blue} delay={900} />
         </div>
+      </div>
+
+      <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+        {[250, 400].map((amount) => (
+          <div
+            key={amount}
+            onClick={() => onAdd(amount)}
+            className="hover-btn press"
+            style={{
+              flex: 1,
+              background: C.blueDim,
+              border: `1px solid ${C.blue}40`,
+              borderRadius: 9,
+              padding: "7px 0",
+              textAlign: "center",
+              cursor: "pointer",
+            }}
+          >
+            <span
+              style={{
+                fontFamily: F.mono,
+                fontSize: 9,
+                fontWeight: 700,
+                color: C.blue,
+              }}
+            >
+              +{amount}ml
+            </span>
+          </div>
+        ))}
+
         <div
-          className="press"
           style={{
-            width: 28,
-            height: 28,
-            borderRadius: 8,
+            flex: 1,
+            display: "flex",
             background: C.blueDim,
             border: `1px solid ${C.blue}40`,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: C.blue,
-            fontSize: 18,
-            fontWeight: 300,
+            borderRadius: 9,
+            overflow: "hidden",
           }}
         >
-          +
+          <input
+            type="number"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleCustomAdd()}
+            placeholder="ml"
+            style={{
+              flex: 1,
+              background: "transparent",
+              border: "none",
+              outline: "none",
+              padding: "7px 8px",
+              fontFamily: F.mono,
+              fontSize: 9,
+              fontWeight: 700,
+              color: C.blue,
+              width: 0,
+            }}
+          />
+          <div
+            onClick={handleCustomAdd}
+            className="press"
+            style={{
+              padding: "7px 10px",
+              background: `${C.blue}30`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              borderLeft: `1px solid ${C.blue}40`,
+            }}
+          >
+            <span
+              style={{
+                fontFamily: F.mono,
+                fontSize: 10,
+                fontWeight: 700,
+                color: C.blue,
+              }}
+            >
+              +
+            </span>
+          </div>
         </div>
       </div>
     </div>

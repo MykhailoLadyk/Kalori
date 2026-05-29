@@ -2,9 +2,6 @@ import { C, F } from "../../lib/constans";
 import { Mono } from "../shared/Primitives";
 import { IconShield, IconCoin } from "../shared/DuoIcon";
 
-// - props: coins, onOpen
-// - renders shield preview + price
-// - fires onOpen upward
 export default function ShopItemOther({ price = 150 }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>

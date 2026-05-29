@@ -1,9 +1,5 @@
 import { IconTrophy } from "../shared/DuoIcon";
 
-// - props: onOpen
-// - renders chest icons with float animation
-// - fires onOpen upward
-
 export default function ShopItemChests({ colors = [] }) {
   return (
     <div

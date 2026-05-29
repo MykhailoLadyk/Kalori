@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, cloneElement, isValidElement } from "react";
 import { C } from "../../lib/constans";
 export function Modal({ id, close, children }) {
   const [visible, setVisible] = useState(false);
@@ -26,9 +26,15 @@ export function Modal({ id, close, children }) {
       close();
     }, 280);
   };
+
+  const renderedChildren = isValidElement(children)
+    ? cloneElement(children, { handleClose })
+    : children;
+
   if (!id && !visible) return null;
   return (
     <div
+      onClick={handleClose}
       style={{
         position: "fixed",
         inset: 0,
@@ -43,6 +49,7 @@ export function Modal({ id, close, children }) {
     >
       <div
         className="sy"
+        onClick={(event) => event.stopPropagation()}
         style={{
           background: C.panel,
           borderRadius: "24px 24px 0 0",
@@ -88,7 +95,7 @@ export function Modal({ id, close, children }) {
         >
           ✕
         </div>
-        {children}
+        {renderedChildren}
       </div>
     </div>
   );

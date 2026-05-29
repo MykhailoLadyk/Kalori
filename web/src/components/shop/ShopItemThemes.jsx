@@ -1,9 +1,5 @@
 import { C } from "../../lib/constans";
 
-// - props: onOpen
-// - renders theme color preview strips
-// - fires onOpen upward, owns no state
-
 export default function ShopItemThemes({ previewColors = [] }) {
   return (
     <div style={{ display: "flex", gap: 3 }}>

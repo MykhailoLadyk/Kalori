@@ -5,8 +5,8 @@ import { MealDeleteModal } from "../modals/home/MealDeleteModal";
 import { MealEditModal } from "../modals/home/MealEditModal";
 import { Modal } from "../modals/Modal";
 export function MealCard({ meal, color, type }) {
-  const [deleteModal, setDeleteModal] = useState(false);
-  const [editModal, setEditModal] = useState(false);
+  const [deleteModal, setDeleteModal] = useState(null);
+  const [editModal, setEditModal] = useState(null);
 
   const [expandedMeal, setExpandedMeal] = useState(null);
   const expanded = expandedMeal === meal.id;
@@ -306,15 +306,14 @@ export function MealCard({ meal, color, type }) {
           </div>
         )}
       </div>
-      {deleteModal ? (
-        <Modal id="deleteMeal" close={() => setDeleteModal(false)}>
-          <MealDeleteModal meal={meal} />
-        </Modal>
-      ) : editModal ? (
-        <Modal id="editMeal" close={() => setEditModal(false)}>
-          <MealEditModal meal={meal} />
-        </Modal>
-      ) : null}
+
+      <Modal id={deleteModal} close={() => setDeleteModal(null)}>
+        <MealDeleteModal meal={meal} />
+      </Modal>
+
+      <Modal id={editModal} close={() => setEditModal(null)}>
+        <MealEditModal meal={meal} />
+      </Modal>
     </>
   );
 }

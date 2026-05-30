@@ -6,10 +6,13 @@ import {
   IconShoppingBag,
   IconGear,
 } from "../shared/DuoIcon";
+import { MealAddOptionSelectModal } from "../modals/home/MealAddOptionSelectModal";
+import { Modal } from "../modals/Modal";
 import { C, F } from "../../lib/constans";
 import { useState } from "react";
-export default function Nav({ active, setPage, onAddMeal }) {
+export default function Nav({ active, setPage }) {
   const [popped, setPopped] = useState(null);
+  const [modal, setModal] = useState(null);
 
   const tabs = [
     { id: "stats", label: "Stats", Icon: IconChartLine },
@@ -21,7 +24,7 @@ export default function Nav({ active, setPage, onAddMeal }) {
   const handleHomeClick = () => {
     setPopped("home");
     setTimeout(() => setPopped(null), 400);
-    if (active === "home") onAddMeal();
+    if (active === "home") setModal(true);
     else setPage("home");
   };
 
@@ -150,6 +153,9 @@ export default function Nav({ active, setPage, onAddMeal }) {
           </div>
         );
       })}
+      <Modal id={modal} close={() => setModal(null)}>
+        <MealAddOptionSelectModal />
+      </Modal>
     </div>
   );
 }

@@ -13,6 +13,7 @@ import { QuestList } from "../components/shared/QuestList";
 
 import { Modal } from "../components/modals/Modal";
 import { DateModal } from "../components/modals/home/DateModal";
+import { MealAddOptionSelectModal } from "../components/modals/home/MealAddOptionSelectModal";
 
 import { CalorieRing } from "../components/home/CalorieRing";
 import { HomeMacros } from "../components/home/HomeMacros";
@@ -20,6 +21,7 @@ import { StreakBanner } from "../components/home/StreakBanner";
 import { WaterTracker } from "../components/home/WaterTracker";
 import { DateSection } from "../components/home/DateSection";
 import { Meals } from "../components/home/Meals";
+
 export default function Home() {
   /// State
   const [modal, setModal] = useState(null);
@@ -29,6 +31,7 @@ export default function Home() {
     datepicker: (
       <DateModal globalDate={selectedDate} setGlobalDate={setSelectedDate} />
     ),
+    select_add_meal: <MealAddOptionSelectModal />,
   };
   /// Mock Data
   const macros = [
@@ -124,7 +127,7 @@ export default function Home() {
           <SectionLabel>Today's Meals</SectionLabel>
 
           <div
-            onClick={() => setModal("add_meal")}
+            onClick={() => setModal("select_add_meal")}
             className="hover-btn press"
             style={{
               display: "flex",

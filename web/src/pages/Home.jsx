@@ -28,9 +28,7 @@ export default function Home() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   /// Modals
   const modals = {
-    datepicker: (
-      <DateModal globalDate={selectedDate} setGlobalDate={setSelectedDate} />
-    ),
+    datepicker: <DateModal date={selectedDate} setDate={setSelectedDate} />,
     select_add_meal: <MealAddOptionSelectModal />,
   };
   /// Mock Data

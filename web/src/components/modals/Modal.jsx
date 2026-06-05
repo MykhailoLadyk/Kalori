@@ -74,7 +74,7 @@ export function Modal({ id, close, children }) {
             margin: "0 auto 16px",
           }}
         />
-        <div
+        {/* <div
           onClick={handleClose}
           className="press"
           style={{
@@ -94,7 +94,7 @@ export function Modal({ id, close, children }) {
           }}
         >
           ✕
-        </div>
+        </div> */}
         {renderedChildren}
       </div>
     </div>

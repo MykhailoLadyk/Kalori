@@ -1,8 +1,24 @@
 import { useState } from "react";
-import SettingsCard from "../components/settings/SettingsCard";
+
 import { Mono } from "../components/shared/Primitives";
 import { C, F } from "../lib/constans";
+
+import SettingsCard from "../components/settings/SettingsCard";
+
 import { Modal } from "../components/modals/Modal";
+import ProfileModal from "../components/modals/settings/ProfileModal";
+import CalorieGoalModal from "../components/modals/settings/CalorieGoalModal";
+import BodyStatsModal from "../components/modals/settings/BodyStatsModal";
+import LanguageModal from "../components/modals/settings/LanguageModal";
+import TimezoneModal from "../components/modals/settings/TimezonesModal";
+import MeasurementsModal from "../components/modals/settings/MeasurmentsModal";
+import PrivacyModal from "../components/modals/settings/PrivacyModal";
+import ExportModal from "../components/modals/settings/ExportModal";
+import LegalModal from "../components/modals/settings/LegalModal";
+import SettingsThemeModal from "../components/modals/settings/SettingsThemesModal";
+import LogoutModal from "../components/modals/settings/LogOutModal";
+import DeleteAccountModal from "../components/modals/settings/DeleteAccountModal";
+
 import {
   IconUser,
   IconTarget,
@@ -28,7 +44,20 @@ export default function Settings() {
     streak: false,
   });
   const [modal, setModal] = useState(null);
-  const modals = {};
+  const modals = {
+    profile: <ProfileModal />,
+    calorieGoal: <CalorieGoalModal />,
+    bodyStats: <BodyStatsModal />,
+    language: <LanguageModal />,
+    timezone: <TimezoneModal />,
+    measurements: <MeasurementsModal />,
+    privacy: <PrivacyModal />,
+    export: <ExportModal />,
+    legal: <LegalModal />,
+    theme: <SettingsThemeModal />,
+    logout: <LogoutModal />,
+    deleteAccount: <DeleteAccountModal />,
+  };
   const toggle = (k) => setToggles((p) => ({ ...p, [k]: !p[k] }));
 
   const SectionLabel = ({ children }) => (
@@ -104,22 +133,28 @@ export default function Settings() {
           }}
         >
           <SettingsCard
+            onClick={() => {
+              setModal("profile");
+            }}
             icon={<IconUser size={18} color={C.soft} />}
             label="Profile Settings"
-            sub="Name, photo, goals"
             arrow
           />
           <SettingsCard
+            onClick={() => {
+              setModal("calorieGoal");
+            }}
             icon={<IconTarget size={18} color={C.soft} />}
-            label="Calorie Goal"
-            sub="2,000 kcal/day"
+            label="Goals & Targets"
             arrow
             withTopBorder
           />
           <SettingsCard
+            onClick={() => {
+              setModal("bodyStats");
+            }}
             icon={<IconWeight size={18} color={C.soft} />}
             label="Body Stats"
-            sub="Weight, height, activity"
             arrow
             withTopBorder
           />
@@ -137,36 +172,44 @@ export default function Settings() {
           }}
         >
           <SettingsCard
+            onClick={() => {
+              setModal("language");
+            }}
             icon={<IconGlobe size={18} color={C.soft} />}
             label="Language"
-            sub="English"
             arrow
           />
-          <SettingsCard
+          {/* <SettingsCard
+            onClick={() => {
+              setModal("timezone");
+            }}
             icon={<IconClock size={18} color={C.soft} />}
             label="Timezone"
-            sub="UTC+1 · Warsaw"
             arrow
             withTopBorder
-          />
-          <SettingsCard
+          /> */}
+          {/* <SettingsCard
+            onClick={() => {
+              setModal("measurements");
+            }}
             icon={<IconRuler size={18} color={C.soft} />}
             label="Measurements"
-            sub="Metric (kg, cm)"
             arrow
             withTopBorder
-          />
+          /> */}
           <SettingsCard
+            onClick={() => {
+              setModal("theme");
+            }}
             icon={<IconPalette size={18} color={C.soft} />}
             label="Theme"
-            sub="Midnight Mint"
             arrow
             withTopBorder
           />
         </div>
       </div>
 
-      <div style={{ marginBottom: 16 }}>
+      {/* <div style={{ marginBottom: 16 }}>
         <SectionLabel>Notifications</SectionLabel>
         <div
           style={{
@@ -200,7 +243,7 @@ export default function Settings() {
             withTopBorder
           />
         </div>
-      </div>
+      </div> */}
 
       <div style={{ marginBottom: 16 }}>
         <SectionLabel>App</SectionLabel>
@@ -213,35 +256,46 @@ export default function Settings() {
           }}
         >
           <SettingsCard
+            onClick={() => {
+              setModal("privacy");
+            }}
             icon={<IconLock size={18} color={C.soft} />}
             label="Privacy"
-            sub="Data & permissions"
             arrow
           />
           <SettingsCard
+            onClick={() => {
+              setModal("export");
+            }}
             icon={<IconExport size={18} color={C.soft} />}
             label="Export My Data"
-            sub="Download all your data"
             arrow
             withTopBorder
           />
           <SettingsCard
+            onClick={() => {
+              setModal("legal");
+            }}
             icon={<IconCalendar size={18} color={C.soft} />}
             label="Legal"
-            sub="Terms & Privacy Policy"
             arrow
             withTopBorder
           />
           <SettingsCard
+            onClick={() => {
+              setModal("logout");
+            }}
             icon={<IconSignOut size={18} color={C.red} />}
             label="Log Out"
             danger
             withTopBorder
           />
           <SettingsCard
+            onClick={() => {
+              setModal("deleteAccount");
+            }}
             icon={<IconTrash size={18} color={C.red} />}
             label="Delete Account"
-            sub="Permanent"
             danger
             withTopBorder
           />

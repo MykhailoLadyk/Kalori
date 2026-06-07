@@ -5,6 +5,7 @@
 body {
   background: #0B0B12;
   color: #F0F0F8;
+  padding-bottom: 80px;
 }
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

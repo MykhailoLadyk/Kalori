@@ -33,11 +33,16 @@ export default function Nav({ active, setPage }) {
   return (
     <div
       style={{
+        position: "fixed",
+        bottom: 0,
+        left: 0,
+        right: 0,
+        zIndex: 50,
         background: C.panel,
         borderTop: `1px solid ${C.border}`,
         display: "flex",
         alignItems: "center",
-        padding: "10px 0 0",
+        padding: "10px 0 calc(10px + env(safe-area-inset-bottom))",
         flexShrink: 0,
       }}
     >

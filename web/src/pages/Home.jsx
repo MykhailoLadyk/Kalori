@@ -33,16 +33,16 @@ export default function Home() {
   };
   /// Mock Data
   const macros = [
-    { label: "Protein", val: 94, max: 150, color: C.blue },
-    { label: "Carbs", val: 148, max: 250, color: C.gold },
-    { label: "Fat", val: 44, max: 70, color: C.pink },
+    { label: "Protein", val: 0, max: 150, color: C.blue },
+    { label: "Carbs", val: 0, max: 250, color: C.gold },
+    { label: "Fat", val: 0, max: 70, color: C.pink },
   ];
   const quests = [
     {
       Icon: QuestMealIcon,
       name: "Log 3 meals today",
       xp: 50,
-      pct: 66,
+      pct: 0,
       type: "Daily",
       color: C.accent,
     },
@@ -50,7 +50,7 @@ export default function Home() {
       Icon: QuestWaterIcon,
       name: "Drink 2.5L water",
       xp: 30,
-      pct: 56,
+      pct: 0,
       type: "Daily",
       color: C.accent,
     },
@@ -58,49 +58,49 @@ export default function Home() {
       Icon: QuestProteinIcon,
       name: "Protein goal 3 days",
       xp: 120,
-      pct: 33,
+      pct: 0,
       type: "Weekly",
       color: C.gold,
     },
   ];
   const meals = {
     Breakfast: [
-      {
-        n: "Oat Porridge",
-        cal: 320,
-        p: 12,
-        c: 58,
-        f: 6,
-        id: 1,
-        type: "Breakfast",
-      },
+      // {
+      //   n: "Oat Porridge",
+      //   cal: 320,
+      //   p: 12,
+      //   c: 58,
+      //   f: 6,
+      //   id: 1,
+      //   type: "Breakfast",
+      // },
     ],
     Lunch: [
-      {
-        n: "Chicken & Rice",
-        cal: 520,
-        p: 42,
-        c: 55,
-        f: 8,
-        id: 2,
-        type: "Lunch",
-      },
-      { n: "Greek Yogurt", cal: 120, p: 10, c: 12, f: 3, id: 3, type: "Lunch" },
+      // {
+      //   n: "Chicken & Rice",
+      //   cal: 520,
+      //   p: 42,
+      //   c: 55,
+      //   f: 8,
+      //   id: 2,
+      //   type: "Lunch",
+      // },
+      // { n: "Greek Yogurt", cal: 120, p: 10, c: 12, f: 3, id: 3, type: "Lunch" },
     ],
     Dinner: [],
     Snacks: [
-      { n: "Protein Bar", cal: 210, p: 20, c: 22, f: 7, id: 4, type: "Snacks" },
+      // { n: "Protein Bar", cal: 210, p: 20, c: 22, f: 7, id: 4, type: "Snacks" },
     ],
   };
-  const water = { current: 2500, goal: 3000 };
+  const water = { current: 0, goal: 3000 };
 
   return (
     <>
       <DateSection setModal={setModal} date={selectedDate} />
-      <CalorieRing consumed={1700} goal={2000}></CalorieRing>
+      <CalorieRing consumed={0} goal={2000}></CalorieRing>
 
       <HomeMacros macros={macros} />
-      <StreakBanner streak={7} shields={3} />
+      <StreakBanner streak={0} shields={0} />
       <div style={{ padding: "10px 22px 0" }}>
         <SectionLabel delay={400}>Quests</SectionLabel>
         <Stagger baseDelay={450} step={70}>

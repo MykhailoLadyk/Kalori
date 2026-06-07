@@ -1,6 +1,4 @@
-// modals/settings/ThemeModal.jsx
 import { C, F } from "../../../lib/constans";
-import { Mono } from "../../../components/shared/Primitives";
 import { Tag } from "../../../components/shared/Primitives";
 import { useState } from "react";
 
@@ -109,14 +107,12 @@ export default function ThemeModal({ onClose }) {
                 transition: "all 0.2s",
               }}
             >
-              {/* color preview */}
               <div style={{ display: "flex", height: 44 }}>
                 {theme.colors.map((col, i) => (
                   <div key={i} style={{ flex: 1, background: col }} />
                 ))}
               </div>
 
-              {/* info row */}
               <div
                 style={{
                   padding: "10px 14px",

@@ -1,4 +1,3 @@
-// modals/settings/CalorieGoalModal.jsx — simplified to calorie + water only
 import { useState } from "react";
 import { C, F } from "../../../lib/constans";
 import { Mono } from "../../../components/shared/Primitives";

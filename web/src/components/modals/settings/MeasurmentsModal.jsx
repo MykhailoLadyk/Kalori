@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { C, F } from "../../../lib/constans";
 import { Mono } from "../../../components/shared/Primitives";
-import { useUser } from "../../../hooks/useUser";
 
 const SYSTEMS = [
   {

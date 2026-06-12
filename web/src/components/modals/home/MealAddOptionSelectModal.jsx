@@ -1,4 +1,4 @@
-// modals/home/AddMealModal.jsx
+import { useRef, useState } from "react";
 import { C, F } from "../../../lib/constans";
 import { Mono } from "../../../components/shared/Primitives";
 
@@ -85,10 +85,71 @@ const OPTIONS = [
     color: C.gold,
   },
 ];
+const Spinner = ({ color }) => (
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    style={{ animation: "spin 0.8s linear infinite" }}
+  >
+    <circle
+      cx="12"
+      cy="12"
+      r="9"
+      stroke={color}
+      strokeWidth="2.5"
+      strokeOpacity="0.2"
+    />
+    <path
+      d="M21 12a9 9 0 0 0-9-9"
+      stroke={color}
+      strokeWidth="2.5"
+      strokeLinecap="round"
+    />
+  </svg>
+);
 
-export function MealAddOptionSelectModal({ onSelect, handleClose }) {
+export function MealAddOptionSelectModal({ setCurrentPage, setMealConfirm }) {
+  const fileInputRef = useRef(null);
+  const [albumLoading, setAlbumLoading] = useState(false);
+
+  const handleOptionClick = (key) => {
+    if (key === "album") {
+      fileInputRef.current?.click();
+      return;
+    }
+    setCurrentPage(key);
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setAlbumLoading(true);
+
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const photoDataUrl = reader.result;
+
+      const result = await analyzeMealPhoto(photoDataUrl);
+
+      setAlbumLoading(false);
+      setMealConfirm(result, photoDataUrl, true);
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  };
+
   return (
     <div>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleFileChange}
+        style={{ display: "none" }}
+      />
       {/* title */}
       <div style={{ marginBottom: 20 }}>
         <div
@@ -115,62 +176,106 @@ export function MealAddOptionSelectModal({ onSelect, handleClose }) {
 
       {/* options */}
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        {OPTIONS.map(({ key, label, sub, icon, color }) => (
-          <div
-            key={key}
-            onClick={() => onSelect(key)}
-            className="hover-card press"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 14,
-              background: C.card,
-              border: `1px solid ${C.border}`,
-              borderRadius: 14,
-              padding: "14px 16px",
-              cursor: "pointer",
-            }}
-          >
-            {/* icon container */}
+        {OPTIONS.map(({ key, label, sub, icon, color }) => {
+          const isAlbum = key === "album";
+          const isLoading = isAlbum && albumLoading;
+          const isDisabled = albumLoading && !isAlbum;
+
+          return (
             <div
+              key={key}
+              onClick={() =>
+                !isDisabled && !isLoading && handleOptionClick(key)
+              }
+              className={isDisabled || isLoading ? "" : "hover-card press"}
               style={{
-                width: 48,
-                height: 48,
-                borderRadius: 14,
-                background: color + "18",
-                border: `1px solid ${color}30`,
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "center",
-                flexShrink: 0,
+                gap: 14,
+                background: C.card,
+                border: `1px solid ${C.border}`,
+                borderRadius: 14,
+                padding: "14px 16px",
+                cursor: isDisabled || isLoading ? "not-allowed" : "pointer",
+                opacity: isDisabled ? 0.4 : 1,
+                position: "relative",
+                overflow: "hidden",
+                transition: "opacity 0.2s",
               }}
             >
-              {icon(color)}
-            </div>
-
-            {/* text */}
-            <div style={{ flex: 1 }}>
+              {/* icon container */}
               <div
                 style={{
-                  fontFamily: F.body,
-                  fontSize: 14,
-                  fontWeight: 700,
-                  color: C.text,
-                  marginBottom: 3,
+                  width: 48,
+                  height: 48,
+                  borderRadius: 14,
+                  background: color + "18",
+                  border: `1px solid ${color}30`,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
                 }}
               >
-                {label}
+                {icon(color)}
               </div>
-              <Mono size={8} color={C.muted}>
-                {sub}
-              </Mono>
-            </div>
 
-            {/* chevron */}
-            <span style={{ color: C.muted, fontSize: 18 }}>›</span>
-          </div>
-        ))}
+              {/* text */}
+              <div style={{ flex: 1 }}>
+                <div
+                  style={{
+                    fontFamily: F.body,
+                    fontSize: 14,
+                    fontWeight: 700,
+                    color: C.text,
+                    marginBottom: 3,
+                  }}
+                >
+                  {label}
+                </div>
+                <Mono size={8} color={C.muted}>
+                  {sub}
+                </Mono>
+              </div>
+
+              {/* chevron or spinner */}
+              {isLoading ? (
+                <Spinner color={color} />
+              ) : (
+                <span style={{ color: C.muted, fontSize: 18 }}>›</span>
+              )}
+
+              {/* spinner overlay on the album card */}
+              {isLoading && (
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    background: `${color}08`,
+                    border: `1px solid ${color}30`,
+                    borderRadius: 14,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "flex-end",
+                    padding: "0 16px",
+                    animation: "fadeIn 0.2s ease both",
+                  }}
+                />
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
+}
+async function analyzeMealPhoto(photoDataUrl) {
+  await new Promise((r) => setTimeout(r, 1500));
+  return {
+    name: "Grilled Chicken Bowl",
+    calories: 540,
+    protein: 38,
+    carbs: 52,
+    fat: 16,
+  };
 }

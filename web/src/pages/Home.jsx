@@ -22,14 +22,20 @@ import { WaterTracker } from "../components/home/WaterTracker";
 import { DateSection } from "../components/home/DateSection";
 import { Meals } from "../components/home/Meals";
 
-export default function Home() {
+export default function Home({ setCurrentPage, setMealConfirm }) {
   /// State
   const [modal, setModal] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
   /// Modals
   const modals = {
     datepicker: <DateModal date={selectedDate} setDate={setSelectedDate} />,
-    select_add_meal: <MealAddOptionSelectModal />,
+    select_add_meal: (
+      <MealAddOptionSelectModal
+        setModal={setModal}
+        setCurrentPage={setCurrentPage}
+        setMealConfirm={setMealConfirm}
+      />
+    ),
   };
   /// Mock Data
   const macros = [
@@ -65,15 +71,15 @@ export default function Home() {
   ];
   const meals = {
     Breakfast: [
-      // {
-      //   n: "Oat Porridge",
-      //   cal: 320,
-      //   p: 12,
-      //   c: 58,
-      //   f: 6,
-      //   id: 1,
-      //   type: "Breakfast",
-      // },
+      {
+        n: "Oat Porridge",
+        cal: 320,
+        p: 12,
+        c: 58,
+        f: 6,
+        id: 1,
+        type: "Breakfast",
+      },
     ],
     Lunch: [
       // {
@@ -89,7 +95,7 @@ export default function Home() {
     ],
     Dinner: [],
     Snacks: [
-      // { n: "Protein Bar", cal: 210, p: 20, c: 22, f: 7, id: 4, type: "Snacks" },
+      { n: "Protein Bar", cal: 210, p: 20, c: 22, f: 7, id: 4, type: "Snacks" },
     ],
   };
   const water = { current: 0, goal: 3000 };

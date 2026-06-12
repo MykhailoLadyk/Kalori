@@ -159,7 +159,7 @@ export default function Nav({ active, setPage }) {
         );
       })}
       <Modal id={modal} close={() => setModal(null)}>
-        <MealAddOptionSelectModal />
+        <MealAddOptionSelectModal setCurrentPage={setPage} />
       </Modal>
     </div>
   );

@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { C, F } from "../lib/constans";
 import { Mono } from "../components/shared/Primitives";
 
@@ -24,16 +25,18 @@ const CaptureIcon = () => (
   </svg>
 );
 
-export default function PhotoAddMeal({ onBack, setMealConfirm }) {
+export default function PhotoAddMeal() {
+  const navigate = useNavigate();
+
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
 
-  const [stream, setStream] = useState(null);
   const [photo, setPhoto] = useState(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
+
   useEffect(() => {
     document.body.classList.add("photo-div");
 
@@ -45,7 +48,6 @@ export default function PhotoAddMeal({ onBack, setMealConfirm }) {
         });
         if (!active) return;
         streamRef.current = s;
-        setStream(s);
         if (videoRef.current) videoRef.current.srcObject = s;
       } catch (err) {
         setError("Camera access denied or unavailable.");
@@ -73,7 +75,6 @@ export default function PhotoAddMeal({ onBack, setMealConfirm }) {
     const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
     setPhoto(dataUrl);
 
-    // stop camera while reviewing
     streamRef.current?.getTracks().forEach((t) => t.stop());
   };
 
@@ -86,7 +87,6 @@ export default function PhotoAddMeal({ onBack, setMealConfirm }) {
         video: { facingMode: "environment" },
       });
       streamRef.current = s;
-      setStream(s);
       if (videoRef.current) videoRef.current.srcObject = s;
     } catch {
       setError("Camera access denied or unavailable.");
@@ -99,19 +99,16 @@ export default function PhotoAddMeal({ onBack, setMealConfirm }) {
       setError(null);
       const parsed = await analyzeMealPhoto(photo);
       setResult(parsed);
-      setMealConfirm(parsed, photo, false);
+
+      navigate("/add-meal/confirm", {
+        state: {
+          meal: parsed,
+          photoData: photo,
+          isAlbum: false,
+        },
+      });
     } catch {
       setError("Couldn't analyze the photo. Try retaking it.");
-    } finally {
-      setAnalyzing(false);
-    }
-  };
-
-  const handleConfirm = async () => {
-    try {
-      setAnalyzing(true);
-
-      onBack();
     } finally {
       setAnalyzing(false);
     }
@@ -130,12 +127,9 @@ export default function PhotoAddMeal({ onBack, setMealConfirm }) {
         animation: "fadeIn 0.22s ease both",
       }}
     >
-      {/* back button — floating */}
+      {/* Floating Back Button */}
       <div
-        onClick={() => {
-          //   streamRef.current?.getTracks().forEach((t) => t.stop());
-          onBack();
-        }}
+        onClick={() => navigate("/")}
         className="press"
         style={{
           position: "absolute",
@@ -158,7 +152,7 @@ export default function PhotoAddMeal({ onBack, setMealConfirm }) {
         <ChevronLeft />
       </div>
 
-      {/* camera viewport / captured photo */}
+      {/* Camera Viewport / Captured Photo */}
       <div
         style={{
           flex: 1,
@@ -191,152 +185,9 @@ export default function PhotoAddMeal({ onBack, setMealConfirm }) {
           />
         )}
         <canvas ref={canvasRef} style={{ display: "none" }} />
-
-        {/* result overlay */}
-        {false && (
-          <div
-            style={{
-              position: "absolute",
-              bottom: 0,
-              left: 0,
-              right: 0,
-              background: "linear-gradient(transparent, #000000ee 40%)",
-              padding: "60px 22px 24px",
-              animation: "fadeUp 0.4s ease both",
-            }}
-          >
-            <div
-              style={{
-                background: "#16161Fcc",
-                backdropFilter: "blur(12px)",
-                border: `1px solid ${C.border}`,
-                borderRadius: 16,
-                padding: "16px",
-                marginBottom: 16,
-              }}
-            >
-              <div
-                style={{
-                  fontFamily: F.body,
-                  fontSize: 15,
-                  fontWeight: 700,
-                  color: C.text,
-                  marginBottom: 12,
-                }}
-              >
-                {result.name}
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  marginBottom: 12,
-                }}
-              >
-                <Mono size={9} color={C.mutedLight}>
-                  Calories
-                </Mono>
-                <span
-                  style={{
-                    fontFamily: F.head,
-                    fontSize: 18,
-                    fontWeight: 900,
-                    color: C.accent,
-                  }}
-                >
-                  {result.calories} kcal
-                </span>
-              </div>
-              <div style={{ display: "flex", gap: 8 }}>
-                {[
-                  { l: "Protein", v: result.protein, col: C.blue },
-                  { l: "Carbs", v: result.carbs, col: C.gold },
-                  { l: "Fat", v: result.fat, col: C.pink },
-                ].map(({ l, v, col }) => (
-                  <div
-                    key={l}
-                    style={{
-                      flex: 1,
-                      background: col + "12",
-                      border: `1px solid ${col}30`,
-                      borderRadius: 10,
-                      padding: "8px",
-                      textAlign: "center",
-                    }}
-                  >
-                    <Mono size={7} color={col}>
-                      {l}
-                    </Mono>
-                    <div
-                      style={{
-                        fontFamily: F.head,
-                        fontSize: 14,
-                        fontWeight: 800,
-                        color: C.text,
-                        marginTop: 2,
-                      }}
-                    >
-                      {v}g
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div style={{ display: "flex", gap: 10 }}>
-              <div
-                onClick={handleRetake}
-                className="hover-btn press"
-                style={{
-                  flex: 1,
-                  background: "#16161Fcc",
-                  border: `1px solid ${C.border}`,
-                  borderRadius: 12,
-                  padding: "14px",
-                  textAlign: "center",
-                  cursor: "pointer",
-                }}
-              >
-                <span
-                  style={{
-                    fontFamily: F.mono,
-                    fontSize: 10,
-                    fontWeight: 700,
-                    color: C.soft,
-                  }}
-                >
-                  RETAKE
-                </span>
-              </div>
-              <div
-                onClick={!analyzing ? handleConfirm : undefined}
-                className="hover-btn press"
-                style={{
-                  flex: 2,
-                  background: analyzing ? C.accentDim : C.accent,
-                  borderRadius: 12,
-                  padding: "14px",
-                  textAlign: "center",
-                  cursor: "pointer",
-                }}
-              >
-                <span
-                  style={{
-                    fontFamily: F.mono,
-                    fontSize: 11,
-                    fontWeight: 700,
-                    color: analyzing ? C.accent : "#000",
-                  }}
-                >
-                  {analyzing ? "SAVING..." : "ADD MEAL"}
-                </span>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
 
-      {/* bottom controls — only show before result */}
+      {/* Bottom Controls */}
       {!result && !error && (
         <div
           style={{
@@ -422,7 +273,6 @@ export default function PhotoAddMeal({ onBack, setMealConfirm }) {
   );
 }
 
-// placeholder — replace with real AI vision call
 async function analyzeMealPhoto(photoDataUrl) {
   await new Promise((r) => setTimeout(r, 1500));
   return {

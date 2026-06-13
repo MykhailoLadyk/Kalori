@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { C, F } from "../lib/constans";
 import { Mono } from "../components/shared/Primitives";
 
@@ -17,7 +18,8 @@ const ChevronLeft = () => (
   </svg>
 );
 
-export default function DescribeAddMeal({ onBack, setMealConfirm }) {
+export default function DescribeAddMeal() {
+  const navigate = useNavigate();
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
@@ -29,7 +31,7 @@ export default function DescribeAddMeal({ onBack, setMealConfirm }) {
       setLoading(true);
       setError(null);
       const parsed = await analyzeMealDescription(text);
-      setMealConfirm(parsed);
+      navigate("/add-meal/confirm", { state: { meal: parsed } });
     } catch (err) {
       setError("Couldn't analyze that. Try being more specific.");
     } finally {
@@ -40,11 +42,7 @@ export default function DescribeAddMeal({ onBack, setMealConfirm }) {
   const handleConfirm = async () => {
     try {
       setLoading(true);
-      // await addMeal({
-      //   ...result,
-      //   date: new Date().toISOString().split("T")[0],
-      // });
-      onBack();
+      navigate("/");
     } finally {
       setLoading(false);
     }
@@ -59,7 +57,6 @@ export default function DescribeAddMeal({ onBack, setMealConfirm }) {
         animation: "fadeIn 0.22s ease both",
       }}
     >
-      {/* header */}
       <div
         style={{
           display: "flex",
@@ -69,7 +66,7 @@ export default function DescribeAddMeal({ onBack, setMealConfirm }) {
         }}
       >
         <div
-          onClick={onBack}
+          onClick={() => navigate("/")}
           className="press"
           style={{
             width: 36,
@@ -179,7 +176,6 @@ export default function DescribeAddMeal({ onBack, setMealConfirm }) {
           </>
         ) : (
           <>
-            {/* result preview */}
             <div
               style={{
                 fontFamily: F.body,
@@ -326,7 +322,6 @@ export default function DescribeAddMeal({ onBack, setMealConfirm }) {
   );
 }
 
-// placeholder — replace with real AI call
 async function analyzeMealDescription(text) {
   await new Promise((r) => setTimeout(r, 1200));
   return {

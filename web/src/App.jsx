@@ -1,5 +1,8 @@
 import { useState } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+import Login from "./components/shared/Login";
+import ProtectedRoute from "./components/shared/ProtectedRoute";
 import Home from "./pages/Home";
 import Nav from "./components/shared/Nav";
 import Stats from "./pages/Stats";
@@ -13,67 +16,27 @@ import ConfirmMeal from "./pages/ConfirmMeal";
 
 import { UserProvider } from "./context/UserContext";
 function App() {
-  const [currentPage, setCurrentPage] = useState("home");
-  const [confirmResult, setConfirmResult] = useState(null);
-  const [confirmPhoto, setConfirmPhoto] = useState(null);
-  const [isAlbum, setIsAlbum] = useState(false);
-
-  const confirmMeal = (meal, photoData = null, isAlbum = false) => {
-    setConfirmResult(meal);
-    setConfirmPhoto(photoData);
-    setIsAlbum(isAlbum);
-    setCurrentPage("confirm");
-  };
   return (
     <>
       {/* <UserProvider> */}
-      {currentPage === "home" && (
-        <Home setCurrentPage={setCurrentPage} setMealConfirm={confirmMeal} />
-      )}
-      {currentPage === "stats" && <Stats />}
-      {currentPage === "game" && <Game />}
-      {currentPage === "shop" && <Shop />}
-      {currentPage === "settings" && <Settings />}
-      {currentPage === "photo" && (
-        <PhotoAddMeal
-          onBack={() => setCurrentPage("home")}
-          setMealConfirm={confirmMeal}
-        />
-      )}
-      {currentPage === "describe" && (
-        <DescribeAddMeal
-          onBack={() => setCurrentPage("home")}
-          setMealConfirm={confirmMeal}
-        />
-      )}
-      {currentPage === "manual" && (
-        <ManualAddMeal
-          onBack={() => setCurrentPage("home")}
-          setCurrentPage={setCurrentPage}
-        />
-      )}
-      {currentPage === "confirm" && (
-        <ConfirmMeal
-          result={confirmResult}
-          onBack={() => setCurrentPage("home")}
-          photo={confirmPhoto}
-          onRetake={() => {
-            setCurrentPage("photo");
-          }}
-          isAlbum={isAlbum}
-        />
-      )}
-
-      {currentPage !== "describe" &&
-        currentPage !== "photo" &&
-        currentPage !== "manual" &&
-        currentPage !== "confirm" && (
-          <Nav
-            active={currentPage}
-            setPage={setCurrentPage}
-            onAddMeal={setCurrentPage}
-          />
-        )}
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route element={<ProtectedRoute />}>
+            <Route element={<Nav />}>
+              <Route path="/" element={<Home />} />
+              <Route path="/stats" element={<Stats />} />
+              <Route path="/game" element={<Game />} />
+              <Route path="/shop" element={<Shop />} />
+              <Route path="/settings" element={<Settings />} />
+            </Route>
+            <Route path="/add-meal/describe" element={<DescribeAddMeal />} />
+            <Route path="/add-meal/photo" element={<PhotoAddMeal />} />
+            <Route path="/add-meal/manual" element={<ManualAddMeal />} />
+            <Route path="/add-meal/confirm" element={<ConfirmMeal />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
 
       {/* </UserProvider> */}
     </>

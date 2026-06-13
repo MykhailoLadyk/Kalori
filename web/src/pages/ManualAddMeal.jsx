@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { C, F } from "../lib/constans";
 import { Mono } from "../components/shared/Primitives";
 
@@ -32,8 +33,12 @@ const FIELD_CONFIG = [
   { key: "fat", label: "Fat", type: "number", placeholder: "g" },
 ];
 
-export default function ManualMealPage({ onBack, meal }) {
-  const { addMeal, updateMeal } = {};
+export default function ManualMealPage() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const meal = location.state?.meal;
+
+  const { updateMeal } = {};
   const isEditing = !!meal;
 
   const [form, setForm] = useState({
@@ -86,13 +91,8 @@ export default function ManualMealPage({ onBack, meal }) {
 
       if (isEditing) {
         await updateMeal(meal.id, payload);
-      } else {
-        // await addMeal({
-        //   ...payload,
-        //   date: new Date().toISOString().split("T")[0],
-        // });
       }
-      onBack();
+      navigate("/");
     } catch (err) {
       console.error(err);
     } finally {
@@ -110,7 +110,6 @@ export default function ManualMealPage({ onBack, meal }) {
         animation: "fadeIn 0.22s ease both",
       }}
     >
-      {/* header */}
       <div
         style={{
           display: "flex",
@@ -120,7 +119,7 @@ export default function ManualMealPage({ onBack, meal }) {
         }}
       >
         <div
-          onClick={onBack}
+          onClick={() => navigate("/")}
           className="press"
           style={{
             width: 36,
@@ -157,7 +156,6 @@ export default function ManualMealPage({ onBack, meal }) {
           flexDirection: "column",
         }}
       >
-        {/* meal type selector */}
         <div style={{ marginBottom: 16 }}>
           <Mono size={8} color={C.mutedLight}>
             Meal Type
@@ -194,7 +192,6 @@ export default function ManualMealPage({ onBack, meal }) {
           </div>
         </div>
 
-        {/* fields */}
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {FIELD_CONFIG.map(({ key, label, type, placeholder }) => (
             <div key={key}>
@@ -230,7 +227,6 @@ export default function ManualMealPage({ onBack, meal }) {
                   color: C.text,
                   outline: "none",
                   transition: "border-color 0.2s",
-                  // larger touch target on mobile
                   minHeight: 46,
                 }}
                 onFocus={(e) =>
@@ -250,7 +246,6 @@ export default function ManualMealPage({ onBack, meal }) {
 
         <div style={{ flex: 1 }} />
 
-        {/* submit */}
         <div
           onClick={!loading ? handleSubmit : undefined}
           className="hover-btn press"

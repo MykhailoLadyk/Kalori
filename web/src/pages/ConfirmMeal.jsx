@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { C, F } from "../lib/constans";
 import { Mono } from "../components/shared/Primitives";
 
@@ -26,13 +27,14 @@ const FIELD_CONFIG = [
   { key: "fat", label: "Fat", unit: "g", color: C.pink },
 ];
 
-export default function ConfirmMeal({
-  result,
-  photo,
-  onBack,
-  onRetake,
-  isAlbum,
-}) {
+export default function ConfirmMeal() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const result = location.state?.meal;
+  const photo = location.state?.photoData;
+  const isAlbum = location.state?.isAlbum;
+
   const { addMeal } = {};
   const [form, setForm] = useState({
     name: result?.name ?? "",
@@ -82,7 +84,7 @@ export default function ConfirmMeal({
         fat: Number(form.fat || 0),
         date: new Date().toISOString().split("T")[0],
       });
-      onBack();
+      navigate("/");
     } catch (err) {
       console.error(err);
     } finally {
@@ -100,7 +102,6 @@ export default function ConfirmMeal({
         animation: "fadeIn 0.22s ease both",
       }}
     >
-      {/* header */}
       <div
         style={{
           display: "flex",
@@ -110,7 +111,7 @@ export default function ConfirmMeal({
         }}
       >
         <div
-          onClick={onBack}
+          onClick={() => navigate("/")}
           className="press"
           style={{
             width: 36,
@@ -147,7 +148,6 @@ export default function ConfirmMeal({
           flexDirection: "column",
         }}
       >
-        {/* photo preview, if present */}
         {photo && (
           <div
             style={{
@@ -165,9 +165,9 @@ export default function ConfirmMeal({
               alt="meal"
               style={{ width: "100%", height: "100%", objectFit: "cover" }}
             />
-            {onRetake && !isAlbum && (
+            {!isAlbum && (
               <div
-                onClick={onRetake}
+                onClick={() => navigate("/add-meal/photo")}
                 className="hover-btn press"
                 style={{
                   position: "absolute",
@@ -207,7 +207,6 @@ export default function ConfirmMeal({
           Review and adjust before adding to your log.
         </div>
 
-        {/* meal type selector */}
         <div style={{ marginBottom: 16 }}>
           <Mono size={8} color={C.mutedLight}>
             Meal Type
@@ -244,7 +243,6 @@ export default function ConfirmMeal({
           </div>
         </div>
 
-        {/* name */}
         <div style={{ marginBottom: 14 }}>
           <div
             style={{
@@ -293,7 +291,6 @@ export default function ConfirmMeal({
           />
         </div>
 
-        {/* big calories display */}
         <div
           style={{
             background: C.card,
@@ -345,7 +342,6 @@ export default function ConfirmMeal({
           )}
         </div>
 
-        {/* macros */}
         <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
           {FIELD_CONFIG.slice(1).map(({ key, label, unit, color }) => (
             <div
@@ -404,10 +400,9 @@ export default function ConfirmMeal({
 
         <div style={{ flex: 1 }} />
 
-        {/* buttons */}
         <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
           <div
-            onClick={onBack}
+            onClick={() => navigate("/")}
             className="hover-btn press"
             style={{
               flex: 1,

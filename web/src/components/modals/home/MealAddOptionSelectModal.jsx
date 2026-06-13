@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { C, F } from "../../../lib/constans";
 import { Mono } from "../../../components/shared/Primitives";
 
@@ -85,6 +86,7 @@ const OPTIONS = [
     color: C.gold,
   },
 ];
+
 const Spinner = ({ color }) => (
   <svg
     width="20"
@@ -110,7 +112,8 @@ const Spinner = ({ color }) => (
   </svg>
 );
 
-export function MealAddOptionSelectModal({ setCurrentPage, setMealConfirm }) {
+export function MealAddOptionSelectModal() {
+  const navigate = useNavigate();
   const fileInputRef = useRef(null);
   const [albumLoading, setAlbumLoading] = useState(false);
 
@@ -119,7 +122,7 @@ export function MealAddOptionSelectModal({ setCurrentPage, setMealConfirm }) {
       fileInputRef.current?.click();
       return;
     }
-    setCurrentPage(key);
+    navigate(`/add-meal/${key}`);
   };
 
   const handleFileChange = async (e) => {
@@ -131,11 +134,16 @@ export function MealAddOptionSelectModal({ setCurrentPage, setMealConfirm }) {
     const reader = new FileReader();
     reader.onload = async () => {
       const photoDataUrl = reader.result;
-
       const result = await analyzeMealPhoto(photoDataUrl);
 
       setAlbumLoading(false);
-      setMealConfirm(result, photoDataUrl, true);
+      navigate("/add-meal/confirm", {
+        state: {
+          meal: result,
+          photoData: photoDataUrl,
+          isAlbum: true,
+        },
+      });
     };
     reader.readAsDataURL(file);
     e.target.value = "";
@@ -150,7 +158,7 @@ export function MealAddOptionSelectModal({ setCurrentPage, setMealConfirm }) {
         onChange={handleFileChange}
         style={{ display: "none" }}
       />
-      {/* title */}
+
       <div style={{ marginBottom: 20 }}>
         <div
           style={{
@@ -174,7 +182,6 @@ export function MealAddOptionSelectModal({ setCurrentPage, setMealConfirm }) {
         </div>
       </div>
 
-      {/* options */}
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         {OPTIONS.map(({ key, label, sub, icon, color }) => {
           const isAlbum = key === "album";
@@ -203,7 +210,6 @@ export function MealAddOptionSelectModal({ setCurrentPage, setMealConfirm }) {
                 transition: "opacity 0.2s",
               }}
             >
-              {/* icon container */}
               <div
                 style={{
                   width: 48,
@@ -220,7 +226,6 @@ export function MealAddOptionSelectModal({ setCurrentPage, setMealConfirm }) {
                 {icon(color)}
               </div>
 
-              {/* text */}
               <div style={{ flex: 1 }}>
                 <div
                   style={{
@@ -238,14 +243,12 @@ export function MealAddOptionSelectModal({ setCurrentPage, setMealConfirm }) {
                 </Mono>
               </div>
 
-              {/* chevron or spinner */}
               {isLoading ? (
                 <Spinner color={color} />
               ) : (
                 <span style={{ color: C.muted, fontSize: 18 }}>›</span>
               )}
 
-              {/* spinner overlay on the album card */}
               {isLoading && (
                 <div
                   style={{
@@ -269,6 +272,7 @@ export function MealAddOptionSelectModal({ setCurrentPage, setMealConfirm }) {
     </div>
   );
 }
+
 async function analyzeMealPhoto(photoDataUrl) {
   await new Promise((r) => setTimeout(r, 1500));
   return {

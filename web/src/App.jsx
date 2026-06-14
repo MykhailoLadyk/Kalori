@@ -13,7 +13,6 @@ import DescribeAddMeal from "./pages/DescribeAddMeal";
 import PhotoAddMeal from "./pages/PhotoAddMeal";
 import ManualAddMeal from "./pages/ManualAddMeal";
 import ConfirmMeal from "./pages/ConfirmMeal";
-
 import { UserProvider } from "./context/UserContext";
 function App() {
   return (

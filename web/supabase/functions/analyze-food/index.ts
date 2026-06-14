@@ -65,37 +65,210 @@ Deno.serve(async (req) => {
     const projectId = Deno.env.get("GOOGLE_CLOUD_PROJECT_ID")!;
     const accessToken = await getAccessToken();
 
-    const prompt = `You are a nutrition expert. Analyze the food in this image.
-Respond ONLY with a valid JSON object, no extra text, no markdown, no backticks.
+    const prompt = `
+    You are a food recognition and nutrition estimation engine.
 
-Use exactly this structure:
+
+
+TASK:
+
+Analyze the provided image and identify ONLY foods that are visibly present.
+
+
+
+OUTPUT REQUIREMENT:
+
+Return ONLY a single valid JSON object.
+
+Do not return markdown.
+
+Do not return explanations.
+
+Do not return code fences.
+
+Do not return any text before or after the JSON.
+
+
+
+JSON SCHEMA (must match exactly):
+
+
+
 {
-  "foods": [
-    {
-      "name": "food item name",
-      "portion": "estimated portion e.g. 150g or 1 cup",
-      "calories": 000,
-      "protein_g": 00,
-      "carbs_g": 00,
-      "fat_g": 00,
-      "fiber_g": 00
-    }
-  ],
-  "meal_total": {
-    "calories": 000,
-    "protein_g": 00,
-    "carbs_g": 00,
-    "fat_g": 00,
-    "fiber_g": 00
-  },
-  "confidence": "high | medium | low",
-  "notes": "any caveats about the estimate"
+
+"foods": [
+
+{
+
+"name": "string",
+
+"portion": "string",
+
+"calories": 0,
+
+"protein_g": 0,
+
+"carbs_g": 0,
+
+"fat_g": 0,
+
+"fiber_g": 0
+
 }
-Rules:
-- List each food item separately in the foods array
-- All numbers must be integers, no decimals
-- If no food detected return { "error": "No food detected" }
-- Never return anything outside the JSON object`;
+
+],
+
+"meal_total": {
+
+"calories": 0,
+
+"protein_g": 0,
+
+"carbs_g": 0,
+
+"fat_g": 0,
+
+"fiber_g": 0
+
+},
+
+"confidence": "high",
+
+"notes": "string"
+
+}
+
+
+
+MANDATORY RULES:
+
+
+
+JSON ONLY
+
+Output must begin with "{"
+
+Output must end with "}"
+
+No markdown
+
+No code fences
+
+No comments
+
+No extra keys
+
+No omitted keys
+
+FOOD DETECTION
+
+Identify only foods that are clearly visible.
+
+Never infer hidden ingredients.
+
+Never infer cooking oils, butter, sauces, seasonings, dressings, toppings, fillings, or side dishes unless visibly present.
+
+Never add foods that are not visible.
+
+PORTION ESTIMATION
+
+Estimate portion from visible size only.
+
+Use units such as:
+
+"100g"
+
+"250g"
+
+"1 cup"
+
+"2 slices"
+
+"1 piece"
+
+If uncertain, provide best estimate and mention uncertainty in notes.
+
+NUTRITION VALUES
+
+All nutrition values must be integers.
+
+Round to nearest whole number.
+
+No decimals.
+
+No strings for numeric fields.
+
+MULTIPLE FOODS
+
+Each visible food must appear as exactly one item in the foods array.
+
+Do not split a single visible food into ingredients unless visually distinguishable.
+
+TOTALS
+
+meal_total values must equal the sum of all food items after rounding.
+
+CONFIDENCE
+
+high = food clearly visible and recognizable
+
+medium = food recognizable but portion uncertain
+
+low = food partially visible, blurry, distant, obstructed, or ambiguous
+
+NO FOOD DETECTED
+
+If no identifiable food is visible, return EXACTLY:
+
+
+
+{"error":"No food detected"}
+
+
+
+INVALID IMAGE
+
+If the image is missing, unreadable, corrupted, contains only text, contains only people, contains only objects, or contains no food, return EXACTLY:
+
+
+
+{"error":"No food detected"}
+
+
+
+HALLUCINATION PREVENTION
+
+Never guess ingredients.
+
+Never guess recipes.
+
+Never guess preparation methods.
+
+Never guess oils.
+
+Never guess condiments.
+
+Never guess beverages unless visible.
+
+Never guess side dishes outside the image.
+
+STRICT VALIDATION
+
+Before responding, verify:
+
+JSON is valid.
+
+All required fields exist.
+
+All numbers are integers.
+
+meal_total equals sum of foods.
+
+confidence is one of: high, medium, low.
+
+Output contains nothing except the JSON object.
+`
+;
 
     const response = await fetch(
       `https://us-central1-aiplatform.googleapis.com/v1/projects/${projectId}/locations/us-central1/publishers/google/models/gemini-2.5-flash-lite:generateContent`,

@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { C, F } from "../lib/constans";
 import { Mono } from "../components/shared/Primitives";
-
+import analyzeFood from "../services/analyzeFood";
 const ChevronLeft = () => (
   <svg
     width="18"
@@ -97,8 +97,12 @@ export default function PhotoAddMeal() {
     try {
       setAnalyzing(true);
       setError(null);
-      const parsed = await analyzeMealPhoto(photo);
-      setResult(parsed);
+      const res = await analyzeFood(photo);
+      console.log("Analyze response:", res);
+
+      const parsed = JSON.parse(res);
+      console.log("Analyze response:", parsed);
+      setResult(true);
 
       navigate("/add-meal/confirm", {
         state: {
@@ -107,7 +111,8 @@ export default function PhotoAddMeal() {
           isAlbum: false,
         },
       });
-    } catch {
+    } catch (err) {
+      console.error(err);
       setError("Couldn't analyze the photo. Try retaking it.");
     } finally {
       setAnalyzing(false);

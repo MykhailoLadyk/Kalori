@@ -60,7 +60,41 @@ Deno.serve(async (req) => {
             role: "user",
             parts: [{
               text:
-                `ONLY give me macros of the ${description} in JSON format with keys: calories, carbs, protein, fat. Do not include any other text or explanation.`,
+`
+You are a nutrition expert. Analyze the provided text description of a meal(${description})
+Respond ONLY with a valid, raw JSON object. Do not include any conversational text, no markdown formatting, and absolutely no code fences or backticks 
+
+Use exactly this structure:
+{
+  "foods": [
+    {
+      "name": "food item name",
+      "portion": "estimated portion e.g. 150g or 1 cup",
+      "calories": 000,
+      "protein_g": 00,
+      "carbs_g": 00,
+      "fat_g": 00,
+      "fiber_g": 00
+    }
+  ],
+  "meal_total": {
+    "calories": 000,
+    "protein_g": 00,
+    "carbs_g": 00,
+    "fat_g": 00,
+    "fiber_g": 00
+  },
+  "confidence": "high | medium | low",
+  "notes": "any caveats about the estimate or missing portion details"
+}
+
+Strict Extraction Rules:
+1. EXCLUSIVITY: Extract ONLY the specific food items explicitly mentioned in the user's text description. Do NOT invent, assume, or append any extra ingredients, sides, condiments, or cooking oils (such as chicken, broccoli, or olive oil) if they are not explicitly written.
+2. MINIMAL INPUT HANDLING: If the user input contains only one food item (e.g., "rice"), the "foods" array must contain exactly one object for that specific item. 
+3. MACRONUTRIENT ACCURACY: Calculate nutritional values based strictly on the items provided. All numbers must be integers (round to the nearest whole number).
+4. NO FOOD RULE: If the text description does not contain legible food items, or if no food can be identified, return exactly this object: { "error": "No food detected" }
+5. VALIDATION: Output must begin with '{' and end with '}'. Never return any content outside the single JSON object. Do not use training examples as fallback data.
+ `,
             }],
           }],
         }),

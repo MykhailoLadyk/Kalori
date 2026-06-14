@@ -37,11 +37,11 @@ export default function ConfirmMeal() {
 
   const { addMeal } = {};
   const [form, setForm] = useState({
-    name: result?.name ?? "",
-    calories: result?.calories ?? "",
-    protein: result?.protein ?? "",
-    carbs: result?.carbs ?? "",
-    fat: result?.fat ?? "",
+    name: result?.foods[0]?.name ?? "",
+    calories: result?.meal_total?.calories ?? "",
+    protein: result?.meal_total?.protein_g ?? "",
+    carbs: result?.meal_total?.carbs_g ?? "",
+    fat: result?.meal_total?.fat_g ?? "",
     type: result?.type ?? "Breakfast",
   });
 

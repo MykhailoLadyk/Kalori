@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { C, F } from "../lib/constans";
 import { Mono } from "../components/shared/Primitives";
+import analyzeFoodDesc from "../services/analyzeFoodDesc";
 
 const ChevronLeft = () => (
   <svg
@@ -30,10 +31,14 @@ export default function DescribeAddMeal() {
     try {
       setLoading(true);
       setError(null);
-      const parsed = await analyzeMealDescription(text);
+      const res = await analyzeFoodDesc(text);
+      console.log("Analyze response:", res);
+
+      const parsed = JSON.parse(res);
       navigate("/add-meal/confirm", { state: { meal: parsed } });
     } catch (err) {
       setError("Couldn't analyze that. Try being more specific.");
+      console.error(err);
     } finally {
       setLoading(false);
     }

@@ -5,8 +5,10 @@ function fileToBase64(file) {
     const reader = new FileReader();
 
     reader.onload = () => {
-      const base64 = reader.result.split(",")[1];
-      resolve(base64);
+      const dataUrl = reader.result;
+      const parts = String(dataUrl).split(",");
+      const base64 = parts[1];
+      resolve({ base64, mimeType: file.type || "image/jpeg" });
     };
 
     reader.onerror = () => reject(new Error("Failed to read image file"));
@@ -15,18 +17,45 @@ function fileToBase64(file) {
   });
 }
 
-export default async function analyzeFoodImage(imageFile) {
-  const imageBase64 = await fileToBase64(imageFile);
+function dataUrlToBase64(dataUrl) {
+  const match = String(dataUrl).match(/^data:(.+);base64,(.*)$/);
+  if (!match) throw new Error("Invalid data URL");
+  return { base64: match[2], mimeType: match[1] };
+}
+
+export default async function analyzeFood(imageInput) {
+  let imageBase64;
+  let mimeType;
+
+  if (typeof imageInput === "string" && imageInput.startsWith("data:")) {
+    // data URL passed (from file reader or canvas.toDataURL)
+    const res = dataUrlToBase64(imageInput);
+    imageBase64 = res.base64;
+    mimeType = res.mimeType;
+  } else if (imageInput instanceof File) {
+    // File object passed
+    const res = await fileToBase64(imageInput);
+    imageBase64 = res.base64;
+    mimeType = res.mimeType;
+  } else {
+    throw new Error("analyzeFood expects a File or a data URL string");
+  }
+
+  const payload = { imageBase64, mimeType };
 
   const { data, error } = await supabase.functions.invoke("analyze-food", {
-    body: {
-      imageBase64,
-      mimeType: imageFile.type,
-    },
+    // ensure body is a JSON string and content-type header is set
+    body: JSON.stringify(payload),
+    headers: { "Content-Type": "application/json" },
   });
 
   if (error) throw error;
-  if (data.error) throw new Error(data.error);
-  console.log(data);
-  return data;
+  if (!data) throw new Error("Empty response from analyze-food function");
+
+  // supabase may return the function response directly or wrapped;
+  // try to normalize: if data.body exists use it, otherwise return data itself.
+  const normalized = typeof data === "object" && data?.body ? data.body : data;
+
+  // normalized is expected to be a JSON string (the function returns JSON.stringify(text))
+  return normalized;
 }

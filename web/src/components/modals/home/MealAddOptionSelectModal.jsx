@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { C, F } from "../../../lib/constans";
 import { Mono } from "../../../components/shared/Primitives";
+import analyzeFood from "../../../services/analyzeFood";
 
 const OPTIONS = [
   {
@@ -134,12 +135,14 @@ export function MealAddOptionSelectModal() {
     const reader = new FileReader();
     reader.onload = async () => {
       const photoDataUrl = reader.result;
-      const result = await analyzeMealPhoto(photoDataUrl);
+      const res = await analyzeFood(photoDataUrl);
+      console.log("Analyze response:", res);
+      const parsed = JSON.parse(res);
 
       setAlbumLoading(false);
       navigate("/add-meal/confirm", {
         state: {
-          meal: result,
+          meal: parsed,
           photoData: photoDataUrl,
           isAlbum: true,
         },

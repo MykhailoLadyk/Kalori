@@ -8,13 +8,22 @@ import CountUp from "../components/shared/CountUp";
 import StatsBarChart from "../components/stats/StatsBarChart";
 import StatsItemQuick from "../components/stats/StatsItemQuick";
 import StatsMacroSplit from "../components/stats/StatsMacroSplit";
+import { useGameStats } from "../hooks/useGameStats";
+import { useMeals } from "../hooks/useMeals";
+import { useUser } from "../hooks/useUser";
 export default function Stats() {
+  const { gameData } = useGameStats();
+  const { rangeMeals, fetchMealsByRange } = useMeals();
+  const { user } = useUser();
   const [period, setPeriod] = useState("W");
+
+  const meals = rangeMeals;
   const cals = [1840, 2200, 1650, 2000, 1360, 0, 0];
   const protein = [88, 102, 74, 95, 64, 0, 0];
   const water = [2.1, 1.8, 2.5, 2.2, 1.4, 0, 0];
-  const goal = 2000,
-    max = 2400;
+  const goal = user?.targets.calories || 2000;
+  const max = 2400;
+
   const quickStats = [
     {
       label: "Avg Calories",
@@ -97,7 +106,7 @@ export default function Stats() {
                   lineHeight: 1,
                 }}
               >
-                <CountUp to={7} duration={800} delay={100} /> days
+                <CountUp to={gameData.streak} duration={800} delay={100} /> days
               </div>
             </div>
           </div>
@@ -105,7 +114,10 @@ export default function Stats() {
             {["W", "M", "3M"].map((p) => (
               <div
                 key={p}
-                onClick={() => setPeriod(p)}
+                onClick={() => {
+                  setPeriod(p);
+                  fetchMealsByRange(p);
+                }}
                 className="press"
                 style={{
                   width: 32,

@@ -48,7 +48,7 @@ export function MealCard({ meal, color, type }) {
             }}
           >
             <svg width="20" height="20" viewBox="0 0 32 32" fill="none">
-              {type === "Breakfast" && (
+              {type === "breakfast" && (
                 <>
                   <circle cx="16" cy="18" r="10" fill={color} opacity="0.2" />
                   <circle
@@ -73,7 +73,7 @@ export function MealCard({ meal, color, type }) {
                   />
                 </>
               )}
-              {type === "Lunch" && (
+              {type === "lunch" && (
                 <>
                   <rect
                     x="5"
@@ -102,7 +102,7 @@ export function MealCard({ meal, color, type }) {
                   />
                 </>
               )}
-              {type === "Dinner" && (
+              {type === "dinner" && (
                 <>
                   <path
                     d="M7 8V24"
@@ -141,7 +141,7 @@ export function MealCard({ meal, color, type }) {
                   />
                 </>
               )}
-              {type === "Snacks" && (
+              {type === "snacks" && (
                 <>
                   <path
                     d="M12 8C12 8 10 11 10 14"
@@ -186,13 +186,13 @@ export function MealCard({ meal, color, type }) {
                 display: "flex",
               }}
             >
-              {meal.n}
+              {meal.name}
             </span>
             <div style={{ display: "flex", gap: 6, marginTop: 4 }}>
               {[
-                { l: "P", v: meal.p, col: C.blue },
-                { l: "C", v: meal.c, col: C.gold },
-                { l: "F", v: meal.f, col: C.pink },
+                { l: "P", v: meal.protein, col: C.blue },
+                { l: "C", v: meal.carbs, col: C.gold },
+                { l: "F", v: meal.fat, col: C.pink },
               ].map(({ l, v, col }) => (
                 <span
                   key={l}
@@ -225,7 +225,7 @@ export function MealCard({ meal, color, type }) {
                 color: C.soft,
               }}
             >
-              {meal.cal}
+              {meal.calories} kcal
             </span>
             <div
               style={{

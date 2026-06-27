@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { C, F } from "../../../lib/constans";
-// import { useMeals } from "../../../hooks/useMeals";
+import { useMeals } from "../../../hooks/useMeals";
 import { Mono } from "../../shared/Primitives";
 
-const mealTypes = ["Breakfast", "Lunch", "Dinner", "Snacks"];
+const mealTypes = ["breakfast", "lunch", "dinner", "snacks"];
 
 const formTypes = [
   {
@@ -19,30 +19,33 @@ const formTypes = [
 ];
 
 export function MealEditModal({ meal, handleClose }) {
+  const { updateMeal, loading } = useMeals();
   const [form, setForm] = useState({
-    name: meal?.n ?? "",
-    calories: meal?.cal ?? "",
-    protein: meal?.p ?? "",
-    carbs: meal?.c ?? "",
-    fat: meal?.f ?? "",
-    type: meal?.type ?? "Breakfast",
+    name: meal?.name ?? "",
+    calories: meal?.calories ?? "",
+    protein: meal?.protein ?? "",
+    carbs: meal?.carbs ?? "",
+    fat: meal?.fat ?? "",
+    type: meal?.type ?? "breakfast",
   });
 
   const [formErrors, setFormErrors] = useState({});
-  /// Change to loading from context later
-  const [loading, setLoading] = useState(false);
 
   const validate = () => {
     const newErrors = {};
     if (!form.name.trim()) newErrors.name = "Name is required";
-    if (form.calories < 0) newErrors.calories = "Cannot be negative";
-    if (form.protein < 0) newErrors.protein = "Cannot be negative";
-    if (form.carbs < 0) newErrors.carbs = "Cannot be negative";
-    if (form.fat < 0) newErrors.fat = "Cannot be negative";
-    if (!form.calories) newErrors.calories = "Calories are required";
-    if (!form.protein) newErrors.protein = "Protein is required";
-    if (!form.carbs) newErrors.carbs = "Carbs are required";
-    if (!form.fat) newErrors.fat = "Fat is required";
+
+    const numericKeys = ["calories", "protein", "carbs", "fat"];
+    numericKeys.forEach((k) => {
+      const val = form[k];
+      const n = Number(val);
+      if (val === "" || val === null || val === undefined || isNaN(n)) {
+        newErrors[k] = `${k.charAt(0).toUpperCase() + k.slice(1)} is required`;
+      } else if (n < 0) {
+        newErrors[k] = "Cannot be negative";
+      }
+    });
+
     return newErrors;
   };
 
@@ -58,7 +61,15 @@ export function MealEditModal({ meal, handleClose }) {
       return;
     }
 
-    /// Context call here
+    const payload = {
+      ...form,
+      calories: Number(form.calories),
+      protein: Number(form.protein),
+      carbs: Number(form.carbs),
+      fat: Number(form.fat),
+    };
+
+    updateMeal(meal.name, payload);
     handleClose();
   };
 

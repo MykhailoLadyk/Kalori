@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { C, F } from "../../../lib/constans";
+import { useUser } from "../../../hooks/useUser";
 
 const LANGUAGES = [
   { code: "en", label: "English", flag: "🇬🇧" },
@@ -10,15 +11,16 @@ const LANGUAGES = [
   { code: "uk", label: "Ukrainian", flag: "🇺🇦" },
 ];
 
-export default function LanguageModal({ onClose }) {
-  const [selected, setSelected] = useState("en");
+export default function LanguageModal({ handleClose }) {
+  const { user, updateUser } = useUser();
+  const [selected, setSelected] = useState(user?.settings?.language || "en");
   const [loading, setLoading] = useState(false);
 
   const handleSave = async () => {
     try {
       setLoading(true);
-      await updateUser({ language: selected });
-      onClose();
+      await updateUser({ settings: { language: selected } });
+      handleClose();
     } finally {
       setLoading(false);
     }

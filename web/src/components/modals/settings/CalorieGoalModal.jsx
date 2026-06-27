@@ -1,8 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { C, F } from "../../../lib/constans";
 import { Mono } from "../../../components/shared/Primitives";
+import { useUser } from "../../../hooks/useUser";
 
-export default function CalorieGoalModal({ onClose }) {
+export default function CalorieGoalModal({ handleClose }) {
+  const { user, updateUser } = useUser();
+
   const GOALS = [
     { key: "lose", label: "Lose weight" },
     { key: "maintain", label: "Maintain" },
@@ -16,21 +19,39 @@ export default function CalorieGoalModal({ onClose }) {
     { key: "very_active", label: "Very Active", sub: "Twice a day" },
   ];
 
-  const [calorieGoal, setCalorieGoal] = useState(2000);
-  const [waterGoal, setWaterGoal] = useState(2500);
+  const [calorieGoal, setCalorieGoal] = useState(user.targets.calories || 2000);
+  const [waterGoal, setWaterGoal] = useState(user.targets.water || 2000);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
-    goal: "maintain",
-    activity_level: "moderate",
+    goal: user?.settings?.weight_goal || "maintain",
+    activity_level: user?.settings?.activity_level || "moderate",
   });
+
+  useEffect(() => {
+    if (user?.settings) {
+      setCalorieGoal(user.targets.calories);
+      setWaterGoal(user.targets.water);
+      setForm({
+        goal: user.settings.weight_goal || "maintain",
+        activity_level: user.settings.activity_level || "moderate",
+      });
+    }
+  }, [user]);
+
   const handleSave = async () => {
     try {
       setLoading(true);
       await updateUser({
-        calorie_goal: Number(calorieGoal),
-        water_goal: Number(waterGoal),
+        targets: {
+          calories: Number(calorieGoal),
+          water: Number(waterGoal),
+        },
+        settings: {
+          weight_goal: form.goal,
+          activity_level: form.activity_level,
+        },
       });
-      onClose();
+      handleClose();
     } finally {
       setLoading(false);
     }

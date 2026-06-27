@@ -1,61 +1,65 @@
 import { useState } from "react";
-import { C, F } from "../lib/constans";
+import {
+  C,
+  achievements as achievementDefinitions,
+  levels,
+} from "../lib/constans";
 import { SectionLabel } from "../components/shared/Primitives";
 import { QuestList } from "../components/shared/QuestList";
-import {
-  QuestMealIcon,
-  QuestProteinIcon,
-  QuestWaterIcon,
-} from "../components/shared/DuoIcon";
-
 import GameCard from "../components/game/GameCard";
 import Achievements from "../components/game/Achievements";
 import { Modal } from "../components/modals/Modal";
 import AchievementsModal from "../components/modals/game/AchievementsModal";
+import { useGameStats } from "../hooks/useGameStats";
 
 export default function Game() {
   const [modal, setModal] = useState(null);
 
-  const gameStats = {
-    level: 12,
-    xp: 850,
-    xpToNext: 1200,
+  const {
+    gameData,
+    achievements: userAchievements,
+    quests,
+    shopItems,
+  } = useGameStats();
+  let level = 0;
+  for (let [lvl, xp] of Object.entries(levels)) {
+    if (gameData.xp_total >= xp) {
+      level = parseInt(lvl);
+    } else {
+      break;
+    }
+  }
+
+  const cardGameStats = {
+    level: level,
+    xp: gameData.xp_total - levels[level],
+    xpToNext: levels[level + 1] - levels[level],
+    streak: gameData.streak,
+    streakShields: shopItems.streak_shields,
   };
 
-  const achievements = [
-    { name: "Early Bird", unlocked: true, color: C.gold },
-    { name: "Protein King", unlocked: true, color: C.blue },
-    { name: "Water Lover", unlocked: true, color: C.blue },
-    { name: "7 Day Streak", unlocked: false, color: C.orange },
-    { name: "Meal Master", unlocked: false, color: C.accent },
-  ];
-
-  const quests = [
-    {
-      Icon: QuestMealIcon,
-      name: "Log 3 meals today",
-      xp: 50,
-      pct: 66,
-      type: "Daily",
-      color: C.accent,
-    },
-    {
-      Icon: QuestWaterIcon,
-      name: "Drink 2.5L water",
-      xp: 30,
-      pct: 56,
-      type: "Daily",
-      color: C.accent,
-    },
-    {
-      Icon: QuestProteinIcon,
-      name: "Protein goal 3 days",
-      xp: 120,
-      pct: 33,
-      type: "Weekly",
-      color: C.gold,
-    },
-  ];
+  const achievementById = new Map(
+    (userAchievements || []).map((achievement) => [
+      achievement.id,
+      achievement,
+    ]),
+  );
+  const achievements = achievementDefinitions.map((achievement) => {
+    const userAchievement = achievementById.get(achievement.id);
+    const max = achievement.max ?? 1;
+    const progress = Math.min(userAchievement?.progress ?? 0, max);
+    const done = progress >= max;
+    return {
+      ...achievement,
+      ...(userAchievement || {}),
+      desc: achievement.description,
+      progress,
+      max,
+      done,
+      unlocked: done,
+      pct: max > 0 ? (progress / max) * 100 : 0,
+    };
+  });
 
   return (
     <>
@@ -66,33 +70,10 @@ export default function Game() {
             marginBottom: 24,
             animation: "fadeUp 0.4s ease both",
           }}
-        >
-          <div
-            style={{
-              fontFamily: F.mono,
-              fontSize: 8,
-              color: C.mutedLight,
-              letterSpacing: 2,
-              textTransform: "uppercase",
-            }}
-          >
-            Level & Progress
-          </div>
-          <div
-            style={{
-              fontFamily: F.head,
-              fontSize: 20,
-              fontWeight: 900,
-              color: C.text,
-              marginTop: 2,
-            }}
-          >
-            Game Stats
-          </div>
-        </div>
+        ></div>
 
         <div style={{ animation: "fadeUp 0.4s ease 0.1s both" }}>
-          <GameCard {...gameStats} />
+          <GameCard {...cardGameStats} />
         </div>
 
         <div style={{ animation: "fadeUp 0.4s ease 0.2s both" }}>
@@ -105,7 +86,7 @@ export default function Game() {
         <div style={{ animation: "fadeUp 0.4s ease 0.3s both" }}>
           <SectionLabel>Active Quests</SectionLabel>
           <div style={{ marginTop: 10 }}>
-            <QuestList quests={quests} />
+            <QuestList />
           </div>
         </div>
       </div>

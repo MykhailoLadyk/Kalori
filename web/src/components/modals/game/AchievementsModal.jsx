@@ -18,8 +18,10 @@ export default function AchievementsModal({ achievements, handleClose }) {
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         {achievements.map((a, i) => {
-          const done = a.done ?? a.unlocked;
-          const pct = a.pct ?? 0;
+          const max = a.max ?? 1;
+          const progress = Math.min(a.progress ?? 0, max);
+          const done = progress >= max;
+          const pct = max > 0 ? (progress / max) * 100 : 0;
           const Icon = a.Icon;
           return (
             <div
@@ -94,15 +96,22 @@ export default function AchievementsModal({ achievements, handleClose }) {
                       fontFamily: F.body,
                       fontSize: 11,
                       color: C.soft,
-                      marginBottom: done ? 0 : 5,
+                      marginBottom: 5,
                     }}
                   >
                     {a.desc}
                   </div>
                 )}
-                {!done && pct > 0 && (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                  }}
+                >
                   <div
                     style={{
+                      flex: 1,
                       height: 4,
                       background: C.border,
                       borderRadius: 4,
@@ -113,13 +122,25 @@ export default function AchievementsModal({ achievements, handleClose }) {
                       style={{
                         height: "100%",
                         width: `${pct}%`,
-                        background: C.accent,
+                        background: done ? C.accent : C.blue,
                         borderRadius: 4,
                         transition: "width 0.8s cubic-bezier(0.22,1,0.36,1)",
                       }}
                     />
                   </div>
-                )}
+                  <div
+                    style={{
+                      fontFamily: F.mono,
+                      fontSize: 8,
+                      fontWeight: 700,
+                      color: done ? C.accent : C.soft,
+                      minWidth: 32,
+                      textAlign: "right",
+                    }}
+                  >
+                    {progress}/{max}
+                  </div>
+                </div>
               </div>
               {typeof a.xp !== "undefined" && (
                 <div

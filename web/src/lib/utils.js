@@ -18,21 +18,8 @@ export function getDayName(date) {
       return "Unknown";
   }
 }
-const MONTHS = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
 
+import { MONTHS } from "./constans.js";
 export function getMonthName(date) {
   const index =
     typeof date === "number"

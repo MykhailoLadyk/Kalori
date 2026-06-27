@@ -1,15 +1,51 @@
 import { C, F } from "../../../lib/constans";
 import { Tag } from "../../shared/Primitives";
 import { IconCoin } from "../../shared/DuoIcon";
+import { useUser } from "../../../hooks/useUser";
+import { useGameStats } from "../../../hooks/useGameStats";
+export default function ShopThemesModal({ themes = [], currentTheme, coins }) {
+  const { updateUser } = useUser();
+  const { updateShopItems, shopItems, updateGameData, gameData } =
+    useGameStats();
+  const onPurchase = async (themeId) => {
+    const theme = themes.find((t) => t.id === themeId);
+    if (!theme) return;
 
-// - props: themes[], currentTheme, coins, onPurchase, onClose
+    if (coins < theme.price) {
+      alert("Not enough coins to purchase this theme.");
+      return;
+    }
 
-export default function ShopThemesModal({
-  themes = [],
-  currentTheme,
-  coins,
-  onPurchase,
-}) {
+    await updateUser({
+      settings: {
+        theme: theme.id,
+      },
+    });
+    await updateShopItems({
+      themesOwned: [...(shopItems?.themesOwned || []), theme.id],
+    });
+    await updateGameData({
+      coins: gameData.coins - theme.price,
+    });
+  };
+
+  const handleThemeClick = async (theme, isLocked, isCurrent, isOwned) => {
+    if (isLocked) return;
+
+    if (isOwned) {
+      if (isCurrent) return;
+
+      await updateUser({
+        settings: {
+          theme: theme.id,
+        },
+      });
+      return;
+    }
+
+    await onPurchase(theme.id);
+  };
+
   return (
     <div>
       <div
@@ -24,22 +60,25 @@ export default function ShopThemesModal({
         Themes
       </div>
 
-      {themes.map(({ id, name, colors, price, lock, active }, i) => {
-        const isActive = active || id === currentTheme;
+      {themes.map(({ id, name, colors, price, lock, owned }, i) => {
+        const isCurrent = String(id) === String(currentTheme);
+        const isOwned = Boolean(owned);
         const isLocked = Boolean(lock);
         return (
           <div
             key={id ?? name}
-            className="hover-card press"
-            onClick={() => (!isLocked && !isActive ? onPurchase?.(id) : null)}
+            className="press"
+            onClick={() =>
+              handleThemeClick({ id }, isLocked, isCurrent, isOwned)
+            }
             style={{
               background: C.card,
               borderRadius: 14,
               overflow: "hidden",
-              border: `1px solid ${isActive ? C.accent : C.border}`,
+              border: `1px solid ${isCurrent ? C.accent : C.border}`,
               marginBottom: 8,
               opacity: isLocked ? 0.5 : 1,
-              animation: `fadeUp 0.35s ease ${i * 50}ms both`,
+              transition: "all 0.2s ease",
             }}
           >
             <div style={{ display: "flex", height: 50 }}>
@@ -68,8 +107,10 @@ export default function ShopThemesModal({
                 </div>
                 {lock && <Tag color={C.gold}>{lock} required</Tag>}
               </div>
-              {isActive ? (
+              {isCurrent ? (
                 <Tag color={C.accent}>Active</Tag>
+              ) : isOwned ? (
+                <Tag color={C.blue}>Owned</Tag>
               ) : (
                 <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
                   <IconCoin size={14} color={C.gold} />

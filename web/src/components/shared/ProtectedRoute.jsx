@@ -1,21 +1,18 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
-
+import { useUser } from "../../hooks/useUser";
 export default function ProtectedRoute() {
-  //   const { user, isLoading } = useUser();
-  const isLoading = false;
-  const user = true;
+  const { user, loading } = useUser();
+  const userAuth = user?.userAuth;
+  const userOnboarding = user?.completedOnboarding;
   const location = useLocation();
-  if (isLoading) {
+  if (loading) {
     return <div>Loading authentication session...</div>;
   }
-  if (!user) {
-    return (
-      <Navigate
-        to="/login"
-        state={{ from: location }}
-        replace // Replace the history entry so the back button doesn't trap the user
-      />
-    );
+  if (!userAuth) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+  if (userAuth && !userOnboarding) {
+    return <Navigate to="/onboarding" state={{ from: location }} replace />;
   }
   return <Outlet />;
 }

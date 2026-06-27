@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { C, F } from "../../../lib/constans";
 import { Mono } from "../../../components/shared/Primitives";
+import { useUser } from "../../../hooks/useUser";
 
-export default function ProfileModal({ onClose }) {
-  // const { user, updateUser } = useUser();
+export default function ProfileModal({ handleClose }) {
+  const { user, updateUser } = useUser();
 
   const [form, setForm] = useState({
     name: "",
@@ -11,13 +12,23 @@ export default function ProfileModal({ onClose }) {
     age: "",
   });
 
+  useEffect(() => {
+    if (user) {
+      setForm({
+        name: user.name || "",
+        email: user.email || "",
+        age: user.age || "",
+      });
+    }
+  }, [user]);
+
   const [loading, setLoading] = useState(false);
 
   const handleSave = async () => {
     try {
       setLoading(true);
       await updateUser(form);
-      onClose();
+      handleClose();
     } finally {
       setLoading(false);
     }

@@ -2,6 +2,8 @@ import { useState } from "react";
 
 import { Mono } from "../components/shared/Primitives";
 import { C, F } from "../lib/constans";
+import { useUser } from "../hooks/useUser";
+import { useGameStats } from "../hooks/useGameStats";
 
 import SettingsCard from "../components/settings/SettingsCard";
 
@@ -38,6 +40,8 @@ import {
 } from "../components/shared/DuoIcon";
 
 export default function Settings() {
+  const { user } = useUser();
+  const { gameData } = useGameStats();
   const [toggles, setToggles] = useState({
     meal: true,
     water: true,
@@ -45,18 +49,18 @@ export default function Settings() {
   });
   const [modal, setModal] = useState(null);
   const modals = {
-    profile: <ProfileModal />,
-    calorieGoal: <CalorieGoalModal />,
-    bodyStats: <BodyStatsModal />,
-    language: <LanguageModal />,
-    timezone: <TimezoneModal />,
-    measurements: <MeasurementsModal />,
-    privacy: <PrivacyModal />,
-    export: <ExportModal />,
-    legal: <LegalModal />,
-    theme: <SettingsThemeModal />,
-    logout: <LogoutModal />,
-    deleteAccount: <DeleteAccountModal />,
+    profile: <ProfileModal handleClose={() => setModal(null)} />,
+    calorieGoal: <CalorieGoalModal handleClose={() => setModal(null)} />,
+    bodyStats: <BodyStatsModal handleClose={() => setModal(null)} />,
+    // language: <LanguageModal handleClose={() => setModal(null)} />,
+    timezone: <TimezoneModal handleClose={() => setModal(null)} />,
+    measurements: <MeasurementsModal handleClose={() => setModal(null)} />,
+    privacy: <PrivacyModal handleClose={() => setModal(null)} />,
+    export: <ExportModal handleClose={() => setModal(null)} />,
+    legal: <LegalModal handleClose={() => setModal(null)} />,
+    theme: <SettingsThemeModal handleClose={() => setModal(null)} />,
+    logout: <LogoutModal handleClose={() => setModal(null)} />,
+    deleteAccount: <DeleteAccountModal handleClose={() => setModal(null)} />,
   };
   const toggle = (k) => setToggles((p) => ({ ...p, [k]: !p[k] }));
 
@@ -103,7 +107,7 @@ export default function Settings() {
             flexShrink: 0,
           }}
         >
-          M
+          {user?.name?.[0]?.toUpperCase() ?? "?"}
         </div>
         <div>
           <div
@@ -114,10 +118,11 @@ export default function Settings() {
               color: C.text,
             }}
           >
-            Maria
+            {user?.name || "User"}
           </div>
           <Mono size={8} color={C.muted}>
-            Level 5 · 1,240 XP
+            Level {Math.floor(gameData?.xp_total / 100) + 1} ·{" "}
+            {gameData?.xp_total || 0} XP
           </Mono>
         </div>
       </div>
@@ -171,14 +176,14 @@ export default function Settings() {
             overflow: "hidden",
           }}
         >
-          <SettingsCard
+          {/* <SettingsCard
             onClick={() => {
               setModal("language");
             }}
             icon={<IconGlobe size={18} color={C.soft} />}
             label="Language"
             arrow
-          />
+          /> */}
           {/* <SettingsCard
             onClick={() => {
               setModal("timezone");

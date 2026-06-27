@@ -2,14 +2,24 @@ import { C, F } from "../../lib/constans";
 import { useState, useEffect } from "react";
 import CountUp from "../shared/CountUp";
 import { Mono } from "../shared/Primitives";
-export function CalorieRing({ consumed, goal }) {
+import { useUser } from "../../hooks/useUser";
+import { useMeals } from "../../hooks/useMeals";
+export function CalorieRing() {
+  const { user } = useUser();
+  const { meals } = useMeals();
+  const goal = Number(user?.targets?.calories || 0);
+  const consumed = meals.reduce(
+    (sum, meal) => sum + Number(meal.calories || 0),
+    0,
+  );
+
   const [ringAnimated, setRingAnimated] = useState(false);
   useEffect(() => {
     const t = setTimeout(() => setRingAnimated(true), 150);
     return () => clearTimeout(t);
   }, []);
   const left = goal - consumed;
-  const pct = consumed / goal;
+  const pct = goal > 0 ? consumed / goal : 0;
   const totalArc = 427;
   return (
     <div
@@ -124,7 +134,7 @@ export function CalorieRing({ consumed, goal }) {
             fontSize: 50,
           }}
         >
-          <CountUp to={left} duration={1200} delay={400} />
+          <CountUp to={Number(left)} duration={1200} delay={400} />
         </div>
         <Mono size={9} color={C.mutedLight}>
           KCAL REMAINING

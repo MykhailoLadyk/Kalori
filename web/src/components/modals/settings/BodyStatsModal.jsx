@@ -1,8 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { C, F } from "../../../lib/constans";
 import { Mono } from "../../../components/shared/Primitives";
+import { useUser } from "../../../hooks/useUser";
 
-export default function BodyStatsModal({ onClose }) {
+export default function BodyStatsModal({ handleClose }) {
+  const { user, updateUser } = useUser();
+
   const [form, setForm] = useState({
     weight: "",
     height: "",
@@ -10,6 +13,19 @@ export default function BodyStatsModal({ onClose }) {
     activity_level: "moderate",
     goal: "maintain",
   });
+
+  useEffect(() => {
+    if (user?.settings) {
+      setForm({
+        weight: user.settings.weight || "",
+        height: user.settings.height || "",
+        age: user.age || "",
+        activity_level: user.settings.activity_level || "moderate",
+        goal: user.settings.weight_goal || "maintain",
+      });
+    }
+  }, [user]);
+
   const [loading, setLoading] = useState(false);
 
   const set = (key, val) => setForm((prev) => ({ ...prev, [key]: val }));
@@ -18,13 +34,15 @@ export default function BodyStatsModal({ onClose }) {
     try {
       setLoading(true);
       await updateUser({
-        weight: Number(form.weight),
-        height: Number(form.height),
+        settings: {
+          weight: Number(form.weight),
+          height: Number(form.height),
+          weight_goal: form.goal,
+          activity_level: form.activity_level,
+        },
         age: Number(form.age),
-        activity_level: form.activity_level,
-        goal: form.goal,
       });
-      onClose();
+      handleClose();
     } finally {
       setLoading(false);
     }

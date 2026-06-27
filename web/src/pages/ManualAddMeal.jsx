@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { C, F } from "../lib/constans";
 import { Mono } from "../components/shared/Primitives";
-
+import { useMeals } from "../hooks/useMeals";
 const ChevronLeft = () => (
   <svg
     width="18"
@@ -18,7 +18,7 @@ const ChevronLeft = () => (
   </svg>
 );
 
-const MEAL_TYPES = ["Breakfast", "Lunch", "Dinner", "Snacks"];
+const MEAL_TYPES = ["breakfast", "lunch", "dinner", "snacks"];
 
 const FIELD_CONFIG = [
   {
@@ -34,12 +34,10 @@ const FIELD_CONFIG = [
 ];
 
 export default function ManualMealPage() {
+  const { addMeal } = useMeals();
   const navigate = useNavigate();
   const location = useLocation();
   const meal = location.state?.meal;
-
-  const { updateMeal } = {};
-  const isEditing = !!meal;
 
   const [form, setForm] = useState({
     name: meal?.name ?? "",
@@ -47,7 +45,7 @@ export default function ManualMealPage() {
     protein: meal?.protein ?? "",
     carbs: meal?.carbs ?? "",
     fat: meal?.fat ?? "",
-    type: meal?.type ?? "Breakfast",
+    type: meal?.type ?? "breakfast",
   });
 
   const [errors, setErrors] = useState({});
@@ -81,7 +79,7 @@ export default function ManualMealPage() {
 
     try {
       setLoading(true);
-      const payload = {
+      const meal = {
         ...form,
         calories: Number(form.calories),
         protein: Number(form.protein || 0),
@@ -89,9 +87,8 @@ export default function ManualMealPage() {
         fat: Number(form.fat || 0),
       };
 
-      if (isEditing) {
-        await updateMeal(meal.id, payload);
-      }
+      await addMeal(meal);
+
       navigate("/");
     } catch (err) {
       console.error(err);

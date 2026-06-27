@@ -3,14 +3,20 @@ import { C, F } from "../../lib/constans";
 import { Mono } from "../shared/Primitives";
 import { AnimBar } from "../shared/AnimBar";
 import { IconDrop } from "../shared/DuoIcon";
-
-export function WaterTracker({ current, goal, onAdd }) {
+import { useMeals } from "../../hooks/useMeals";
+import { useUser } from "../../hooks/useUser";
+export function WaterTracker() {
+  const { meals, addMeal } = useMeals();
+  const { user } = useUser();
+  const waterMeals = meals.filter((m) => m.name.toLowerCase() === "water");
+  const current = waterMeals.reduce((sum, m) => sum + m.amount, 0);
+  const goal = user.targets.water;
   const [inputValue, setInputValue] = useState("");
 
   const handleCustomAdd = () => {
     const amount = parseInt(inputValue);
     if (!amount || amount <= 0) return;
-    onAdd(amount);
+    addMeal({ name: "water", amount });
     setInputValue("");
   };
 
@@ -53,7 +59,7 @@ export function WaterTracker({ current, goal, onAdd }) {
               {current}ml / {goal}ml
             </Mono>
           </div>
-          <AnimBar pct={pct} color={C.blue} delay={900} />
+          <AnimBar pct={pct} color={C.blue} delay={0} />
         </div>
       </div>
 
@@ -61,7 +67,7 @@ export function WaterTracker({ current, goal, onAdd }) {
         {[250, 400].map((amount) => (
           <div
             key={amount}
-            onClick={() => onAdd(amount)}
+            onClick={() => addMeal({ name: "water", amount })}
             className="hover-btn press"
             style={{
               flex: 1,

@@ -2,10 +2,18 @@ import { C, F } from "../../../lib/constans";
 import { Mono } from "../../shared/Primitives";
 import { useState } from "react";
 import { getNumberOfDaysInMonth, getMonthName } from "../../../lib/utils";
+import { useMeals } from "../../../hooks/useMeals";
 export function DateModal({ handleClose, date, setDate }) {
   const [localDate, setLocalDate] = useState(date.getDate());
   const [localMonth, setLocalMonth] = useState(date.getMonth());
   const [selectedMonth, setSelectedMonth] = useState(date.getMonth());
+  const { setMeals } = useMeals();
+
+  const today = new Date();
+  const todayYear = today.getFullYear();
+  const todayMonth = today.getMonth();
+  const todayDay = today.getDate();
+  const todayStart = new Date(todayYear, todayMonth, todayDay);
 
   const currentYear = date.getFullYear();
   const daysInMonth = getNumberOfDaysInMonth(currentYear, localMonth);
@@ -13,7 +21,10 @@ export function DateModal({ handleClose, date, setDate }) {
   const leadingEmptyDays = (firstDayOfMonth + 6) % 7;
 
   const isPrevDisabled = localMonth === 0;
-  const isNextDisabled = localMonth === 11;
+  const isNextDisabled = localMonth === date.getMonth();
+
+  const selectedCandidate = new Date(currentYear, selectedMonth, localDate);
+  const isSelectedFuture = selectedCandidate > todayStart;
   return (
     <div>
       <div
@@ -100,9 +111,13 @@ export function DateModal({ handleClose, date, setDate }) {
         ))}
         {[...Array(daysInMonth)].map((_, i) => {
           const d = i + 1;
+          const dayDateObj = new Date(currentYear, localMonth, d);
+          const isFuture = dayDateObj > todayStart;
+
           return (
             <div
               onClick={() => {
+                if (isFuture) return;
                 setLocalDate(d);
                 setSelectedMonth(localMonth);
               }}
@@ -118,12 +133,18 @@ export function DateModal({ handleClose, date, setDate }) {
                   localDate === d && selectedMonth === localMonth
                     ? C.accent
                     : "transparent",
-                border: `1px solid ${localDate === d && selectedMonth === localMonth ? C.accent : C.border}`,
+                border: `1px solid ${
+                  localDate === d && selectedMonth === localMonth
+                    ? C.accent
+                    : C.border
+                }`,
                 transition: "all 0.15s",
                 animation:
                   localDate === d && selectedMonth === localMonth
                     ? "pulse 2s ease infinite"
                     : "none",
+                cursor: isFuture ? "default" : "pointer",
+                opacity: isFuture ? 0.5 : 1,
               }}
             >
               <span
@@ -132,8 +153,9 @@ export function DateModal({ handleClose, date, setDate }) {
                   fontSize: 13,
                   fontWeight:
                     localDate === d && selectedMonth === localMonth ? 800 : 500,
-                  color:
-                    localDate === d && selectedMonth === localMonth
+                  color: isFuture
+                    ? C.muted
+                    : localDate === d && selectedMonth === localMonth
                       ? "#000"
                       : C.text,
                 }}
@@ -144,9 +166,12 @@ export function DateModal({ handleClose, date, setDate }) {
           );
         })}
       </div>
+
       <div
         onClick={() => {
+          if (isSelectedFuture) return;
           setDate(new Date(date.getFullYear(), selectedMonth, localDate));
+          if (localDate !== date.getDate()) setMeals([]); /// Change to fetch meals later
           handleClose();
         }}
         className="hover-btn press"
@@ -160,6 +185,8 @@ export function DateModal({ handleClose, date, setDate }) {
           fontWeight: 800,
           color: "#000",
           marginTop: 14,
+          opacity: isSelectedFuture ? 0.6 : 1,
+          pointerEvents: isSelectedFuture ? "none" : "auto",
         }}
       >
         Confirm

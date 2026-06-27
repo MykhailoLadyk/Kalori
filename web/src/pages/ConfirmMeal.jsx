@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { C, F } from "../lib/constans";
 import { Mono } from "../components/shared/Primitives";
-
+import { useMeals } from "../hooks/useMeals";
+import { useGameStats } from "../hooks/useGameStats";
 const ChevronLeft = () => (
   <svg
     width="18"
@@ -18,7 +19,7 @@ const ChevronLeft = () => (
   </svg>
 );
 
-const MEAL_TYPES = ["Breakfast", "Lunch", "Dinner", "Snacks"];
+const MEAL_TYPES = ["breakfast", "lunch", "dinner", "snacks"];
 
 const FIELD_CONFIG = [
   { key: "calories", label: "Calories", unit: "kcal", color: C.accent },
@@ -28,21 +29,21 @@ const FIELD_CONFIG = [
 ];
 
 export default function ConfirmMeal() {
+  const { addMeal } = useMeals();
+  const { gameData, updateGameData } = useGameStats();
   const navigate = useNavigate();
   const location = useLocation();
 
   const result = location.state?.meal;
   const photo = location.state?.photoData;
   const isAlbum = location.state?.isAlbum;
-
-  const { addMeal } = {};
   const [form, setForm] = useState({
     name: result?.foods[0]?.name ?? "",
     calories: result?.meal_total?.calories ?? "",
     protein: result?.meal_total?.protein_g ?? "",
     carbs: result?.meal_total?.carbs_g ?? "",
     fat: result?.meal_total?.fat_g ?? "",
-    type: result?.type ?? "Breakfast",
+    type: result?.type ?? "breakfast",
   });
 
   const [errors, setErrors] = useState({});
@@ -63,7 +64,7 @@ export default function ConfirmMeal() {
     if (form.calories < 0) newErrors.calories = "Cannot be negative";
     if (form.protein < 0) newErrors.protein = "Cannot be negative";
     if (form.carbs < 0) newErrors.carbs = "Cannot be negative";
-    if (form.fat < 0) newErrors.fat = "Cannot be negative";
+    if (form.fat < 0) newErrors.fat = "Cannot be negativeeeeeeeeeeee";
     return newErrors;
   };
 
@@ -76,13 +77,14 @@ export default function ConfirmMeal() {
 
     try {
       setLoading(true);
+      const xpAwarded = 10;
+      await updateGameData({ xp_total: gameData.xp_total + xpAwarded });
       await addMeal({
         ...form,
         calories: Number(form.calories),
         protein: Number(form.protein || 0),
         carbs: Number(form.carbs || 0),
         fat: Number(form.fat || 0),
-        date: new Date().toISOString().split("T")[0],
       });
       navigate("/");
     } catch (err) {

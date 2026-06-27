@@ -1,15 +1,15 @@
 // modals/home/MealDeleteModal.jsx
 import { C, F } from "../../../lib/constans";
 import { IconTrash } from "../../shared/DuoIcon";
-// import { useMeals } from "../../hooks/useMeals";
+import { useMeals } from "../../../hooks/useMeals";
 
-export function MealDeleteModal({ meal, onClose, handleClose }) {
-  //   const { deleteMeal } = useMeals();
+export function MealDeleteModal({ meal, handleClose }) {
+  const { deleteMeal } = useMeals();
 
-  //   const handleDelete = async () => {
-  //     await deleteMeal(meal.id);
-  //     onClose();
-  //   };
+  const handleDelete = async () => {
+    await deleteMeal(meal.name);
+    handleClose();
+  };
   return (
     <div>
       {/* icon */}
@@ -63,7 +63,7 @@ export function MealDeleteModal({ meal, onClose, handleClose }) {
             marginTop: 2,
           }}
         >
-          {meal?.n}?
+          {meal?.name}?
         </div>
         <div
           style={{
@@ -98,7 +98,7 @@ export function MealDeleteModal({ meal, onClose, handleClose }) {
             color: C.text,
           }}
         >
-          {meal?.n}
+          {meal?.name}
         </span>
         <span
           style={{
@@ -108,7 +108,7 @@ export function MealDeleteModal({ meal, onClose, handleClose }) {
             color: C.soft,
           }}
         >
-          {meal?.cal} kcal
+          {meal?.calories} kcal
         </span>
       </div>
 
@@ -117,7 +117,6 @@ export function MealDeleteModal({ meal, onClose, handleClose }) {
         <div
           onClick={() => {
             handleClose();
-            // onClose();
           }}
           className="hover-btn press"
           style={{
@@ -137,7 +136,10 @@ export function MealDeleteModal({ meal, onClose, handleClose }) {
           CANCEL
         </div>
         <div
-          //   onClick={handleDelete}
+          onClick={() => {
+            handleDelete();
+            handleClose();
+          }}
           className="hover-btn press"
           style={{
             flex: 1,

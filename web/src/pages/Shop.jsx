@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { C, F } from "../lib/constans";
+import { useGameStats } from "../hooks/useGameStats";
+import { useUser } from "../hooks/useUser";
+import { C, F, levels, themesDefinitions } from "../lib/constans";
 import { Modal } from "../components/modals/Modal";
 import { Mono, Tag } from "../components/shared/Primitives";
 import {
@@ -17,42 +19,29 @@ import ChestsModal from "../components/modals/shop/chestsModal";
 
 export default function Shop() {
   const [modal, setModal] = useState(null);
+  const { gameData, shopItems } = useGameStats();
+  const { user } = useUser();
 
-  const coins = 847;
-  const themes = [
-    {
-      id: "mint",
-      name: "Midnight Mint",
-      colors: ["#0B0B12", C.accent],
-      price: 0,
-      active: true,
-    },
-    {
-      id: "warm",
-      name: "Warm Paper",
-      colors: ["#F5F0E8", "#FF4D00"],
-      price: 200,
-    },
-    {
-      id: "teal",
-      name: "Teal Night",
-      colors: ["#0E0E1A", "#00E5CC"],
-      price: 200,
-    },
-    {
-      id: "aurora",
-      name: "Aurora",
-      colors: ["#0a0014", "#cc44ff"],
-      price: 500,
-      lock: "Lv 8",
-    },
-    {
-      id: "ember",
-      name: "Ember Dark",
-      colors: ["#1a0800", "#FF8C42"],
-      price: 350,
-    },
-  ];
+  const coins = gameData.coins;
+  const themesOwned = shopItems?.themesOwned ?? [];
+
+  let level = 0;
+  for (const [lvl, xp] of Object.entries(levels)) {
+    if (gameData.xp_total >= xp) {
+      level = Number(lvl);
+    } else {
+      break;
+    }
+  }
+
+  const themes = themesDefinitions.map((theme) => {
+    const isLocked = level < theme.lvlUnlocked;
+    return {
+      ...theme,
+      owned: themesOwned.includes(theme.id),
+      lock: isLocked ? `Lv ${theme.lvlUnlocked}` : null,
+    };
+  });
   const chests = [
     {
       id: "basic",
@@ -79,12 +68,6 @@ export default function Shop() {
       drops: ["Coins ×150-500", "Epic theme", "3× Shields"],
     },
   ];
-  const shieldPacks = [
-    { qty: "1×", price: 150 },
-    { qty: "3×", price: 400 },
-    { qty: "5×", price: 600 },
-  ];
-
   const sections = [
     {
       id: "themes",
@@ -95,15 +78,15 @@ export default function Shop() {
       color: C.pink,
       preview: <ShopItemThemes previewColors={themes.map((t) => t.colors)} />,
     },
-    {
-      id: "chests",
-      label: "Chests",
-      Icon: IconTrophy,
-      desc: "Unlock random rewards",
-      count: `${chests.length} types`,
-      color: C.gold,
-      preview: <ShopItemChests colors={[C.blue, C.pink, C.gold]} />,
-    },
+    // {
+    //   id: "chests",
+    //   label: "Chests",
+    //   Icon: IconTrophy,
+    //   desc: "Unlock random rewards",
+    //   count: `${chests.length} types`,
+    //   color: C.gold,
+    //   preview: <ShopItemChests colors={[C.blue, C.pink, C.gold]} />,
+    // },
     {
       id: "other",
       label: "Other",
@@ -111,36 +94,16 @@ export default function Shop() {
       desc: "Streak shields & more",
       count: "Shields",
       color: C.orange,
-      preview: <ShopItemOther price={shieldPacks[0].price} />,
+      preview: <ShopItemOther />,
     },
   ];
 
   const modals = {
     themes: (
-      <ShopThemesModal
-        themes={themes}
-        currentTheme="mint"
-        coins={coins}
-        onPurchase={() => null}
-        onClose={() => setModal(null)}
-      />
+      <ShopThemesModal themes={themes} currentTheme={user?.settings?.theme} />
     ),
-    chests: (
-      <ChestsModal
-        coins={coins}
-        chests={chests}
-        onPurchase={() => null}
-        onClose={() => setModal(null)}
-      />
-    ),
-    other: (
-      <ShopOtherModal
-        coins={coins}
-        packs={shieldPacks}
-        onPurchase={() => null}
-        onClose={() => setModal(null)}
-      />
-    ),
+    chests: <ChestsModal />,
+    other: <ShopOtherModal />,
   };
 
   return (

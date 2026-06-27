@@ -8,7 +8,7 @@ const EXPORT_OPTIONS = [
   { key: "profile", label: "Profile Data", sub: "Your account and body stats" },
 ];
 
-export default function ExportModal({ onClose }) {
+export default function ExportModal({ handleClose }) {
   const [selected, setSelected] = useState(["meals"]);
   const [exporting, setExporting] = useState(false);
   const [done, setDone] = useState(false);

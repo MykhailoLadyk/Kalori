@@ -1,7 +1,31 @@
 import { Mono } from "../shared/Primitives";
 import { C } from "../../lib/constans";
 import { AnimBar } from "../shared/AnimBar";
-export function HomeMacros({ macros }) {
+import { useMeals } from "../../hooks/useMeals";
+import { useUser } from "../../hooks/useUser";
+export function HomeMacros() {
+  const { meals } = useMeals();
+  const { user } = useUser();
+  const macros = [
+    {
+      label: "Protein",
+      val: meals.reduce((sum, meal) => sum + Number(meal.protein || 0), 0),
+      max: user?.targets?.protein || 150,
+      color: C.blue,
+    },
+    {
+      label: "Carbs",
+      val: meals.reduce((sum, meal) => sum + Number(meal.carbs || 0), 0),
+      max: user?.targets?.carbs || 50,
+      color: C.gold,
+    },
+    {
+      label: "Fat",
+      val: meals.reduce((sum, meal) => sum + Number(meal.fat || 0), 0),
+      max: user?.targets?.fat || 70,
+      color: C.pink,
+    },
+  ];
   return (
     <div
       style={{

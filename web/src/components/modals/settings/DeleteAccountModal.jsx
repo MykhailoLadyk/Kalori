@@ -3,7 +3,7 @@ import { C, F } from "../../../lib/constans";
 import { Mono } from "../../../components/shared/Primitives";
 import { IconTrash } from "../../../components/shared/DuoIcon";
 
-export default function DeleteAccountModal({ onClose }) {
+export default function DeleteAccountModal({ handleClose }) {
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -147,7 +147,7 @@ export default function DeleteAccountModal({ onClose }) {
       {/* buttons */}
       <div style={{ display: "flex", gap: 10 }}>
         <div
-          onClick={onClose}
+          onClick={handleClose}
           className="hover-btn press"
           style={{
             flex: 1,

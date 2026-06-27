@@ -19,7 +19,7 @@ const SECTIONS = [
   },
 ];
 
-export default function PrivacyModal({ onClose }) {
+export default function PrivacyModal({ handleClose }) {
   return (
     <div>
       <div
@@ -71,7 +71,7 @@ export default function PrivacyModal({ onClose }) {
       </div>
 
       <div
-        onClick={onClose}
+        onClick={handleClose}
         className="hover-btn press"
         style={{
           marginTop: 20,

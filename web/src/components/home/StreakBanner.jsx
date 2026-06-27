@@ -1,7 +1,11 @@
 import { C, F } from "../../lib/constans";
 import { Mono } from "../shared/Primitives";
 import { IconFire, IconShield } from "../shared/DuoIcon";
-export function StreakBanner({ streak, shields }) {
+import { useGameStats } from "../../hooks/useGameStats";
+export function StreakBanner() {
+  const { gameData, shopItems } = useGameStats();
+  const streak = gameData?.streak;
+  const shields = shopItems?.streak_shields || 0;
   return (
     <div
       style={{

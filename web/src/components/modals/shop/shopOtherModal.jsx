@@ -1,10 +1,23 @@
 import { C, F } from "../../../lib/constans";
 import { Mono } from "../../shared/Primitives";
 import { IconShield, IconCoin } from "../../shared/DuoIcon";
+import { shieldPacks } from "../../../lib/constans";
+import { useGameStats } from "../../../hooks/useGameStats";
 
-// - props: coins, onPurchase, onClose
-
-export default function ShopOtherModal({ packs = [], onPurchase }) {
+export default function ShopOtherModal() {
+  const { shopItems, updateShopItems, gameData, updateGameData } =
+    useGameStats();
+  async function onPurchase(price, qty) {
+    const newCoiins = gameData.coins - price;
+    if (newCoiins < 0) {
+      alert("Not enough coins");
+      return;
+    }
+    const newStreakShields = shopItems.streak_shields + parseInt(qty);
+    await updateShopItems({ streak_shields: newStreakShields });
+    await updateGameData({ coins: newCoiins });
+    alert(`Purchased ${qty} Streak Shield(s) for ${price} coins!`);
+  }
   return (
     <div>
       <div
@@ -84,10 +97,10 @@ export default function ShopOtherModal({ packs = [], onPurchase }) {
           </div>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
-          {packs.map(({ qty, price }, i) => (
+          {shieldPacks.map(({ qty, price }, i) => (
             <div
               key={qty}
-              onClick={() => onPurchase?.(qty)}
+              onClick={() => onPurchase(price, qty)}
               className="hover-btn press"
               style={{
                 flex: 1,

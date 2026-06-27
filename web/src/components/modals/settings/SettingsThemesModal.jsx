@@ -1,59 +1,50 @@
-import { C, F } from "../../../lib/constans";
+import { C, F, themesDefinitions } from "../../../lib/constans";
 import { Tag } from "../../../components/shared/Primitives";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useUser } from "../../../hooks/useUser";
+import { useGameStats } from "../../../hooks/useGameStats";
 
-const THEMES = [
-  {
-    id: "midnight_mint",
-    name: "Midnight Mint",
-    colors: ["#0B0B12", "#6EE7B7"],
-    price: 0,
-    active: true,
-  },
-  {
-    id: "warm_paper",
-    name: "Warm Paper",
-    colors: ["#F5F0E8", "#FF4D00"],
-    price: 200,
-  },
-  {
-    id: "teal_night",
-    name: "Teal Night",
-    colors: ["#0E0E1A", "#00E5CC"],
-    price: 200,
-  },
-  // {
-  //   id: "aurora",
-  //   name: "Aurora",
-  //   colors: ["#0a0014", "#cc44ff"],
-  //   price: 500,
-  //   lock: "Lv 8",
-  // },
-  // {
-  //   id: "ember_dark",
-  //   name: "Ember Dark",
-  //   colors: ["#1a0800", "#FF8C42"],
-  //   price: 350,
-  // },
-  // {
-  //   id: "ocean_depth",
-  //   name: "Ocean Depth",
-  //   colors: ["#020d1a", "#0ea5e9"],
-  //   price: 300,
-  // },
-];
+function resolveThemeId(themeSetting, ownedThemes) {
+  if (!themeSetting) return ownedThemes[0]?.id ?? null;
 
-export default function ThemeModal({ onClose }) {
-  const [selected, setSelected] = useState("midnight_mint");
+  const matched = ownedThemes.find(
+    (theme) => theme.id === themeSetting || theme.name === themeSetting,
+  );
+  return matched?.id ?? ownedThemes[0]?.id ?? null;
+}
+
+export default function ThemeModal({ handleClose }) {
+  const { user, updateUser } = useUser();
+  const { shopItems } = useGameStats();
+  const themesOwned = shopItems?.themesOwned ?? [];
+  const ownedThemes = themesDefinitions.filter((theme) =>
+    themesOwned.includes(theme.id),
+  );
+
+  const [selected, setSelected] = useState(() =>
+    resolveThemeId(user?.settings?.theme, ownedThemes),
+  );
   const [loading, setLoading] = useState(false);
 
-  // mock coins — replace with gameData.coins
+  useEffect(() => {
+    setSelected(resolveThemeId(user?.settings?.theme, ownedThemes));
+  }, [user, ownedThemes]);
 
-  const handleApply = async () => {};
+  const handleSelectTheme = async (theme) => {
+    setSelected(theme.id);
 
-  const handlePurchase = async (theme) => {
-    // deduct coins and unlock — wire to gameService
-    console.log("purchase", theme.id);
+    await updateUser({
+      settings: {
+        theme: theme.id,
+      },
+    });
+  };
+
+  const handleApply = () => {
+    const selectedTheme = ownedThemes.find((theme) => theme.id === selected);
+    if (!selectedTheme) return;
+
+    handleClose();
   };
 
   return (
@@ -86,24 +77,20 @@ export default function ThemeModal({ onClose }) {
           marginBottom: 20,
         }}
       >
-        {THEMES.map((theme) => {
+        {ownedThemes.map((theme) => {
           const isSelected = selected === theme.id;
-          const isLocked = !!theme.lock;
-          const isFree = theme.price === 0;
-          const isOwned = isFree || theme.active;
 
           return (
             <div
               key={theme.id}
-              onClick={() => !isLocked && setSelected(theme.id)}
-              className={isLocked ? "" : "press"}
+              onClick={() => handleSelectTheme(theme)}
+              className="press"
               style={{
                 background: C.card,
                 border: `1px solid ${isSelected ? C.accent : C.border}`,
                 borderRadius: 14,
                 overflow: "hidden",
-                opacity: isLocked ? 0.5 : 1,
-                cursor: isLocked ? "not-allowed" : "pointer",
+                cursor: "pointer",
                 transition: "all 0.2s",
               }}
             >
@@ -132,11 +119,6 @@ export default function ThemeModal({ onClose }) {
                   >
                     {theme.name}
                   </div>
-                  {isLocked && (
-                    <div style={{ marginTop: 2 }}>
-                      <Tag color={C.gold}>{theme.lock} required</Tag>
-                    </div>
-                  )}
                 </div>
 
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -146,6 +128,20 @@ export default function ThemeModal({ onClose }) {
             </div>
           );
         })}
+        {ownedThemes.length === 0 && (
+          <div
+            style={{
+              border: `1px solid ${C.border}`,
+              borderRadius: 14,
+              padding: "12px 14px",
+              color: C.soft,
+              fontFamily: F.body,
+              fontSize: 13,
+            }}
+          >
+            You do not own any themes yet.
+          </div>
+        )}
       </div>
 
       <div

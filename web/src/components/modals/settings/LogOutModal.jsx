@@ -2,7 +2,7 @@ import { useState } from "react";
 import { C, F } from "../../../lib/constans";
 import { IconSignOut } from "../../../components/shared/DuoIcon";
 
-export default function LogOutModal({ onClose }) {
+export default function LogOutModal({ handleClose }) {
   const [loading, setLoading] = useState(false);
 
   const handleLogOut = async () => {};
@@ -56,7 +56,7 @@ export default function LogOutModal({ onClose }) {
       {/* buttons */}
       <div style={{ display: "flex", gap: 10 }}>
         <div
-          onClick={onClose}
+          onClick={handleClose}
           className="hover-btn press"
           style={{
             flex: 1,

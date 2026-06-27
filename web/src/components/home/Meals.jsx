@@ -1,18 +1,19 @@
 import { C, F } from "../../lib/constans";
 import { MealCard } from "./MealCard";
-
+import { useMeals } from "../../hooks/useMeals";
 const MEAL_TYPES = [
-  { key: "Breakfast", color: C.gold },
-  { key: "Lunch", color: C.blue },
-  { key: "Dinner", color: C.pink },
-  { key: "Snacks", color: C.orange },
+  { key: "breakfast", color: C.gold },
+  { key: "lunch", color: C.blue },
+  { key: "dinner", color: C.pink },
+  { key: "snacks", color: C.orange },
 ];
 
-export function Meals({ meals }) {
+export function Meals() {
+  const { meals } = useMeals();
   return (
     <>
       {MEAL_TYPES.map(({ key, color }) => {
-        const items = meals[key] ?? [];
+        const items = meals.filter((meal) => meal.type === key) || [];
         return (
           <div key={key} style={{ marginBottom: 14 }}>
             <div
@@ -61,12 +62,7 @@ export function Meals({ meals }) {
               </div>
             ) : (
               items.map((meal, index) => (
-                <MealCard
-                  key={meal.id ?? index}
-                  meal={meal}
-                  color={color}
-                  type={key}
-                />
+                <MealCard key={index} meal={meal} color={color} type={key} />
               ))
             )}
           </div>

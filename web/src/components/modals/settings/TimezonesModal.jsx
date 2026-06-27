@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { C, F } from "../../../lib/constans";
 import { Mono } from "../../../components/shared/Primitives";
+import { useUser } from "../../../hooks/useUser";
 
 const TIMEZONES = [
   { value: "UTC-5", label: "Eastern Time", sub: "UTC−5 · New York" },
@@ -13,15 +14,16 @@ const TIMEZONES = [
   { value: "UTC+3", label: "Moscow", sub: "UTC+3 · MSK" },
 ];
 
-export default function TimezoneModal({ onClose }) {
-  const [selected, setSelected] = useState("UTC+1");
+export default function TimezoneModal({ handleClose }) {
+  const { user, updateUser } = useUser();
+  const [selected, setSelected] = useState(user?.settings?.timezone || "UTC+1");
   const [loading, setLoading] = useState(false);
 
   const handleSave = async () => {
     try {
       setLoading(true);
-      await updateUser({ timezone: selected });
-      onClose();
+      await updateUser({ settings: { timezone: selected } });
+      handleClose();
     } finally {
       setLoading(false);
     }

@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { C, F } from "../../../lib/constans";
 import { Mono } from "../../../components/shared/Primitives";
+import { useUser } from "../../../hooks/useUser";
 
 const SYSTEMS = [
   {
@@ -17,15 +18,18 @@ const SYSTEMS = [
   },
 ];
 
-export default function MeasurementsModal({ onClose }) {
-  const [selected, setSelected] = useState("metric");
+export default function MeasurementsModal({ handleClose }) {
+  const { user, updateUser } = useUser();
+  const [selected, setSelected] = useState(
+    user?.settings?.measurement_system || "metric",
+  );
   const [loading, setLoading] = useState(false);
 
   const handleSave = async () => {
     try {
       setLoading(true);
-      await updateUser({ measurement_system: selected });
-      onClose();
+      await updateUser({ settings: { measurement_system: selected } });
+      handleClose();
     } finally {
       setLoading(false);
     }
@@ -102,7 +106,9 @@ export default function MeasurementsModal({ onClose }) {
                   key={unit}
                   style={{
                     background: selected === key ? C.accentMid : C.panel,
-                    border: `1px solid ${selected === key ? C.accent + "40" : C.border}`,
+                    border: `1px solid ${
+                      selected === key ? C.accent + "40" : C.border
+                    }`,
                     borderRadius: 7,
                     padding: "3px 8px",
                   }}

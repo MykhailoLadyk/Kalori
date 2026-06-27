@@ -15,7 +15,7 @@ const SECTIONS = [
   },
 ];
 
-export default function LegalModal({ onClose }) {
+export default function LegalModal({ handleClose }) {
   return (
     <div>
       <div
@@ -67,7 +67,7 @@ export default function LegalModal({ onClose }) {
       </div>
 
       <div
-        onClick={onClose}
+        onClick={handleClose}
         className="hover-btn press"
         style={{
           marginTop: 20,

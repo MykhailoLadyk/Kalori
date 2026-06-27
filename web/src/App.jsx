@@ -16,11 +16,13 @@ import Onboarding from "./pages/Onboarding";
 import { UserProvider } from "./context/UserContext";
 import { MealProvider } from "./context/MealContext";
 import { GameProvider } from "./context/GameContext";
+import { StatsProvider } from "./context/StatsContext";
 function App() {
   return (
     <>
       <UserProvider>
         <MealProvider>
+          <StatsProvider>
           <GameProvider>
             <BrowserRouter>
               <Routes>
@@ -45,6 +47,7 @@ function App() {
               </Routes>
             </BrowserRouter>
           </GameProvider>
+          </StatsProvider>
         </MealProvider>
       </UserProvider>
     </>

@@ -3,6 +3,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { C, F } from "../lib/constans";
 import { Mono } from "../components/shared/Primitives";
 import { useMeals } from "../hooks/useMeals";
+import { useGameStats } from "../hooks/useGameStats";
+import { getStreakMultiplier } from "../lib/utils";
 const ChevronLeft = () => (
   <svg
     width="18"
@@ -21,12 +23,7 @@ const ChevronLeft = () => (
 const MEAL_TYPES = ["breakfast", "lunch", "dinner", "snacks"];
 
 const FIELD_CONFIG = [
-  {
-    key: "name",
-    label: "Name",
-    type: "text",
-    placeholder: "e.g. Chicken & Rice",
-  },
+  { key: "name", label: "Name", type: "text", placeholder: "e.g. Chicken & Rice" },
   { key: "calories", label: "Calories", type: "number", placeholder: "kcal" },
   { key: "protein", label: "Protein", type: "number", placeholder: "g" },
   { key: "carbs", label: "Carbs", type: "number", placeholder: "g" },
@@ -34,6 +31,7 @@ const FIELD_CONFIG = [
 ];
 
 export default function ManualMealPage() {
+  const { gameData, updateGameData } = useGameStats();
   const { addMeal } = useMeals();
   const navigate = useNavigate();
   const location = useLocation();
@@ -79,6 +77,12 @@ export default function ManualMealPage() {
 
     try {
       setLoading(true);
+      const multiplier = getStreakMultiplier(gameData.streak);
+      const baseXp = 10;
+      const xpAwarded = baseXp * multiplier;
+      const baseCoins = 5;
+      const coinsAwarded = baseCoins * multiplier;
+      await updateGameData({ xp_total: gameData.xp_total + xpAwarded, coins: gameData.coins + coinsAwarded });
       const meal = {
         ...form,
         calories: Number(form.calories),
@@ -100,21 +104,9 @@ export default function ManualMealPage() {
   return (
     <div
       className="sy"
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        flex: 1,
-        animation: "fadeIn 0.22s ease both",
-      }}
+      style={{ display: "flex", flexDirection: "column", flex: 1, animation: "fadeIn 0.22s ease both" }}
     >
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 12,
-          padding: "8px 22px 16px",
-        }}
-      >
+      <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "8px 22px 16px" }}>
         <div
           onClick={() => navigate("/")}
           className="press"
@@ -133,26 +125,10 @@ export default function ManualMealPage() {
         >
           <ChevronLeft />
         </div>
-        <div
-          style={{
-            fontFamily: F.head,
-            fontSize: 18,
-            fontWeight: 900,
-            color: C.text,
-          }}
-        >
-          Add Meal
-        </div>
+        <div style={{ fontFamily: F.head, fontSize: 18, fontWeight: 900, color: C.text }}>Add Meal</div>
       </div>
 
-      <div
-        style={{
-          padding: "0 22px 22px",
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
+      <div style={{ padding: "0 22px 22px", flex: 1, display: "flex", flexDirection: "column" }}>
         <div style={{ marginBottom: 16 }}>
           <Mono size={8} color={C.mutedLight}>
             Meal Type
@@ -192,13 +168,7 @@ export default function ManualMealPage() {
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {FIELD_CONFIG.map(({ key, label, type, placeholder }) => (
             <div key={key}>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  marginBottom: 5,
-                }}
-              >
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
                 <Mono size={8} color={C.mutedLight}>
                   {label}
                 </Mono>
@@ -226,16 +196,8 @@ export default function ManualMealPage() {
                   transition: "border-color 0.2s",
                   minHeight: 46,
                 }}
-                onFocus={(e) =>
-                  (e.target.style.borderColor = errors[key]
-                    ? C.red + "80"
-                    : C.accent)
-                }
-                onBlur={(e) =>
-                  (e.target.style.borderColor = errors[key]
-                    ? C.red + "80"
-                    : C.border)
-                }
+                onFocus={(e) => (e.target.style.borderColor = errors[key] ? C.red + "80" : C.accent)}
+                onBlur={(e) => (e.target.style.borderColor = errors[key] ? C.red + "80" : C.border)}
               />
             </div>
           ))}
@@ -257,14 +219,7 @@ export default function ManualMealPage() {
             minHeight: 50,
           }}
         >
-          <span
-            style={{
-              fontFamily: F.mono,
-              fontSize: 11,
-              fontWeight: 700,
-              color: loading ? C.accent : "#000",
-            }}
-          >
+          <span style={{ fontFamily: F.mono, fontSize: 11, fontWeight: 700, color: loading ? C.accent : "#000" }}>
             {loading ? "SAVING..." : "ADD MEAL"}
           </span>
         </div>

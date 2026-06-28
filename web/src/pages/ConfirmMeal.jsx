@@ -4,6 +4,7 @@ import { C, F } from "../lib/constans";
 import { Mono } from "../components/shared/Primitives";
 import { useMeals } from "../hooks/useMeals";
 import { useGameStats } from "../hooks/useGameStats";
+import { getStreakMultiplier } from "../lib/utils";
 const ChevronLeft = () => (
   <svg
     width="18"
@@ -77,8 +78,12 @@ export default function ConfirmMeal() {
 
     try {
       setLoading(true);
-      const xpAwarded = 10;
-      await updateGameData({ xp_total: gameData.xp_total + xpAwarded });
+      const multiplier = getStreakMultiplier(gameData.streak);
+      const baseXp = 10;
+      const xpAwarded = baseXp * multiplier;
+      const baseCoins = 5;
+      const coinsAwarded = baseCoins * multiplier;
+      await updateGameData({ xp_total: gameData.xp_total + xpAwarded, coins: gameData.coins + coinsAwarded });
       await addMeal({
         ...form,
         calories: Number(form.calories),
@@ -97,21 +102,9 @@ export default function ConfirmMeal() {
   return (
     <div
       className="sy"
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        flex: 1,
-        animation: "fadeIn 0.22s ease both",
-      }}
+      style={{ display: "flex", flexDirection: "column", flex: 1, animation: "fadeIn 0.22s ease both" }}
     >
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 12,
-          padding: "8px 22px 16px",
-        }}
-      >
+      <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "8px 22px 16px" }}>
         <div
           onClick={() => navigate("/")}
           className="press"
@@ -130,26 +123,10 @@ export default function ConfirmMeal() {
         >
           <ChevronLeft />
         </div>
-        <div
-          style={{
-            fontFamily: F.head,
-            fontSize: 18,
-            fontWeight: 900,
-            color: C.text,
-          }}
-        >
-          Confirm Meal
-        </div>
+        <div style={{ fontFamily: F.head, fontSize: 18, fontWeight: 900, color: C.text }}>Confirm Meal</div>
       </div>
 
-      <div
-        style={{
-          padding: "0 22px 22px",
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
+      <div style={{ padding: "0 22px 22px", flex: 1, display: "flex", flexDirection: "column" }}>
         {photo && (
           <div
             style={{
@@ -162,11 +139,7 @@ export default function ConfirmMeal() {
               border: `1px solid ${C.border}`,
             }}
           >
-            <img
-              src={photo}
-              alt="meal"
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
-            />
+            <img src={photo} alt="meal" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             {!isAlbum && (
               <div
                 onClick={() => navigate("/add-meal/photo")}
@@ -183,29 +156,13 @@ export default function ConfirmMeal() {
                   cursor: "pointer",
                 }}
               >
-                <span
-                  style={{
-                    fontFamily: F.mono,
-                    fontSize: 9,
-                    fontWeight: 700,
-                    color: "#fff",
-                  }}
-                >
-                  RETAKE
-                </span>
+                <span style={{ fontFamily: F.mono, fontSize: 9, fontWeight: 700, color: "#fff" }}>RETAKE</span>
               </div>
             )}
           </div>
         )}
 
-        <div
-          style={{
-            fontFamily: F.body,
-            fontSize: 13,
-            color: C.soft,
-            marginBottom: 14,
-          }}
-        >
+        <div style={{ fontFamily: F.body, fontSize: 13, color: C.soft, marginBottom: 14 }}>
           Review and adjust before adding to your log.
         </div>
 
@@ -246,13 +203,7 @@ export default function ConfirmMeal() {
         </div>
 
         <div style={{ marginBottom: 14 }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginBottom: 5,
-            }}
-          >
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
             <Mono size={8} color={C.mutedLight}>
               Name
             </Mono>
@@ -280,16 +231,8 @@ export default function ConfirmMeal() {
               transition: "border-color 0.2s",
               minHeight: 46,
             }}
-            onFocus={(e) =>
-              (e.target.style.borderColor = errors.name
-                ? C.red + "80"
-                : C.accent)
-            }
-            onBlur={(e) =>
-              (e.target.style.borderColor = errors.name
-                ? C.red + "80"
-                : C.border)
-            }
+            onFocus={(e) => (e.target.style.borderColor = errors.name ? C.red + "80" : C.accent)}
+            onBlur={(e) => (e.target.style.borderColor = errors.name ? C.red + "80" : C.border)}
           />
         </div>
 
@@ -306,15 +249,7 @@ export default function ConfirmMeal() {
           <Mono size={8} color={C.mutedLight}>
             Calories
           </Mono>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 6,
-              marginTop: 6,
-            }}
-          >
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginTop: 6 }}>
             <input
               type="number"
               value={form.calories}
@@ -360,15 +295,7 @@ export default function ConfirmMeal() {
               <Mono size={7} color={color}>
                 {label}
               </Mono>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "baseline",
-                  justifyContent: "center",
-                  gap: 3,
-                  marginTop: 4,
-                }}
-              >
+              <div style={{ display: "flex", alignItems: "baseline", justifyContent: "center", gap: 3, marginTop: 4 }}>
                 <input
                   type="number"
                   value={form[key]}
@@ -417,16 +344,7 @@ export default function ConfirmMeal() {
               minHeight: 50,
             }}
           >
-            <span
-              style={{
-                fontFamily: F.mono,
-                fontSize: 10,
-                fontWeight: 700,
-                color: C.soft,
-              }}
-            >
-              CANCEL
-            </span>
+            <span style={{ fontFamily: F.mono, fontSize: 10, fontWeight: 700, color: C.soft }}>CANCEL</span>
           </div>
           <div
             onClick={!loading ? handleConfirm : undefined}
@@ -441,14 +359,7 @@ export default function ConfirmMeal() {
               minHeight: 50,
             }}
           >
-            <span
-              style={{
-                fontFamily: F.mono,
-                fontSize: 11,
-                fontWeight: 700,
-                color: loading ? C.accent : "#000",
-              }}
-            >
+            <span style={{ fontFamily: F.mono, fontSize: 11, fontWeight: 700, color: loading ? C.accent : "#000" }}>
               {loading ? "SAVING..." : "ADD MEAL"}
             </span>
           </div>

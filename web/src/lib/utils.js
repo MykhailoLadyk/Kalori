@@ -21,15 +21,16 @@ export function getDayName(date) {
 
 import { MONTHS } from "./constans.js";
 export function getMonthName(date) {
-  const index =
-    typeof date === "number"
-      ? date
-      : date instanceof Date
-        ? date.getMonth()
-        : -1;
+  const index = typeof date === "number" ? date : date instanceof Date ? date.getMonth() : -1;
   return MONTHS[index] || "";
 }
 export function getNumberOfDaysInMonth(year, month) {
   const newDate = new Date(year, month + 1, 0);
   return newDate.getDate();
+}
+export function getStreakMultiplier(streak) {
+  if (streak >= 30) return 3;
+  if (streak >= 14) return 2;
+  if (streak >= 7) return 1.5;
+  return 1;
 }

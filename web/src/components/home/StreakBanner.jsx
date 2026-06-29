@@ -1,4 +1,4 @@
-import { C, F } from "../../lib/constans";
+import { C, F, alpha } from "../../lib/constans";
 import { Mono } from "../shared/Primitives";
 import { IconFire, IconShield } from "../shared/DuoIcon";
 import { useGameStats } from "../../hooks/useGameStats";
@@ -15,8 +15,8 @@ export function StreakBanner() {
     >
       <div
         style={{
-          background: "linear-gradient(135deg, #FB923C20, #FCD34D10)",
-          border: "1px solid #FB923C35",
+          background: `linear-gradient(135deg, ${alpha(C.orange, 13)}, ${alpha(C.gold, 6)})`,
+          border: `1px solid ${alpha(C.orange, 21)}`,
           borderRadius: 14,
           padding: "10px 14px",
           display: "flex",

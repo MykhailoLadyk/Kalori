@@ -1,4 +1,4 @@
-import { C, F } from "../../../lib/constans";
+import { C, F, alpha } from "../../../lib/constans";
 import { Mono } from "../../shared/Primitives";
 import { IconShield, IconCoin } from "../../shared/DuoIcon";
 import { shieldPacks } from "../../../lib/constans";
@@ -34,8 +34,8 @@ export default function ShopOtherModal() {
 
       <div
         style={{
-          background: "linear-gradient(135deg, #FB923C20, #FCD34D10)",
-          border: "1px solid #FB923C40",
+          background: `linear-gradient(135deg, ${alpha(C.orange, 13)}, ${alpha(C.gold, 6)})`,
+          border: `1px solid ${alpha(C.orange, 25)}`,
           borderRadius: 18,
           padding: "18px",
         }}
@@ -129,12 +129,12 @@ export default function ShopOtherModal() {
                   gap: 3,
                 }}
               >
-                <IconCoin size={10} color="#00000090" />
+                <IconCoin size={10} color={alpha("#000", 56)} />
                 <span
                   style={{
                     fontFamily: F.mono,
                     fontSize: 9,
-                    color: "#00000090",
+                    color: alpha("#000", 56),
                     fontWeight: 700,
                   }}
                 >

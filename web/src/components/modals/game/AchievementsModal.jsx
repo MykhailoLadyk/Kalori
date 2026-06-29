@@ -1,4 +1,4 @@
-import { C, F } from "../../../lib/constans";
+import { C, F, alpha } from "../../../lib/constans";
 import { IconTrophy } from "../../../components/shared/DuoIcon";
 
 export default function AchievementsModal({ achievements, handleClose }) {
@@ -43,7 +43,7 @@ export default function AchievementsModal({ achievements, handleClose }) {
                   width: 44,
                   height: 44,
                   borderRadius: 13,
-                  background: done ? C.accent + "25" : C.panel,
+                  background: done ? alpha(C.accent, 15) : C.panel,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -78,8 +78,8 @@ export default function AchievementsModal({ achievements, handleClose }) {
                         fontSize: 8,
                         fontWeight: 700,
                         color: C.accent,
-                        background: C.accent + "18",
-                        border: `1px solid ${C.accent}35`,
+                        background: alpha(C.accent, 9),
+                        border: `1px solid ${alpha(C.accent, 21)}`,
                         padding: "2px 7px",
                         borderRadius: 6,
                         textTransform: "uppercase",

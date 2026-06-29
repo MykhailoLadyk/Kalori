@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { C, F } from "../../lib/constans";
+import { C, F, alpha } from "../../lib/constans";
 import { Mono } from "./Primitives";
 
 const CONFIGS = {
@@ -25,10 +25,10 @@ function ToastContent({ notification }) {
           alignItems: "center",
           gap: 7,
           background: C.panel,
-          border: `1px solid ${color}40`,
+          border: `1px solid ${alpha(color, 25)}`,
           borderRadius: 10,
           padding: "8px 12px",
-          boxShadow: `0 4px 20px #00000060, 0 0 0 1px ${color}20`,
+          boxShadow: `0 4px 20px ${alpha("#000", 38)}, 0 0 0 1px ${alpha(color, 13)}`,
         }}
       >
         <span style={{ fontSize: 14 }}>{cfg.icon}</span>
@@ -45,11 +45,11 @@ function ToastContent({ notification }) {
       <div
         style={{
           background: C.panel,
-          border: `1px solid ${color}40`,
+          border: `1px solid ${alpha(color, 25)}`,
           borderRadius: 14,
           padding: "12px 14px",
           minWidth: 200,
-          boxShadow: `0 4px 20px #00000060`,
+          boxShadow: `0 4px 20px ${alpha("#000", 38)}`,
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
@@ -81,11 +81,11 @@ function ToastContent({ notification }) {
       <div
         style={{
           background: C.panel,
-          border: `1px solid ${C.gold}50`,
+          border: `1px solid ${alpha(C.gold, 31)}`,
           borderRadius: 14,
           padding: "12px 14px",
           minWidth: 200,
-          boxShadow: `0 4px 20px #00000060, 0 0 20px ${C.gold}20`,
+          boxShadow: `0 4px 20px ${alpha("#000", 38)}, 0 0 20px ${alpha(C.gold, 13)}`,
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
@@ -114,7 +114,7 @@ function ToastContent({ notification }) {
           borderRadius: 14,
           padding: "14px 16px",
           minWidth: 210,
-          boxShadow: `0 4px 24px #00000070, 0 0 30px ${C.accentGlow}`,
+          boxShadow: `0 4px 24px ${alpha("#000", 44)}, 0 0 30px ${C.accentGlow}`,
         }}
       >
         <Mono size={8} color={C.mutedLight}>
@@ -136,11 +136,11 @@ function ToastContent({ notification }) {
       <div
         style={{
           background: C.panel,
-          border: `1px solid ${C.orange}40`,
+          border: `1px solid ${alpha(C.orange, 25)}`,
           borderRadius: 14,
           padding: "12px 14px",
           minWidth: 180,
-          boxShadow: `0 4px 20px #00000060`,
+          boxShadow: `0 4px 20px ${alpha("#000", 38)}`,
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>

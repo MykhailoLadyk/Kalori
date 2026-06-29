@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { C, F } from "../lib/constans";
+import { C, F, alpha } from "../lib/constans";
 import { Mono } from "../components/shared/Primitives";
 import { useMeals } from "../hooks/useMeals";
 import { useGameStats } from "../hooks/useGameStats";
@@ -148,7 +148,7 @@ export default function ConfirmMeal() {
                   position: "absolute",
                   bottom: 10,
                   right: 10,
-                  background: "#000000a0",
+                  background: alpha("#000", 63),
                   backdropFilter: "blur(8px)",
                   border: `1px solid ${C.border}`,
                   borderRadius: 9,
@@ -221,7 +221,7 @@ export default function ConfirmMeal() {
             style={{
               width: "100%",
               background: C.card,
-              border: `1px solid ${errors.name ? C.red + "80" : C.border}`,
+              border: `1px solid ${errors.name ? alpha(C.red, 50) : C.border}`,
               borderRadius: 10,
               padding: "12px 14px",
               fontFamily: F.body,
@@ -231,8 +231,8 @@ export default function ConfirmMeal() {
               transition: "border-color 0.2s",
               minHeight: 46,
             }}
-            onFocus={(e) => (e.target.style.borderColor = errors.name ? C.red + "80" : C.accent)}
-            onBlur={(e) => (e.target.style.borderColor = errors.name ? C.red + "80" : C.border)}
+            onFocus={(e) => (e.target.style.borderColor = errors.name ? alpha(C.red, 50) : C.accent)}
+            onBlur={(e) => (e.target.style.borderColor = errors.name ? alpha(C.red, 50) : C.border)}
           />
         </div>
 
@@ -285,8 +285,8 @@ export default function ConfirmMeal() {
               key={key}
               style={{
                 flex: 1,
-                background: color + "12",
-                border: `1px solid ${color}30`,
+                background: alpha(color, 7),
+                border: `1px solid ${alpha(color, 19)}`,
                 borderRadius: 12,
                 padding: "10px",
                 textAlign: "center",

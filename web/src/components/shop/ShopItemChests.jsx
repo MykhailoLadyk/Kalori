@@ -1,4 +1,5 @@
 import { IconTrophy } from "../shared/DuoIcon";
+import { alpha } from "../../lib/constans";
 
 export default function ShopItemChests({ colors = [] }) {
   return (
@@ -17,8 +18,8 @@ export default function ShopItemChests({ colors = [] }) {
             width: 36,
             height: 36,
             borderRadius: 10,
-            background: col + "20",
-            border: `1px solid ${col}50`,
+            background: alpha(col, 13),
+            border: `1px solid ${alpha(col, 31)}`,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",

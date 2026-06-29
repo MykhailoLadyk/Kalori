@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { C, F } from "../lib/constans";
+import { C, F, alpha } from "../lib/constans";
 import { Mono } from "../components/shared/Primitives";
 import analyzeFood from "../services/analyzeFood";
 const ChevronLeft = () => (
@@ -143,7 +143,7 @@ export default function PhotoAddMeal() {
           zIndex: 10,
           width: 36,
           height: 36,
-          background: "#00000060",
+          background: alpha("#000", 38),
           backdropFilter: "blur(8px)",
           border: `1px solid ${C.border}`,
           borderRadius: 11,
@@ -262,7 +262,7 @@ export default function PhotoAddMeal() {
                 width: 72,
                 height: 72,
                 borderRadius: "50%",
-                border: "4px solid #ffffff40",
+                border: `4px solid ${alpha("#fff", 25)}`,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",

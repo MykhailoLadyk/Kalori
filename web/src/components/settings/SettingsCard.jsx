@@ -1,5 +1,5 @@
 import { Mono } from "../shared/Primitives";
-import { C, F } from "../../lib/constans";
+import { C, F, alpha } from "../../lib/constans";
 
 export default function SettingsCard({
   icon,
@@ -31,8 +31,8 @@ export default function SettingsCard({
           width: 34,
           height: 34,
           borderRadius: 10,
-          background: danger ? "#F8717115" : C.panel,
-          border: `1px solid ${danger ? "#F8717130" : C.border}`,
+          background: danger ? alpha(C.red, 8) : C.panel,
+          border: `1px solid ${danger ? alpha(C.red, 19) : C.border}`,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",

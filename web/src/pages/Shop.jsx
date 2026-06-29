@@ -4,12 +4,7 @@ import { useUser } from "../hooks/useUser";
 import { C, F, levels, themesDefinitions } from "../lib/constans";
 import { Modal } from "../components/modals/Modal";
 import { Mono, Tag } from "../components/shared/Primitives";
-import {
-  IconCoin,
-  IconPalette,
-  IconTrophy,
-  IconShield,
-} from "../components/shared/DuoIcon";
+import { IconCoin, IconPalette, IconTrophy, IconShield } from "../components/shared/DuoIcon";
 import ShopItemThemes from "../components/shop/ShopItemThemes";
 import ShopItemChests from "../components/shop/ShopItemChests";
 import ShopItemOther from "../components/shop/ShopItemOther";
@@ -36,11 +31,7 @@ export default function Shop() {
 
   const themes = themesDefinitions.map((theme) => {
     const isLocked = level < theme.lvlUnlocked;
-    return {
-      ...theme,
-      owned: themesOwned.includes(theme.id),
-      lock: isLocked ? `Lv ${theme.lvlUnlocked}` : null,
-    };
+    return { ...theme, owned: themesOwned.includes(theme.id), lock: isLocked ? `Lv ${theme.lvlUnlocked}` : null };
   });
   const chests = [
     {
@@ -99,9 +90,7 @@ export default function Shop() {
   ];
 
   const modals = {
-    themes: (
-      <ShopThemesModal themes={themes} currentTheme={user?.settings?.theme} />
-    ),
+    themes: <ShopThemesModal themes={themes} currentTheme={user?.settings?.theme} coins={coins} />,
     chests: <ChestsModal />,
     other: <ShopOtherModal />,
   };
@@ -109,12 +98,7 @@ export default function Shop() {
   return (
     <div style={{ padding: "16px 22px 16px" }}>
       <div
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          marginBottom: 14,
-          animation: "fadeUp 0.4s ease both",
-        }}
+        style={{ display: "flex", justifyContent: "flex-end", marginBottom: 14, animation: "fadeUp 0.4s ease both" }}
       >
         <div
           style={{
@@ -129,16 +113,7 @@ export default function Shop() {
           }}
         >
           <IconCoin size={18} color={C.gold} />
-          <span
-            style={{
-              fontFamily: F.head,
-              fontSize: 20,
-              fontWeight: 900,
-              color: C.gold,
-            }}
-          >
-            {coins}
-          </span>
+          <span style={{ fontFamily: F.head, fontSize: 20, fontWeight: 900, color: C.gold }}>{coins}</span>
         </div>
       </div>
 
@@ -157,33 +132,12 @@ export default function Shop() {
             }}
           >
             <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "flex-start",
-                marginBottom: 12,
-              }}
+              style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}
             >
               <div>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    marginBottom: 4,
-                  }}
-                >
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
                   <Icon size={20} color={color} />
-                  <span
-                    style={{
-                      fontFamily: F.head,
-                      fontSize: 17,
-                      fontWeight: 800,
-                      color: C.text,
-                    }}
-                  >
-                    {label}
-                  </span>
+                  <span style={{ fontFamily: F.head, fontSize: 17, fontWeight: 800, color: C.text }}>{label}</span>
                 </div>
                 <Mono size={8} color={C.muted}>
                   {desc}

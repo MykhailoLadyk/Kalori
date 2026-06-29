@@ -9,14 +9,8 @@ export function UserProvider({ children }) {
     email: "maria@example.com",
     age: 28,
     userAuth: true,
-    completedOnboarding: true,
-    targets: {
-      calories: 2800,
-      protein: 150,
-      carbs: 250,
-      fat: 110,
-      water: 3000,
-    },
+    completedOnboarding: false,
+    targets: { calories: 2800, protein: 150, carbs: 250, fat: 110, water: 3000 },
     settings: {
       timezone: "UTC+1",
       language: "pl",
@@ -58,14 +52,8 @@ export function UserProvider({ children }) {
       const updatedUser = {
         ...user,
         ...updates,
-        settings: {
-          ...user.settings,
-          ...updates.settings,
-        },
-        targets: {
-          ...user.targets,
-          ...updates.targets,
-        },
+        settings: { ...user.settings, ...updates.settings },
+        targets: { ...user.targets, ...updates.targets },
       };
 
       setUser(updatedUser);
@@ -79,15 +67,7 @@ export function UserProvider({ children }) {
   };
 
   return (
-    <UserContext.Provider
-      value={{
-        user,
-        loading,
-        updating,
-        error,
-        updateUser: handleUpdateUser,
-      }}
-    >
+    <UserContext.Provider value={{ user, loading, updating, error, updateUser: handleUpdateUser }}>
       {children}
     </UserContext.Provider>
   );

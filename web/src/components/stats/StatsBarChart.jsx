@@ -1,5 +1,5 @@
 import { Mono } from "../shared/Primitives";
-import { C, F } from "../../lib/constans";
+import { C, F, alpha } from "../../lib/constans";
 import { useEffect, useState } from "react";
 
 const SHORT_DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -80,7 +80,7 @@ export default function StatsBarChart({ label, data, dates, max, color, goalV, u
               right: 0,
               bottom: 20 + (goalV / max) * barAreaH,
               height: 1,
-              background: `repeating-linear-gradient(90deg, ${color}50 0, ${color}50 3px, transparent 3px, transparent 7px)`,
+              background: `repeating-linear-gradient(90deg, ${alpha(color, 31)} 0, ${alpha(color, 31)} 3px, transparent 3px, transparent 7px)`,
               pointerEvents: "none",
               zIndex: 2,
             }}
@@ -143,9 +143,9 @@ export default function StatsBarChart({ label, data, dates, max, color, goalV, u
                     width: "100%",
                     height: barsVisible ? `${h}%` : "3px",
                     background:
-                      v === 0 ? C.border : isToday ? `linear-gradient(180deg, ${color}, ${color}88)` : color + "70",
+                      v === 0 ? C.border : isToday ? `linear-gradient(180deg, ${color}, ${alpha(color, 53)})` : alpha(color, 44),
                     borderRadius: "4px 4px 0 0",
-                    boxShadow: isToday ? `0 0 14px ${color}66` : "none",
+                    boxShadow: isToday ? `0 0 14px ${alpha(color, 40)}` : "none",
                     transition: `height 0.8s cubic-bezier(0.22,1,0.36,1) ${idx * 60}ms`,
                     minHeight: 3,
                   }}

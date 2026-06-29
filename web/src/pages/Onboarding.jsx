@@ -1,6 +1,6 @@
 // pages/OnboardingPage.jsx
 import { useState } from "react";
-import { C, F } from "../lib/constans";
+import { C, F, alpha } from "../lib/constans";
 import { Mono } from "../components/shared/Primitives";
 import { AnimBar } from "../components/shared/AnimBar";
 import { useUser } from "../hooks/useUser";
@@ -62,7 +62,7 @@ function Field({
           display: "flex",
           alignItems: "center",
           background: C.card,
-          border: `1px solid ${error ? C.red + "80" : focused ? C.accent : C.border}`,
+          border: `1px solid ${error ? alpha(C.red, 50) : focused ? C.accent : C.border}`,
           borderRadius: 12,
           overflow: "hidden",
           transition: "border-color 0.2s",
@@ -108,8 +108,8 @@ function Chip({ label, sub, selected, onSelect, color = C.accent }) {
       onClick={onSelect}
       className="press"
       style={{
-        background: selected ? color + "18" : C.card,
-        border: `1px solid ${selected ? color + "60" : C.border}`,
+        background: selected ? alpha(color, 9) : C.card,
+        border: `1px solid ${selected ? alpha(color, 38) : C.border}`,
         borderRadius: 12,
         padding: "12px 14px",
         cursor: "pointer",
@@ -731,8 +731,8 @@ export default function OnboardingPage() {
                       height: 40,
                       borderRadius: 12,
                       flexShrink: 0,
-                      background: color + "18",
-                      border: `1px solid ${color}30`,
+                      background: alpha(color, 9),
+                      border: `1px solid ${alpha(color, 19)}`,
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",

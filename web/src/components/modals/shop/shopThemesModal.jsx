@@ -5,28 +5,18 @@ import { useUser } from "../../../hooks/useUser";
 import { useGameStats } from "../../../hooks/useGameStats";
 export default function ShopThemesModal({ themes = [], currentTheme, coins }) {
   const { updateUser } = useUser();
-  const { updateShopItems, shopItems, updateGameData, gameData } =
-    useGameStats();
+  const { updateShopItems, shopItems, updateGameData, gameData } = useGameStats();
   const onPurchase = async (themeId) => {
     const theme = themes.find((t) => t.id === themeId);
     if (!theme) return;
-
     if (coins < theme.price) {
       alert("Not enough coins to purchase this theme.");
       return;
     }
 
-    await updateUser({
-      settings: {
-        theme: theme.id,
-      },
-    });
-    await updateShopItems({
-      themesOwned: [...(shopItems?.themesOwned || []), theme.id],
-    });
-    await updateGameData({
-      coins: gameData.coins - theme.price,
-    });
+    await updateUser({ settings: { theme: theme.id } });
+    await updateShopItems({ themesOwned: [...(shopItems?.themesOwned || []), theme.id] });
+    await updateGameData({ coins: gameData.coins - theme.price });
   };
 
   const handleThemeClick = async (theme, isLocked, isCurrent, isOwned) => {
@@ -35,11 +25,7 @@ export default function ShopThemesModal({ themes = [], currentTheme, coins }) {
     if (isOwned) {
       if (isCurrent) return;
 
-      await updateUser({
-        settings: {
-          theme: theme.id,
-        },
-      });
+      await updateUser({ settings: { theme: theme.id } });
       return;
     }
 
@@ -48,17 +34,7 @@ export default function ShopThemesModal({ themes = [], currentTheme, coins }) {
 
   return (
     <div>
-      <div
-        style={{
-          fontFamily: F.head,
-          fontSize: 20,
-          fontWeight: 900,
-          color: C.text,
-          marginBottom: 16,
-        }}
-      >
-        Themes
-      </div>
+      <div style={{ fontFamily: F.head, fontSize: 20, fontWeight: 900, color: C.text, marginBottom: 16 }}>Themes</div>
 
       {themes.map(({ id, name, colors, price, lock, owned }, i) => {
         const isCurrent = String(id) === String(currentTheme);
@@ -68,9 +44,7 @@ export default function ShopThemesModal({ themes = [], currentTheme, coins }) {
           <div
             key={id ?? name}
             className="press"
-            onClick={() =>
-              handleThemeClick({ id }, isLocked, isCurrent, isOwned)
-            }
+            onClick={() => handleThemeClick({ id }, isLocked, isCurrent, isOwned)}
             style={{
               background: C.card,
               borderRadius: 14,
@@ -87,24 +61,10 @@ export default function ShopThemesModal({ themes = [], currentTheme, coins }) {
               ))}
             </div>
             <div
-              style={{
-                padding: "10px 14px",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
+              style={{ padding: "10px 14px", display: "flex", justifyContent: "space-between", alignItems: "center" }}
             >
               <div>
-                <div
-                  style={{
-                    fontFamily: F.body,
-                    fontSize: 13,
-                    fontWeight: 600,
-                    color: C.text,
-                  }}
-                >
-                  {name}
-                </div>
+                <div style={{ fontFamily: F.body, fontSize: 13, fontWeight: 600, color: C.text }}>{name}</div>
                 {lock && <Tag color={C.gold}>{lock} required</Tag>}
               </div>
               {isCurrent ? (
@@ -114,16 +74,7 @@ export default function ShopThemesModal({ themes = [], currentTheme, coins }) {
               ) : (
                 <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
                   <IconCoin size={14} color={C.gold} />
-                  <span
-                    style={{
-                      fontFamily: F.mono,
-                      fontSize: 10,
-                      color: C.gold,
-                      fontWeight: 700,
-                    }}
-                  >
-                    {price}
-                  </span>
+                  <span style={{ fontFamily: F.mono, fontSize: 10, color: C.gold, fontWeight: 700 }}>{price}</span>
                 </div>
               )}
             </div>

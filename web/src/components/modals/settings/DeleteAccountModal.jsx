@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { C, F } from "../../../lib/constans";
+import { C, F, alpha } from "../../../lib/constans";
 import { Mono } from "../../../components/shared/Primitives";
 import { IconTrash } from "../../../components/shared/DuoIcon";
 
@@ -25,8 +25,8 @@ export default function DeleteAccountModal({ handleClose }) {
             width: 56,
             height: 56,
             borderRadius: 16,
-            background: "#F8717115",
-            border: `1px solid #F8717130`,
+            background: alpha(C.red, 8),
+            border: `1px solid ${alpha(C.red, 19)}`,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -65,8 +65,8 @@ export default function DeleteAccountModal({ handleClose }) {
       {/* what gets deleted */}
       <div
         style={{
-          background: "#F8717108",
-          border: `1px solid #F8717120`,
+          background: alpha(C.red, 3),
+          border: `1px solid ${alpha(C.red, 13)}`,
           borderRadius: 12,
           padding: "12px 14px",
           marginBottom: 20,
@@ -123,7 +123,7 @@ export default function DeleteAccountModal({ handleClose }) {
             width: "100%",
             marginTop: 6,
             background: C.card,
-            border: `1px solid ${isConfirmed ? C.red + "60" : C.border}`,
+            border: `1px solid ${isConfirmed ? alpha(C.red, 38) : C.border}`,
             borderRadius: 10,
             padding: "10px 12px",
             fontFamily: F.mono,
@@ -175,8 +175,8 @@ export default function DeleteAccountModal({ handleClose }) {
           className={isConfirmed ? "hover-btn press" : ""}
           style={{
             flex: 1,
-            background: isConfirmed ? "#F8717120" : C.card,
-            border: `1px solid ${isConfirmed ? "#F8717150" : C.border}`,
+            background: isConfirmed ? alpha(C.red, 13) : C.card,
+            border: `1px solid ${isConfirmed ? alpha(C.red, 31) : C.border}`,
             borderRadius: 12,
             padding: "13px 0",
             textAlign: "center",

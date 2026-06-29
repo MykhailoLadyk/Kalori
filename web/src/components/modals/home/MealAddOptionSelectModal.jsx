@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { C, F } from "../../../lib/constans";
+import { C, F, alpha } from "../../../lib/constans";
 import { Mono } from "../../../components/shared/Primitives";
 import analyzeFood from "../../../services/analyzeFood";
 
@@ -218,8 +218,8 @@ export function MealAddOptionSelectModal() {
                   width: 48,
                   height: 48,
                   borderRadius: 14,
-                  background: color + "18",
-                  border: `1px solid ${color}30`,
+                  background: alpha(color, 9),
+                  border: `1px solid ${alpha(color, 19)}`,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -257,8 +257,8 @@ export function MealAddOptionSelectModal() {
                   style={{
                     position: "absolute",
                     inset: 0,
-                    background: `${color}08`,
-                    border: `1px solid ${color}30`,
+                    background: alpha(color, 3),
+                    border: `1px solid ${alpha(color, 19)}`,
                     borderRadius: 14,
                     display: "flex",
                     alignItems: "center",

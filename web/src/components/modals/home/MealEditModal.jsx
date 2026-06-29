@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { C, F } from "../../../lib/constans";
+import { C, F, alpha } from "../../../lib/constans";
 import { useMeals } from "../../../hooks/useMeals";
 import { Mono } from "../../shared/Primitives";
 
@@ -153,7 +153,7 @@ export function MealEditModal({ meal, handleClose }) {
               style={{
                 width: "100%",
                 background: C.card,
-                border: `1px solid ${formErrors[key] ? C.red + "80" : C.border}`,
+                border: `1px solid ${formErrors[key] ? alpha(C.red, 50) : C.border}`,
                 borderRadius: 10,
                 padding: "10px 12px",
                 fontFamily: F.body,
@@ -164,8 +164,8 @@ export function MealEditModal({ meal, handleClose }) {
               }}
               onFocus={(e) => (e.target.style.borderColor = C.accent)}
               onBlur={(e) =>
-                (e.target.style.borderColor = formErrors[key]
-                  ? C.red + "80"
+                                (e.target.style.borderColor = formErrors[key]
+                  ? alpha(C.red, 50)
                   : C.border)
               }
             />

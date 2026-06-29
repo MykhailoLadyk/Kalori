@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { C, F } from "../../lib/constans";
+import { C, F, alpha } from "../../lib/constans";
 import { IconPencil, IconTrash } from "../shared/DuoIcon";
 import { MealDeleteModal } from "../modals/home/MealDeleteModal";
 import { MealEditModal } from "../modals/home/MealEditModal";
@@ -19,7 +19,7 @@ export function MealCard({ meal, color, type }) {
         style={{
           background: C.card,
           borderRadius: 13,
-          border: `1px solid ${expanded ? color + "40" : C.border}`,
+          border: `1px solid ${expanded ? alpha(color, 25) : C.border}`,
           marginBottom: 6,
           overflow: "hidden",
           cursor: "pointer",
@@ -40,7 +40,7 @@ export function MealCard({ meal, color, type }) {
               width: 36,
               height: 36,
               borderRadius: 10,
-              background: color + "18",
+              background: alpha(color, 9),
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -200,7 +200,7 @@ export function MealCard({ meal, color, type }) {
                     fontFamily: F.mono,
                     fontSize: 8,
                     color: col,
-                    background: col + "18",
+                    background: alpha(col, 9),
                     borderRadius: 4,
                     padding: "1px 5px",
                   }}
@@ -280,8 +280,8 @@ export function MealCard({ meal, color, type }) {
               className="hover-btn press"
               style={{
                 flex: 1,
-                background: "#F8717112",
-                border: `1px solid #F8717130`,
+                background: alpha(C.red, 7),
+                border: `1px solid ${alpha(C.red, 19)}`,
                 borderRadius: 9,
                 padding: "7px 0",
                 display: "flex",

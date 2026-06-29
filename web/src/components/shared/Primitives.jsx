@@ -1,4 +1,4 @@
-import { C, F } from "../../lib/constans";
+import { C, F, alpha } from "../../lib/constans";
 export function Mono({ children, size = 9, color = C.soft, weight = 700 }) {
   return (
     <span
@@ -43,8 +43,8 @@ export function Tag({ children, color = C.accent }) {
         fontWeight: 700,
         letterSpacing: 1.2,
         color,
-        background: color + "18",
-        border: `1px solid ${color}35`,
+        background: alpha(color, 9),
+        border: `1px solid ${alpha(color, 21)}`,
         padding: "2px 7px",
         borderRadius: 6,
         textTransform: "uppercase",

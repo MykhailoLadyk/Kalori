@@ -1,4 +1,4 @@
-import { C, F } from "../../lib/constans";
+import { C, F, alpha } from "../../lib/constans";
 import { Tag } from "./Primitives";
 import { IconStar } from "./DuoIcon";
 
@@ -16,10 +16,10 @@ export function Quest({
       key={name}
       className="hover-card"
       style={{
-        background: done ? color + "12" : C.card,
+        background: done ? alpha(color, 7) : C.card,
         borderRadius: 13,
         padding: "11px 13px",
-        border: `1px solid ${done ? color + "40" : C.border}`,
+        border: `1px solid ${done ? alpha(color, 25) : C.border}`,
         display: "flex",
         alignItems: "center",
         gap: 10,
@@ -69,8 +69,8 @@ export function Quest({
       ) : (
         <div
           style={{
-            background: color + "18",
-            border: `1px solid ${color}35`,
+            background: alpha(color, 9),
+            border: `1px solid ${alpha(color, 21)}`,
             borderRadius: 7,
             padding: "3px 7px",
             fontFamily: F.mono,

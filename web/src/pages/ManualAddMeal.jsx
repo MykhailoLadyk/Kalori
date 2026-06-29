@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { C, F } from "../lib/constans";
+import { C, F, alpha } from "../lib/constans";
 import { Mono } from "../components/shared/Primitives";
 import { useMeals } from "../hooks/useMeals";
 import { useGameStats } from "../hooks/useGameStats";
@@ -186,7 +186,7 @@ export default function ManualMealPage() {
                 style={{
                   width: "100%",
                   background: C.card,
-                  border: `1px solid ${errors[key] ? C.red + "80" : C.border}`,
+                  border: `1px solid ${errors[key] ? alpha(C.red, 50) : C.border}`,
                   borderRadius: 10,
                   padding: "12px 14px",
                   fontFamily: F.body,
@@ -196,8 +196,8 @@ export default function ManualMealPage() {
                   transition: "border-color 0.2s",
                   minHeight: 46,
                 }}
-                onFocus={(e) => (e.target.style.borderColor = errors[key] ? C.red + "80" : C.accent)}
-                onBlur={(e) => (e.target.style.borderColor = errors[key] ? C.red + "80" : C.border)}
+                onFocus={(e) => (e.target.style.borderColor = errors[key] ? alpha(C.red, 50) : C.accent)}
+                onBlur={(e) => (e.target.style.borderColor = errors[key] ? alpha(C.red, 50) : C.border)}
               />
             </div>
           ))}

@@ -1,6 +1,6 @@
 // pages/AuthPage.jsx
 import { useState } from "react";
-import { C, F } from "../lib/constans";
+import { C, F, alpha } from "../lib/constans";
 import { Mono } from "../components/shared/Primitives";
 import { supabase } from "../services/supabase";
 
@@ -137,7 +137,7 @@ function AuthInput({
         style={{
           width: "100%",
           background: C.card,
-          border: `1px solid ${error ? C.red + "80" : focused ? C.accent : C.border}`,
+          border: `1px solid ${error ? alpha(C.red, 50) : focused ? C.accent : C.border}`,
           borderRadius: 12,
           padding: "12px 14px",
           fontFamily: F.body,
@@ -437,8 +437,8 @@ export default function Login() {
           {authError && (
             <div
               style={{
-                background: "#F8717110",
-                border: `1px solid #F8717130`,
+                background: alpha(C.red, 6),
+                border: `1px solid ${alpha(C.red, 19)}`,
                 borderRadius: 10,
                 padding: "10px 14px",
                 marginBottom: 16,

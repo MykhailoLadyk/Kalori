@@ -1,5 +1,5 @@
 import { Mono } from "../shared/Primitives";
-import { C, F } from "../../lib/constans";
+import { C, F, alpha } from "../../lib/constans";
 import { useState } from "react";
 
 const MONTH_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -125,7 +125,7 @@ export default function StatsLineChart({ label, data, dates, color, goalV, unit,
           strokeLinecap="round"
           strokeLinejoin="round"
           style={{
-            filter: `drop-shadow(0 0 6px ${color}66)`,
+            filter: `drop-shadow(0 0 6px ${alpha(color, 40)})`,
           }}
         />
 

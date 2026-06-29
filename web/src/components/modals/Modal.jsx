@@ -1,5 +1,5 @@
 import { useEffect, useState, cloneElement, isValidElement } from "react";
-import { C } from "../../lib/constans";
+import { C, alpha } from "../../lib/constans";
 export function Modal({ id, close, children }) {
   const [visible, setVisible] = useState(false);
   const [closing, setClosing] = useState(false);
@@ -39,7 +39,7 @@ export function Modal({ id, close, children }) {
         position: "fixed",
         inset: 0,
         zIndex: 100,
-        background: closing ? "transparent" : "#00000070",
+        background: closing ? "transparent" : alpha("#000", 44),
         backdropFilter: visible && !closing ? "blur(4px)" : "none",
         display: "flex",
         flexDirection: "column",

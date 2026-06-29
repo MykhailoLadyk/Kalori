@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { C, F } from "../../../lib/constans";
+import { C, F, alpha } from "../../../lib/constans";
 import { Mono } from "../../../components/shared/Primitives";
 import { useUser } from "../../../hooks/useUser";
 
@@ -107,7 +107,7 @@ export default function MeasurementsModal({ handleClose }) {
                   style={{
                     background: selected === key ? C.accentMid : C.panel,
                     border: `1px solid ${
-                      selected === key ? C.accent + "40" : C.border
+                      selected === key ? alpha(C.accent, 25) : C.border
                     }`,
                     borderRadius: 7,
                     padding: "3px 8px",

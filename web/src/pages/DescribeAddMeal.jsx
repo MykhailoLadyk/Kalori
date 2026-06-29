@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { C, F } from "../lib/constans";
+import { C, F, alpha } from "../lib/constans";
 import { Mono } from "../components/shared/Primitives";
 import analyzeFoodDesc from "../services/analyzeFoodDesc";
 
@@ -243,8 +243,8 @@ export default function DescribeAddMeal() {
                     key={l}
                     style={{
                       flex: 1,
-                      background: col + "12",
-                      border: `1px solid ${col}30`,
+                      background: alpha(col, 7),
+                      border: `1px solid ${alpha(col, 19)}`,
                       borderRadius: 10,
                       padding: "8px",
                       textAlign: "center",

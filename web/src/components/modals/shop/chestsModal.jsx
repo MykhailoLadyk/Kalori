@@ -1,4 +1,4 @@
-import { C, F } from "../../../lib/constans";
+import { C, F, alpha } from "../../../lib/constans";
 import { Tag, Mono } from "../../shared/Primitives";
 import {
   IconCoin,
@@ -39,7 +39,7 @@ export default function ChestsModal({ chests = [], onPurchase }) {
             style={{
               background: C.card,
               borderRadius: 18,
-              border: `1px solid ${color}40`,
+              border: `1px solid ${alpha(color, 25)}`,
               marginBottom: 12,
               overflow: "hidden",
               animation: `scaleIn 0.35s ease ${i * 80}ms both`,
@@ -47,12 +47,12 @@ export default function ChestsModal({ chests = [], onPurchase }) {
           >
             <div
               style={{
-                background: `linear-gradient(135deg, ${color}15, ${color}05)`,
+                background: `linear-gradient(135deg, ${alpha(color, 8)}, ${alpha(color, 2)})`,
                 padding: "20px",
                 display: "flex",
                 alignItems: "center",
                 gap: 14,
-                borderBottom: `1px solid ${color}20`,
+                borderBottom: `1px solid ${alpha(color, 13)}`,
               }}
             >
               <div style={{ animation: `float ${2 + i * 0.4}s ease infinite` }}>

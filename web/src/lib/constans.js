@@ -7,28 +7,47 @@
 // ══════════════════════════════════════════════════
 // COLORS AND FONTS
 // ══════════════════════════════════════════════════
+
+// C values are CSS variable references — they resolve at render time
+// via the custom properties set on :root by ThemeContext.
 export const C = {
-  bg: "#0B0B12",
-  panel: "#111118",
-  card: "#16161F",
-  border: "#21212E",
-  accent: "#6EE7B7",
-  accentDim: "#6EE7B710",
-  accentMid: "#6EE7B730",
-  accentGlow: "#6EE7B755",
-  gold: "#FCD34D",
-  goldDim: "#FCD34D15",
-  blue: "#60A5FA",
-  blueDim: "#60A5FA15",
-  pink: "#F9A8D4",
-  pinkDim: "#F9A8D415",
-  orange: "#FB923C",
-  red: "#F87171",
-  text: "#F0F0F8",
-  soft: "#8888A8",
-  muted: "#404058",
-  mutedLight: "#585878",
+  bg: "var(--c-bg)",
+  panel: "var(--c-panel)",
+  card: "var(--c-card)",
+  border: "var(--c-border)",
+  accent: "var(--c-accent)",
+  accentDim: "var(--c-accent-dim)",
+  accentMid: "var(--c-accent-mid)",
+  accentGlow: "var(--c-accent-glow)",
+  gold: "var(--c-gold)",
+  goldDim: "var(--c-gold-dim)",
+  blue: "var(--c-blue)",
+  blueDim: "var(--c-blue-dim)",
+  pink: "var(--c-pink)",
+  pinkDim: "var(--c-pink-dim)",
+  orange: "var(--c-orange)",
+  red: "var(--c-red)",
+  text: "var(--c-text)",
+  soft: "var(--c-soft)",
+  muted: "var(--c-muted)",
+  mutedLight: "var(--c-muted-light)",
 };
+
+/**
+ * Create a semi-transparent version of any CSS color (hex or CSS variable).
+ * Uses color-mix() which is supported in all modern browsers.
+ *
+ * @param {string} color  - CSS color value, e.g. "var(--c-accent)" or "#6EE7B7"
+ * @param {number} percent - Opacity percentage 0-100
+ * @returns {string} CSS color-mix expression
+ *
+ * @example alpha(C.accent, 10)  → "color-mix(in srgb, var(--c-accent) 10%, transparent)"
+ * @example alpha(C.red, 50)     → "color-mix(in srgb, var(--c-red) 50%, transparent)"
+ */
+export function alpha(color, percent) {
+  return `color-mix(in srgb, ${color} ${percent}%, transparent)`;
+}
+
 export const F = {
   head: "'Nunito', sans-serif",
   body: "'DM Sans', system-ui, sans-serif",
@@ -108,13 +127,131 @@ export const quests = [
   { id: 29, name: "Protein planner", progress: 4, icon: "protein", type: "Weekly", reward: 175, max: 10 },
   { id: 30, name: "Weekly boss", progress: 2, icon: "fire", type: "Weekly", reward: 300, max: 7 },
 ];
+
+// ══════════════════════════════════════════════════
+// THEME PALETTES
+// ══════════════════════════════════════════════════
+// Each theme defines the full set of CSS variable values.
+// The `colors` array [bg, accent] is kept for shop/settings previews.
+
 export const themesDefinitions = [
-  { id: 1, name: "Midnight Mint", lvlUnlocked: 1, price: 0, colors: ["#0B0B12", C.accent] },
-  { id: 2, name: "Warm Paper", lvlUnlocked: 3, price: 150, colors: ["#F5F0E8", "#FF4D00"] },
-  { id: 3, name: "Teal Night", lvlUnlocked: 5, price: 300, colors: ["#0E0E1A", "#00E5CC"] },
-  { id: 4, name: "Aurora", lvlUnlocked: 7, price: 500, colors: ["#0a0014", "#cc44ff"] },
-  { id: 5, name: "Ember Dark", lvlUnlocked: 10, price: 800, colors: ["#1a0800", "#FF8C42"] },
+  {
+    id: 1,
+    name: "Midnight Mint",
+    lvlUnlocked: 1,
+    price: 0,
+    colors: ["#0B0B12", "#6EE7B7"],
+    palette: {
+      bg: "#0B0B12",
+      panel: "#111118",
+      card: "#16161F",
+      border: "#21212E",
+      accent: "#6EE7B7",
+      gold: "#FCD34D",
+      blue: "#60A5FA",
+      pink: "#F9A8D4",
+      orange: "#FB923C",
+      red: "#F87171",
+      text: "#F0F0F8",
+      soft: "#8888A8",
+      muted: "#404058",
+      mutedLight: "#585878",
+    },
+  },
+  {
+    id: 2,
+    name: "Warm Paper",
+    lvlUnlocked: 2,
+    price: 50,
+    colors: ["#F5F0E8", "#FF4D00"],
+    palette: {
+      bg: "#F5F0E8",
+      panel: "#EDE7DD",
+      card: "#E4DED4",
+      border: "#D0C8BC",
+      accent: "#FF4D00",
+      gold: "#B45309",
+      blue: "#2563EB",
+      pink: "#DB2777",
+      orange: "#EA580C",
+      red: "#DC2626",
+      text: "#1C1108",
+      soft: "#7A7062",
+      muted: "#C4BAA8",
+      mutedLight: "#9A9080",
+    },
+  },
+  {
+    id: 3,
+    name: "Teal Night",
+    lvlUnlocked: 5,
+    price: 300,
+    colors: ["#0E0E1A", "#00E5CC"],
+    palette: {
+      bg: "#0E0E1A",
+      panel: "#141428",
+      card: "#1A1A32",
+      border: "#26264A",
+      accent: "#00E5CC",
+      gold: "#FCD34D",
+      blue: "#38BDF8",
+      pink: "#F0ABFC",
+      orange: "#FB923C",
+      red: "#FB7185",
+      text: "#E8E8FA",
+      soft: "#7878A8",
+      muted: "#383858",
+      mutedLight: "#505078",
+    },
+  },
+  {
+    id: 4,
+    name: "Aurora",
+    lvlUnlocked: 7,
+    price: 500,
+    colors: ["#0A0014", "#CC44FF"],
+    palette: {
+      bg: "#0A0014",
+      panel: "#120022",
+      card: "#1A0030",
+      border: "#2E0058",
+      accent: "#CC44FF",
+      gold: "#FBBF24",
+      blue: "#818CF8",
+      pink: "#F472B6",
+      orange: "#FB923C",
+      red: "#FB7185",
+      text: "#F0E8FF",
+      soft: "#9878B8",
+      muted: "#3D2060",
+      mutedLight: "#5C3888",
+    },
+  },
+  {
+    id: 5,
+    name: "Ember Dark",
+    lvlUnlocked: 10,
+    price: 800,
+    colors: ["#1A0E04", "#FF8C42"],
+    palette: {
+      bg: "#1A0E04",
+      panel: "#22140A",
+      card: "#2C1C10",
+      border: "#402C1C",
+      accent: "#FF8C42",
+      gold: "#FCD34D",
+      blue: "#60A5FA",
+      pink: "#FDA4AF",
+      orange: "#FDBA74",
+      red: "#F87171",
+      text: "#FFF0E0",
+      soft: "#A88868",
+      muted: "#4D3020",
+      mutedLight: "#6D4838",
+    },
+  },
 ];
+
 export const shieldPacks = [
   { qty: "1×", price: 150 },
   { qty: "3×", price: 400 },

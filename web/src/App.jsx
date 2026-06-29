@@ -18,11 +18,13 @@ import { MealProvider } from "./context/MealContext";
 import { GameProvider } from "./context/GameContext";
 import { StatsProvider } from "./context/StatsContext";
 import { NotificationProvider } from "./context/NotificationContext";
+import { ThemeProvider } from "./context/ThemeContext";
 function App() {
   return (
     <>
       <NotificationProvider>
       <UserProvider>
+        <ThemeProvider>
         <MealProvider>
           <StatsProvider>
           <GameProvider>
@@ -50,7 +52,8 @@ function App() {
             </BrowserRouter>
           </GameProvider>
           </StatsProvider>
-        </MealProvider>
+         </MealProvider>
+        </ThemeProvider>
       </UserProvider>
       </NotificationProvider>
     </>

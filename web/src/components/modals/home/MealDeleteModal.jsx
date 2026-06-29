@@ -1,5 +1,5 @@
 // modals/home/MealDeleteModal.jsx
-import { C, F } from "../../../lib/constans";
+import { C, F, alpha } from "../../../lib/constans";
 import { IconTrash } from "../../shared/DuoIcon";
 import { useMeals } from "../../../hooks/useMeals";
 
@@ -21,8 +21,8 @@ export function MealDeleteModal({ meal, handleClose }) {
             width: 56,
             height: 56,
             borderRadius: 16,
-            background: "#F8717115",
-            border: `1px solid #F8717130`,
+            background: alpha(C.red, 8),
+            border: `1px solid ${alpha(C.red, 19)}`,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -143,8 +143,8 @@ export function MealDeleteModal({ meal, handleClose }) {
           className="hover-btn press"
           style={{
             flex: 1,
-            background: "#F8717120",
-            border: `1px solid #F8717150`,
+            background: alpha(C.red, 13),
+            border: `1px solid ${alpha(C.red, 31)}`,
             borderRadius: 12,
             padding: "13px 0",
             textAlign: "center",

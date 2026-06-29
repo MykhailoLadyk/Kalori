@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect } from "react";
+import { useNotifications } from "./NotificationContext";
 import { fetchGameData, updateGameData } from "../services/gameService";
 
 export const GameContext = createContext(null);
@@ -25,13 +26,14 @@ const mockUserQuests = [
 ];
 
 export function GameProvider({ children }) {
-  const [gameData, setGameData] = useState({ xp_total: 0, streak: 50, coins: 500 });
+  const [gameData, setGameData] = useState({ xp_total: 0, streak: 0, coins: 500 });
   const [achievements, setAchievements] = useState(mockUserAchievements);
   const [quests, setQuests] = useState(mockUserQuests);
   const [shopItems, setShopItems] = useState({ streak_shields: 2, themesOwned: [1, 2, 5] });
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [updating, setUpdating] = useState(false);
+  const { addNotification } = useNotifications();
 
   useEffect(() => {
     // const loadGameData = async () => {
@@ -61,8 +63,28 @@ export function GameProvider({ children }) {
     // } finally {
     //   setUpdating(false);
     // }
+    const prev = gameData;
     const newGameData = { ...gameData, ...updates };
     setGameData(newGameData);
+
+    // Notifications: xp, coins, level
+    try {
+      const prevXP = prev.xp_total ?? 0;
+      const newXP = newGameData.xp_total ?? prevXP;
+      const xpDelta = newXP - prevXP;
+      if (xpDelta > 0) addNotification({ type: "xp", amount: xpDelta });
+
+      const prevCoins = prev.coins ?? 0;
+      const newCoins = newGameData.coins ?? prevCoins;
+      const coinsDelta = newCoins - prevCoins;
+      if (coinsDelta > 0) addNotification({ type: "coins", amount: coinsDelta });
+
+      if (updates.level !== undefined && updates.level !== prev.level) {
+        addNotification({ type: "levelup", level: updates.level });
+      }
+    } catch (e) {
+      console.error("addNotification failed", e);
+    }
   };
   const handleUpdateAchievements = async (updates) => {
     // try {
@@ -75,7 +97,29 @@ export function GameProvider({ children }) {
     // } finally {
     //   setUpdating(false);
     // }
-    setAchievements(updates);
+    const prev = achievements;
+    // support either array or single achievement
+    if (Array.isArray(updates)) {
+      const newOnes = updates.filter((u) => !prev.some((p) => p.id === u.id));
+      setAchievements(updates);
+      try {
+        newOnes.forEach((ach) => addNotification({ type: "achievement", ...ach }));
+      } catch (e) {
+        console.error("addNotification failed", e);
+      }
+    } else if (updates && typeof updates === "object") {
+      // single achievement
+      if (!prev.some((p) => p.id === updates.id)) {
+        setAchievements((p) => [updates, ...p]);
+        try {
+          addNotification({ type: "achievement", ...updates });
+        } catch (e) {
+          console.error("addNotification failed", e);
+        }
+      } else {
+        setAchievements((p) => p.map((it) => (it.id === updates.id ? updates : it)));
+      }
+    }
   };
   const handleUpdateQuests = async (updates) => {
     // try {
@@ -88,7 +132,20 @@ export function GameProvider({ children }) {
     // } finally {
     //   setUpdating(false);
     // }
-    setQuests(updates);
+    const prev = quests;
+    if (Array.isArray(updates)) {
+      // completed quests are those present in prev but missing in updates
+      const completed = prev.filter((p) => !updates.some((u) => u.id === p.id));
+      setQuests(updates);
+      try {
+        completed.forEach((q) => addNotification({ type: "quest", ...q }));
+      } catch (e) {
+        console.error("addNotification failed", e);
+      }
+    } else if (updates && typeof updates === "object") {
+      // single quest update: if progress indicates completion (e.g., completed flag or removed elsewhere)
+      setQuests((prevQ) => prevQ.map((q) => (q.id === updates.id ? { ...q, ...updates } : q)));
+    }
   };
   const handleUpdateShopItems = async (updates) => {
     // try {

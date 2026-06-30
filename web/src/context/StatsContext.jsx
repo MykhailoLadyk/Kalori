@@ -1,85 +1,103 @@
-import { createContext, useMemo, useCallback } from "react";
+import { createContext, useMemo, useCallback, useState, useEffect } from "react";
 import { useMeals } from "../hooks/useMeals";
 import { useUser } from "../hooks/useUser";
+import { fetchMealsByRange } from "../services/mealService";
 
 export const StatsContext = createContext(null);
 
-// Deterministic LCG pseudo-random generator
-function seededRandom(seed) {
-  let s = seed;
-  return () => {
-    s = (s * 16807 + 0) % 2147483647;
-    return s / 2147483647;
-  };
-}
+export function StatsProvider({ children }) {
+  const { meals } = useMeals(); // Today's meals
+  const { user } = useUser();
+  const [historicalMeals, setHistoricalMeals] = useState([]);
+  const [loadingStats, setLoadingStats] = useState(false);
 
-function generateMockData(targets) {
-  const data = [];
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  useEffect(() => {
+    if (!user?.userAuth) {
+      setHistoricalMeals([]);
+      return;
+    }
 
-  // Initialize PRNG outside the loop to ensure progressive variance across days
-  const baseSeed = 10;
-  const rand = seededRandom(baseSeed);
+    const loadHistoricalData = async () => {
+      try {
+        setLoadingStats(true);
+        const today = new Date();
+        const ninetyDaysAgo = new Date(today);
+        ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 89);
 
-  for (let i = 89; i >= 0; i--) {
-    const d = new Date(today);
-    d.setDate(d.getDate() - i);
+        const endDate = today.toISOString().split("T")[0];
+        const startDate = ninetyDaysAgo.toISOString().split("T")[0];
 
-    // Variance helper yielding a continuous deterministic stream within [0.7, 1.3]
-    const vary = (target) => {
-      const factor = 0.9 + rand() * 0.6;
-      return Math.round(target * factor);
+        const data = await fetchMealsByRange(startDate, endDate);
+        setHistoricalMeals(data);
+      } catch (err) {
+        console.error("Failed to load historical stats", err);
+      } finally {
+        setLoadingStats(false);
+      }
     };
 
-    data.push({
-      date: d.toISOString().slice(0, 10),
-      calories: vary(targets.calories),
-      protein: vary(targets.protein),
-      carbs: vary(targets.carbs),
-      fat: vary(targets.fat),
-      water: vary(targets.water),
-    });
-  }
-  return data;
-}
-
-export function StatsProvider({ children }) {
-  const { meals } = useMeals();
-  const { user } = useUser();
-
-  const targets = useMemo(
-    () =>
-      user?.targets || {
-        calories: 2000,
-        protein: 150,
-        carbs: 250,
-        fat: 70,
-        water: 3000,
-      },
-    [user?.targets],
-  );
+    loadHistoricalData();
+  }, [user?.userAuth]);
 
   const dailyData = useMemo(() => {
-    const mock = generateMockData(targets);
-    const todayStr = new Date().toISOString().slice(0, 10);
-    const todayIndex = mock.findIndex((d) => d.date === todayStr);
+    const dataMap = new Map();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-    if (todayIndex !== -1) {
-      const foodMeals = meals.filter((m) => !m.amount && m.calories);
-      const waterEntries = meals.filter((m) => m.amount);
-
-      mock[todayIndex] = {
-        date: todayStr,
-        calories: foodMeals.reduce((s, m) => s + (m.calories || 0), 0),
-        protein: foodMeals.reduce((s, m) => s + (m.protein || 0), 0),
-        carbs: foodMeals.reduce((s, m) => s + (m.carbs || 0), 0),
-        fat: foodMeals.reduce((s, m) => s + (m.fat || 0), 0),
-        water: waterEntries.reduce((s, m) => s + (m.amount || 0), 0),
-      };
+    // Initialize the last 90 days with 0s
+    for (let i = 89; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().slice(0, 10);
+      dataMap.set(dateStr, {
+        date: dateStr,
+        calories: 0,
+        protein: 0,
+        carbs: 0,
+        fat: 0,
+        water: 0,
+      });
     }
-    return mock;
-  }, [meals, targets]);
+
+    // Process historical meals
+    historicalMeals.forEach((meal) => {
+      if (meal.date && dataMap.has(meal.date)) {
+        const day = dataMap.get(meal.date);
+        if (meal.name === "water" || meal.amount) {
+          day.water += meal.amount || 0;
+        } else {
+          day.calories += meal.calories || 0;
+          day.protein += meal.protein || 0;
+          day.carbs += meal.carbs || 0;
+          day.fat += meal.fat || 0;
+        }
+      }
+    });
+
+    // Override today's data with the live 'meals' state to ensure it's up to date
+    const todayStr = today.toISOString().slice(0, 10);
+    if (dataMap.has(todayStr)) {
+      const day = dataMap.get(todayStr);
+      day.calories = 0;
+      day.protein = 0;
+      day.carbs = 0;
+      day.fat = 0;
+      day.water = 0;
+
+      meals.forEach((m) => {
+        if (m.name === "water" || m.amount) {
+          day.water += m.amount || 0;
+        } else {
+          day.calories += m.calories || 0;
+          day.protein += m.protein || 0;
+          day.carbs += m.carbs || 0;
+          day.fat += m.fat || 0;
+        }
+      });
+    }
+
+    return Array.from(dataMap.values());
+  }, [historicalMeals, meals]);
 
   // Memoize functions to prevent downstream consumers from re-rendering unexpectedly
   const getWeekData = useCallback(() => dailyData.slice(-7), [dailyData]);
@@ -116,6 +134,7 @@ export function StatsProvider({ children }) {
   const contextValue = useMemo(
     () => ({
       dailyData,
+      loadingStats,
       getWeekData,
       getMonthData,
       get3MonthData,
@@ -123,6 +142,7 @@ export function StatsProvider({ children }) {
     }),
     [
       dailyData,
+      loadingStats,
       getWeekData,
       getMonthData,
       get3MonthData,

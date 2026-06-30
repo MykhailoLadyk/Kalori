@@ -1,63 +1,91 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect } from "react";
 import { fetchUser, updateUser } from "../services/userService";
+import { supabase } from "../services/supabase";
 
 export const UserContext = createContext(null);
 
 export function UserProvider({ children }) {
-  const [user, setUser] = useState({
-    name: "Maria",
-    email: "maria@example.com",
-    age: 28,
-    userAuth: true,
-    completedOnboarding: true,
-    targets: { calories: 2800, protein: 150, carbs: 250, fat: 110, water: 3000 },
-    settings: {
-      timezone: "UTC+1",
-      language: "pl",
-      theme: 1,
-      measurement_system: "metric",
-      weight_goal: "maintain",
-      activity_level: "moderate",
-      weight: 70,
-      height: 175,
-    },
-  });
-  const [loading, setLoading] = useState(false); // change to true later
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [error, setError] = useState(null);
 
-  // useEffect(() => {
-  //   const loadUser = async () => {
-  //     try {
-  //       setLoading(true);
-  //       setError(null);
-  //       const userData = await fetchUser();
-  //       setUser(userData);
-  //     } catch (error) {
-  //       setError(error.message || "Failed to fetch user");
-  //       console.error("Failed to fetch user");
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
+  useEffect(() => {
+    let mounted = true;
 
-  //   loadUser();
-  // }, []);
+    const loadUserProfile = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session) {
+          const userData = await fetchUser();
+          if (mounted) {
+            setUser({ 
+              ...userData, 
+              userAuth: true,
+              email: session.user.email 
+            });
+          }
+        } else {
+          if (mounted) setUser(null);
+        }
+      } catch (error) {
+        if (mounted) {
+          setError(error.message || "Failed to fetch user");
+          console.error("Failed to fetch user", error);
+        }
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
+    loadUserProfile();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+          loadUserProfile();
+        } else if (event === "SIGNED_OUT") {
+          if (mounted) setUser(null);
+        }
+      }
+    );
+
+    return () => {
+      mounted = false;
+      authListener.subscription.unsubscribe();
+    };
+  }, []);
 
   const handleUpdateUser = async (updates) => {
     try {
       setUpdating(true);
       setError(null);
-      // For nested settings updates
-      const updatedUser = {
-        ...user,
-        ...updates,
-        settings: { ...user.settings, ...updates.settings },
-        targets: { ...user.targets, ...updates.targets },
-      };
+      
+      const newSettings = updates.settings ? { ...user.settings, ...updates.settings } : user.settings;
+      const newTargets = updates.targets ? { ...user.targets, ...updates.targets } : user.targets;
 
-      setUser(updatedUser);
-      // In production, await updateUser(updates);
+      const fullUpdates = {
+        ...updates,
+        settings: newSettings,
+        targets: newTargets,
+      };
+      
+      // Update local state optimistically
+      setUser(prev => ({
+        ...prev,
+        ...fullUpdates,
+      }));
+
+      // Remove frontend-only properties before sending to db
+      const dbUpdates = { ...fullUpdates };
+      delete dbUpdates.userAuth;
+      delete dbUpdates.email;
+      
+      await updateUser(dbUpdates);
     } catch (error) {
       setError(error.message || "Failed to update user");
       console.error("Failed to update user", error);

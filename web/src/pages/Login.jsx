@@ -8,59 +8,13 @@ import { supabase } from "../services/supabase";
 const KaloriMark = () => (
   <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
     <rect width="36" height="36" rx="10" fill={C.accent} opacity="0.15" />
-    <rect
-      width="36"
-      height="36"
-      rx="10"
-      stroke={C.accent}
-      strokeWidth="1"
-      fill="none"
-      opacity="0.4"
-    />
+    <rect width="36" height="36" rx="10" stroke={C.accent} strokeWidth="1" fill="none" opacity="0.4" />
     {/* fork */}
-    <line
-      x1="11"
-      y1="8"
-      x2="11"
-      y2="14"
-      stroke={C.accent}
-      strokeWidth="1.8"
-      strokeLinecap="round"
-    />
-    <line
-      x1="14"
-      y1="8"
-      x2="14"
-      y2="14"
-      stroke={C.accent}
-      strokeWidth="1.8"
-      strokeLinecap="round"
-    />
-    <line
-      x1="17"
-      y1="8"
-      x2="17"
-      y2="14"
-      stroke={C.accent}
-      strokeWidth="1.8"
-      strokeLinecap="round"
-    />
-    <path
-      d="M11 14 Q14 17 17 14"
-      stroke={C.accent}
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      fill="none"
-    />
-    <line
-      x1="14"
-      y1="17"
-      x2="14"
-      y2="28"
-      stroke={C.accent}
-      strokeWidth="1.8"
-      strokeLinecap="round"
-    />
+    <line x1="11" y1="8" x2="11" y2="14" stroke={C.accent} strokeWidth="1.8" strokeLinecap="round" />
+    <line x1="14" y1="8" x2="14" y2="14" stroke={C.accent} strokeWidth="1.8" strokeLinecap="round" />
+    <line x1="17" y1="8" x2="17" y2="14" stroke={C.accent} strokeWidth="1.8" strokeLinecap="round" />
+    <path d="M11 14 Q14 17 17 14" stroke={C.accent} strokeWidth="1.8" strokeLinecap="round" fill="none" />
+    <line x1="14" y1="17" x2="14" y2="28" stroke={C.accent} strokeWidth="1.8" strokeLinecap="round" />
     {/* arc ring — calorie ring hint */}
     <path
       d="M22 10 A8 8 0 1 1 21.99 10"
@@ -97,26 +51,12 @@ const GoogleIcon = () => (
 );
 
 // ── Input ─────────────────────────────────────────────────────
-function AuthInput({
-  label,
-  type = "text",
-  value,
-  onChange,
-  placeholder,
-  error,
-  autoComplete,
-}) {
+function AuthInput({ label, type = "text", value, onChange, placeholder, error, autoComplete }) {
   const [focused, setFocused] = useState(false);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <Mono size={8} color={C.mutedLight}>
           {label}
         </Mono>
@@ -202,22 +142,24 @@ export default function Login() {
       setLoading(true);
 
       if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         // UserContext onAuthStateChange handles the rest
       }
 
       if (isSignup) {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: { data: { name } }, // stored in auth.users.user_metadata
         });
         if (error) throw error;
-        setMessage("Check your email to confirm your account.");
+        
+        // If email confirmation is disabled, data.session will exist and the auth listener handles the rest.
+        // If it's enabled, data.session will be null.
+        if (!data.session) {
+          setMessage("Check your email to confirm your account.");
+        }
       }
 
       if (isForgot) {
@@ -237,9 +179,7 @@ export default function Login() {
   const handleGoogle = async () => {
     try {
       setLoading(true);
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-      });
+      const { error } = await supabase.auth.signInWithOAuth({ provider: "google" });
       if (error) throw error;
     } catch (err) {
       setAuthError(err.message);
@@ -282,22 +222,9 @@ export default function Login() {
       />
 
       {/* card */}
-      <div
-        style={{
-          width: "100%",
-          maxWidth: 400,
-          animation: "fadeUp 0.4s ease both",
-        }}
-      >
+      <div style={{ width: "100%", maxWidth: 400, animation: "fadeUp 0.4s ease both" }}>
         {/* logo + wordmark */}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            marginBottom: 36,
-          }}
-        >
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 36 }}>
           <div style={{ animation: "bounceIn 0.6s ease both" }}>
             <KaloriMark />
           </div>
@@ -315,11 +242,7 @@ export default function Login() {
           >
             Kalori
           </div>
-          <Mono
-            size={8}
-            color={C.muted}
-            style={{ marginTop: 4, animation: "fadeUp 0.4s ease 0.15s both" }}
-          >
+          <Mono size={8} color={C.muted} style={{ marginTop: 4, animation: "fadeUp 0.4s ease 0.15s both" }}>
             {isLogin && "TRACK · LEVEL UP · IMPROVE"}
             {isSignup && "START YOUR JOURNEY"}
             {isForgot && "RECOVER YOUR ACCOUNT"}
@@ -386,24 +309,8 @@ export default function Login() {
           {/* forgot header */}
           {isForgot && (
             <div style={{ marginBottom: 20 }}>
-              <div
-                style={{
-                  fontFamily: F.head,
-                  fontSize: 18,
-                  fontWeight: 900,
-                  color: C.text,
-                }}
-              >
-                Forgot Password
-              </div>
-              <div
-                style={{
-                  fontFamily: F.body,
-                  fontSize: 13,
-                  color: C.soft,
-                  marginTop: 4,
-                }}
-              >
+              <div style={{ fontFamily: F.head, fontSize: 18, fontWeight: 900, color: C.text }}>Forgot Password</div>
+              <div style={{ fontFamily: F.body, fontSize: 13, color: C.soft, marginTop: 4 }}>
                 Enter your email and we'll send a reset link.
               </div>
             </div>
@@ -425,11 +332,7 @@ export default function Login() {
               }}
             >
               <span style={{ color: C.accent, fontSize: 14 }}>✓</span>
-              <span
-                style={{ fontFamily: F.body, fontSize: 12, color: C.accent }}
-              >
-                {message}
-              </span>
+              <span style={{ fontFamily: F.body, fontSize: 12, color: C.accent }}>{message}</span>
             </div>
           )}
 
@@ -449,17 +352,12 @@ export default function Login() {
               }}
             >
               <span style={{ color: C.red, fontSize: 14 }}>✕</span>
-              <span style={{ fontFamily: F.body, fontSize: 12, color: C.red }}>
-                {authError}
-              </span>
+              <span style={{ fontFamily: F.body, fontSize: 12, color: C.red }}>{authError}</span>
             </div>
           )}
 
           {/* fields */}
-          <div
-            style={{ display: "flex", flexDirection: "column", gap: 12 }}
-            onKeyDown={handleKeyDown}
-          >
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }} onKeyDown={handleKeyDown}>
             {isSignup && (
               <AuthInput
                 label="Name"
@@ -498,13 +396,7 @@ export default function Login() {
               <span
                 onClick={() => switchMode("forgot")}
                 className="press"
-                style={{
-                  fontFamily: F.mono,
-                  fontSize: 8,
-                  color: C.mutedLight,
-                  cursor: "pointer",
-                  letterSpacing: 1,
-                }}
+                style={{ fontFamily: F.mono, fontSize: 8, color: C.mutedLight, cursor: "pointer", letterSpacing: 1 }}
               >
                 FORGOT PASSWORD?
               </span>
@@ -527,94 +419,19 @@ export default function Login() {
               minHeight: 48,
             }}
           >
-            <span
-              style={{
-                fontFamily: F.mono,
-                fontSize: 11,
-                fontWeight: 700,
-                color: loading ? C.accent : "#000",
-              }}
-            >
-              {loading
-                ? "PLEASE WAIT..."
-                : isLogin
-                  ? "LOG IN"
-                  : isSignup
-                    ? "CREATE ACCOUNT"
-                    : "SEND RESET LINK"}
+            <span style={{ fontFamily: F.mono, fontSize: 11, fontWeight: 700, color: loading ? C.accent : "#000" }}>
+              {loading ? "PLEASE WAIT..." : isLogin ? "LOG IN" : isSignup ? "CREATE ACCOUNT" : "SEND RESET LINK"}
             </span>
           </div>
-
-          {/* divider */}
-          {!isForgot && (
-            <>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 12,
-                  margin: "20px 0",
-                }}
-              >
-                <div style={{ flex: 1, height: 1, background: C.border }} />
-                <Mono size={8} color={C.muted}>
-                  OR
-                </Mono>
-                <div style={{ flex: 1, height: 1, background: C.border }} />
-              </div>
-
-              {/* google */}
-              <div
-                onClick={!loading ? handleGoogle : undefined}
-                className="hover-btn press"
-                style={{
-                  background: C.card,
-                  border: `1px solid ${C.border}`,
-                  borderRadius: 12,
-                  padding: "13px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 10,
-                  cursor: "pointer",
-                  minHeight: 48,
-                }}
-              >
-                <GoogleIcon />
-                <span
-                  style={{
-                    fontFamily: F.mono,
-                    fontSize: 10,
-                    fontWeight: 700,
-                    color: C.soft,
-                  }}
-                >
-                  CONTINUE WITH GOOGLE
-                </span>
-              </div>
-            </>
-          )}
         </div>
 
         {/* back to login from forgot */}
         {isForgot && (
-          <div
-            style={{
-              textAlign: "center",
-              marginTop: 20,
-              animation: "fadeIn 0.3s ease 0.3s both",
-            }}
-          >
+          <div style={{ textAlign: "center", marginTop: 20, animation: "fadeIn 0.3s ease 0.3s both" }}>
             <span
               onClick={() => switchMode("login")}
               className="press"
-              style={{
-                fontFamily: F.mono,
-                fontSize: 8,
-                color: C.mutedLight,
-                cursor: "pointer",
-                letterSpacing: 1,
-              }}
+              style={{ fontFamily: F.mono, fontSize: 8, color: C.mutedLight, cursor: "pointer", letterSpacing: 1 }}
             >
               ← BACK TO LOG IN
             </span>
@@ -624,50 +441,17 @@ export default function Login() {
         {/* terms */}
         {isSignup && (
           <div
-            style={{
-              textAlign: "center",
-              marginTop: 16,
-              padding: "0 8px",
-              animation: "fadeIn 0.3s ease 0.3s both",
-            }}
+            style={{ textAlign: "center", marginTop: 16, padding: "0 8px", animation: "fadeIn 0.3s ease 0.3s both" }}
           >
             <span style={{ fontFamily: F.body, fontSize: 11, color: C.muted }}>
               By signing up you agree to our{" "}
-              <span
-                style={{
-                  color: C.mutedLight,
-                  textDecoration: "underline",
-                  cursor: "pointer",
-                }}
-              >
-                Terms
-              </span>{" "}
-              and{" "}
-              <span
-                style={{
-                  color: C.mutedLight,
-                  textDecoration: "underline",
-                  cursor: "pointer",
-                }}
-              >
+              <span style={{ color: C.mutedLight, textDecoration: "underline", cursor: "pointer" }}>Terms</span> and{" "}
+              <span style={{ color: C.mutedLight, textDecoration: "underline", cursor: "pointer" }}>
                 Privacy Policy
               </span>
             </span>
           </div>
         )}
-
-        {/* version */}
-        <div
-          style={{
-            textAlign: "center",
-            marginTop: 24,
-            animation: "fadeIn 0.3s ease 0.4s both",
-          }}
-        >
-          <Mono size={7} color={C.muted}>
-            KALORI V1.0 · MINT DARK
-          </Mono>
-        </div>
       </div>
     </div>
   );

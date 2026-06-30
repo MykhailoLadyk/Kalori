@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect } from "react";
 import { useNotifications } from "./NotificationContext";
 import { fetchGameData, updateGameData } from "../services/gameService";
+import { achievements as achievementDefinitions, quests as questDefinitions } from "../lib/constans";
 
 export const GameContext = createContext(null);
 
@@ -34,7 +35,7 @@ const mockUserQuests = [
 ];
 
 export function GameProvider({ children }) {
-  const [gameData, setGameData] = useState({ xp_total: 0, streak: 0, coins: 100 });
+  const [gameData, setGameData] = useState({ xp_total: 99, streak: 0, coins: 100 });
   const [achievements, setAchievements] = useState(mockUserAchievements);
   const [quests, setQuests] = useState(mockUserQuests);
   const [shopItems, setShopItems] = useState({ streak_shields: 0, themesOwned: [1] });
@@ -95,50 +96,103 @@ export function GameProvider({ children }) {
     }
   };
   const handleUpdateAchievements = async (updates) => {
-    // try {
-    //   setUpdating(true);
-    //   const updatedGameData = await updateGameData(updates);
-    //   setGameData(updatedGameData);
-    // } catch (error) {
-    //   setError(error.message || "Failed to update game data");
-    //   console.error(error);
-    // } finally {
-    //   setUpdating(false);
-    // }
+    if (!updates || !updates.length) return;
 
-    const prev = achievements;
-    if (!prev.some((p) => p.id === updates.id)) {
-      setAchievements((p) => [updates, ...p]);
-    } else {
-      setAchievements((p) => p.map((it) => (it.id === updates.id ? updates : it)));
-    }
-    const newOnes = updates.filter((u) => !prev.some((p) => p.id === u.id));
-    try {
-      newOnes.forEach((ach) => addNotification({ type: "achievement", ...ach }));
-    } catch (e) {
-      console.error("addNotification failed", e);
-    }
+    const achDefMap = new Map(achievementDefinitions.map((a) => [a.id, a]));
+
+    // Fire side effects safely outside the setState callback
+    updates.forEach((update) => {
+      const a = achievements.find((ach) => ach.id === update.id);
+      const def = achDefMap.get(update.id);
+      if (a) {
+        const wasCompleted = a.completedAt != null;
+        const isNowCompleted = update.progress >= (def?.max ?? 1);
+        if (isNowCompleted && !wasCompleted) {
+          try {
+            addNotification({ ...def, ...a, ...update, type: "achievement" });
+          } catch (e) {
+            console.error("addNotification failed", e);
+          }
+        }
+      } else {
+        // Brand new achievement
+        if (update.progress >= (def?.max ?? 1)) {
+          try {
+            addNotification({ ...def, ...update, type: "achievement" });
+          } catch (e) {
+            console.error("addNotification failed", e);
+          }
+        }
+      }
+    });
+
+    setAchievements((prev) => {
+      const merged = prev.map((a) => {
+        const update = updates.find((u) => u.id === a.id);
+        if (!update) return a;
+        
+        const def = achDefMap.get(a.id);
+        const result = { ...a, ...update };
+        if (update.progress >= (def?.max ?? 1) && !a.completedAt) {
+          result.completedAt = new Date().toISOString();
+        }
+        return result;
+      });
+
+      const newOnes = updates.filter((u) => !prev.some((p) => p.id === u.id));
+      newOnes.forEach((update) => {
+        const def = achDefMap.get(update.id);
+        if (update.progress >= (def?.max ?? 1)) {
+          update.completedAt = new Date().toISOString();
+        }
+        merged.unshift(update);
+      });
+
+      return merged;
+    });
   };
-  const handleUpdateQuests = async (updates) => {
-    // try {
-    //   setUpdating(true);
-    //   const updatedGameData = await updateGameData(updates);
-    //   setGameData(updatedGameData);
-    // } catch (error) {
-    //   setError(error.message || "Failed to update game data");
-    //   console.error(error);
-    // } finally {
-    //   setUpdating(false);
-    // }
 
-    const prev = quests;
-    const completed = prev.filter((p) => !updates.some((u) => u.id === p.id));
-    try {
-      completed.forEach((q) => addNotification({ type: "quest", ...q }));
-    } catch (e) {
-      console.error("addNotification failed", e);
-    }
-    setQuests((prevQ) => prevQ.map((q) => (q.id === updates.id ? { ...q, ...updates } : q)));
+  const handleUpdateQuests = async (updates) => {
+    if (!updates || !updates.length) return;
+
+    const questDefMap = new Map(questDefinitions.map((q) => [q.id, q]));
+
+    // Fire side effects safely outside the setState callback
+    updates.forEach((update) => {
+      const q = quests.find((quest) => quest.id === update.id);
+      const def = questDefMap.get(update.id);
+      if (q) {
+        const wasCompleted = q.completedAt != null;
+        const isNowCompleted = update.progress >= (def?.max ?? 1);
+        if (isNowCompleted && !wasCompleted) {
+          try {
+            addNotification({ 
+              ...def, 
+              ...q, 
+              ...update, 
+              type: "quest",
+              coins: def.reward // map reward to coins for the toast UI
+            });
+          } catch (e) {
+            console.error("addNotification failed", e);
+          }
+        }
+      }
+    });
+
+    setQuests((prevQ) => {
+      return prevQ.map((q) => {
+        const update = updates.find((u) => u.id === q.id);
+        if (!update) return q;
+
+        const def = questDefMap.get(q.id);
+        const result = { ...q, ...update };
+        if (update.progress >= (def?.max ?? 1) && !q.completedAt) {
+          result.completedAt = new Date().toISOString();
+        }
+        return result;
+      });
+    });
   };
   const handleUpdateShopItems = async (updates) => {
     // try {

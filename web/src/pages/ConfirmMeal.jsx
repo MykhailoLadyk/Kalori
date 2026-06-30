@@ -4,7 +4,9 @@ import { C, F, alpha } from "../lib/constans";
 import { Mono } from "../components/shared/Primitives";
 import { useMeals } from "../hooks/useMeals";
 import { useGameStats } from "../hooks/useGameStats";
+import { useUser } from "../hooks/useUser";
 import { getStreakMultiplier } from "../lib/utils";
+import { processProgress } from "../lib/progressEngine";
 const ChevronLeft = () => (
   <svg
     width="18"
@@ -30,8 +32,9 @@ const FIELD_CONFIG = [
 ];
 
 export default function ConfirmMeal() {
-  const { addMeal } = useMeals();
-  const { gameData, updateGameData } = useGameStats();
+  const { meals, addMeal } = useMeals();
+  const { gameData, quests, achievements, updateGameData, updateQuests, updateAchievements } = useGameStats();
+  const { user } = useUser();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -84,13 +87,25 @@ export default function ConfirmMeal() {
       const baseCoins = 5;
       const coinsAwarded = baseCoins * multiplier;
       await updateGameData({ xp_total: gameData.xp_total + xpAwarded, coins: gameData.coins + coinsAwarded });
-      await addMeal({
+      const mealObj = {
         ...form,
         calories: Number(form.calories),
         protein: Number(form.protein || 0),
         carbs: Number(form.carbs || 0),
         fat: Number(form.fat || 0),
-      });
+      };
+      await addMeal(mealObj);
+
+      const contextBag = {
+        meals: [...meals, mealObj],
+        user,
+        userQuests: quests || [],
+        userAchievements: achievements || [],
+        gameData: { ...gameData, xp_total: gameData.xp_total + xpAwarded, coins: gameData.coins + coinsAwarded },
+      };
+      const { updatedQuests, updatedAchievements } = processProgress("ADD_MEAL", mealObj, contextBag);
+      if (updatedQuests.length) updateQuests(updatedQuests);
+      if (updatedAchievements.length) updateAchievements(updatedAchievements);
       navigate("/");
     } catch (err) {
       console.error(err);

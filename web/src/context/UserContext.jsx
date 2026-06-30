@@ -9,7 +9,7 @@ export function UserProvider({ children }) {
     email: "maria@example.com",
     age: 28,
     userAuth: true,
-    completedOnboarding: false,
+    completedOnboarding: true,
     targets: { calories: 2800, protein: 150, carbs: 250, fat: 110, water: 3000 },
     settings: {
       timezone: "UTC+1",

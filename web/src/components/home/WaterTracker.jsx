@@ -5,18 +5,35 @@ import { AnimBar } from "../shared/AnimBar";
 import { IconDrop } from "../shared/DuoIcon";
 import { useMeals } from "../../hooks/useMeals";
 import { useUser } from "../../hooks/useUser";
+import { useGameStats } from "../../hooks/useGameStats";
+import { processProgress } from "../../lib/progressEngine";
 export function WaterTracker() {
   const { meals, addMeal } = useMeals();
   const { user } = useUser();
+  const { gameData, quests, achievements, updateQuests, updateAchievements } = useGameStats();
   const waterMeals = meals.filter((m) => m.name.toLowerCase() === "water");
   const current = waterMeals.reduce((sum, m) => sum + m.amount, 0);
   const goal = user.targets.water;
   const [inputValue, setInputValue] = useState("");
 
+  const handleAddWater = (amount) => {
+    addMeal({ name: "water", amount });
+    const contextBag = {
+      meals: [...meals, { name: "water", amount }],
+      user,
+      userQuests: quests || [],
+      userAchievements: achievements || [],
+      gameData,
+    };
+    const { updatedQuests, updatedAchievements } = processProgress("ADD_WATER", { amount }, contextBag);
+    if (updatedQuests.length) updateQuests(updatedQuests);
+    if (updatedAchievements.length) updateAchievements(updatedAchievements);
+  };
+
   const handleCustomAdd = () => {
     const amount = parseInt(inputValue);
     if (!amount || amount <= 0) return;
-    addMeal({ name: "water", amount });
+    handleAddWater(amount);
     setInputValue("");
   };
 
@@ -67,7 +84,7 @@ export function WaterTracker() {
         {[250, 400].map((amount) => (
           <div
             key={amount}
-            onClick={() => addMeal({ name: "water", amount })}
+            onClick={() => handleAddWater(amount)}
             className="hover-btn press"
             style={{
               flex: 1,

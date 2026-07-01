@@ -3,6 +3,8 @@ import { useNotifications } from "./NotificationContext";
 import { fetchGameData, updateGameData } from "../services/gameService";
 import { achievements as achievementDefinitions, quests as questDefinitions } from "../lib/constans";
 import { useUser } from "../hooks/useUser";
+import { supabase } from "../services/supabase";
+import { getTodayDateString, getDaysBetweenDates } from "../lib/dateUtils";
 
 export const GameContext = createContext(null);
 
@@ -24,7 +26,7 @@ const defaultQuests = [
 
 export function GameProvider({ children }) {
   const { user } = useUser();
-  const [gameData, setGameData] = useState({ xp_total: 0, streak: 0, coins: 0, level: 1 });
+  const [gameData, setGameData] = useState({ xp_total: 0, streak: 0, coins: 0, level: 1, last_log_date: null });
   const [achievements, setAchievements] = useState(defaultAchievements);
   const [quests, setQuests] = useState(defaultQuests);
   const [shopItems, setShopItems] = useState({ streak_shields: 0, themesOwned: [1] });
@@ -42,9 +44,49 @@ export function GameProvider({ children }) {
         const data = await fetchGameData();
         
         if (data.achievements) setAchievements(data.achievements);
-        if (data.quests) setQuests(data.quests);
         if (data.themesOwned) setShopItems(prev => ({ ...prev, themesOwned: data.themesOwned }));
         if (data.streak_shields !== undefined) setShopItems(prev => ({ ...prev, streak_shields: data.streak_shields }));
+
+        // --- Quest Lazy Loading Logic ---
+        let currentQuests = data.quests || defaultQuests;
+        const today = getTodayDateString();
+        
+        let needsDaily = false;
+        let needsWeekly = false;
+        
+        if (data.last_daily_refresh !== today) needsDaily = true;
+        
+        const daysSinceWeekly = getDaysBetweenDates(data.last_weekly_refresh, today);
+        if (!data.last_weekly_refresh || daysSinceWeekly >= 7) needsWeekly = true;
+        
+        if (needsDaily || needsWeekly) {
+            const dailyPool = questDefinitions.filter(q => q.type === "Daily");
+            const weeklyPool = questDefinitions.filter(q => q.type === "Weekly");
+            
+            let newDailyQuests = currentQuests.filter(q => questDefinitions.find(d => d.id === q.id)?.type === "Daily");
+            let newWeeklyQuests = currentQuests.filter(q => questDefinitions.find(d => d.id === q.id)?.type === "Weekly");
+            
+            if (needsDaily) {
+                const shuffled = [...dailyPool].sort(() => 0.5 - Math.random());
+                newDailyQuests = shuffled.slice(0, 2).map(q => ({ id: q.id, progress: 0 }));
+            }
+            if (needsWeekly) {
+                const shuffled = [...weeklyPool].sort(() => 0.5 - Math.random());
+                newWeeklyQuests = shuffled.slice(0, 1).map(q => ({ id: q.id, progress: 0 }));
+            }
+            
+            currentQuests = [...newDailyQuests, ...newWeeklyQuests];
+            setQuests(currentQuests);
+            
+            // Fire RPC to securely update db
+            await supabase.rpc('refresh_quests', {
+                new_quests: currentQuests,
+                is_daily_refresh: needsDaily,
+                is_weekly_refresh: needsWeekly
+            });
+        } else {
+            setQuests(currentQuests);
+        }
 
         // Remove array fields from base gameData state so it's clean
         const baseData = { ...data };
@@ -52,6 +94,8 @@ export function GameProvider({ children }) {
         delete baseData.quests;
         delete baseData.themesOwned;
         delete baseData.streak_shields;
+        delete baseData.last_daily_refresh;
+        delete baseData.last_weekly_refresh;
 
         setGameData(baseData);
       } catch (error) {

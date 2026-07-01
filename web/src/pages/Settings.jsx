@@ -42,11 +42,7 @@ import {
 export default function Settings() {
   const { user } = useUser();
   const { gameData } = useGameStats();
-  const [toggles, setToggles] = useState({
-    meal: true,
-    water: true,
-    streak: false,
-  });
+  const [toggles, setToggles] = useState({ meal: true, water: true, streak: false });
   const [modal, setModal] = useState(null);
   const modals = {
     profile: <ProfileModal handleClose={() => setModal(null)} />,
@@ -83,13 +79,7 @@ export default function Settings() {
   return (
     <div style={{ padding: "16px 22px 16px" }}>
       <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 14,
-          marginBottom: 20,
-          animation: "fadeUp 0.4s ease both",
-        }}
+        style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20, animation: "fadeUp 0.4s ease both" }}
       >
         <div
           style={{
@@ -110,33 +100,16 @@ export default function Settings() {
           {user?.name?.[0]?.toUpperCase() ?? "?"}
         </div>
         <div>
-          <div
-            style={{
-              fontFamily: F.head,
-              fontSize: 18,
-              fontWeight: 900,
-              color: C.text,
-            }}
-          >
-            {user?.name || "User"}
-          </div>
+          <div style={{ fontFamily: F.head, fontSize: 18, fontWeight: 900, color: C.text }}>{user?.name || "User"}</div>
           <Mono size={8} color={C.muted}>
-            Level {Math.floor(gameData?.xp_total / 100) + 1} ·{" "}
-            {gameData?.xp_total || 0} XP
+            Level {Math.floor(gameData?.xp_total / 100) + 1} · {gameData?.xp_total || 0} XP
           </Mono>
         </div>
       </div>
 
       <div style={{ marginBottom: 16 }}>
         <SectionLabel>Account</SectionLabel>
-        <div
-          style={{
-            background: C.card,
-            borderRadius: 16,
-            border: `1px solid ${C.border}`,
-            overflow: "hidden",
-          }}
-        >
+        <div style={{ background: C.card, borderRadius: 16, border: `1px solid ${C.border}`, overflow: "hidden" }}>
           <SettingsCard
             onClick={() => {
               setModal("profile");
@@ -168,14 +141,7 @@ export default function Settings() {
 
       <div style={{ marginBottom: 16 }}>
         <SectionLabel>Preferences</SectionLabel>
-        <div
-          style={{
-            background: C.card,
-            borderRadius: 16,
-            border: `1px solid ${C.border}`,
-            overflow: "hidden",
-          }}
-        >
+        <div style={{ background: C.card, borderRadius: 16, border: `1px solid ${C.border}`, overflow: "hidden" }}>
           {/* <SettingsCard
             onClick={() => {
               setModal("language");
@@ -252,14 +218,7 @@ export default function Settings() {
 
       <div style={{ marginBottom: 16 }}>
         <SectionLabel>App</SectionLabel>
-        <div
-          style={{
-            background: C.card,
-            borderRadius: 16,
-            border: `1px solid ${C.border}`,
-            overflow: "hidden",
-          }}
-        >
+        <div style={{ background: C.card, borderRadius: 16, border: `1px solid ${C.border}`, overflow: "hidden" }}>
           <SettingsCard
             onClick={() => {
               setModal("privacy");
@@ -268,7 +227,7 @@ export default function Settings() {
             label="Privacy"
             arrow
           />
-          <SettingsCard
+          {/* <SettingsCard
             onClick={() => {
               setModal("export");
             }}
@@ -276,7 +235,7 @@ export default function Settings() {
             label="Export My Data"
             arrow
             withTopBorder
-          />
+          /> */}
           <SettingsCard
             onClick={() => {
               setModal("legal");
@@ -307,15 +266,9 @@ export default function Settings() {
         </div>
       </div>
 
-      <div
-        style={{
-          textAlign: "center",
-          marginTop: 8,
-          animation: "fadeIn 0.4s ease 0.6s both",
-        }}
-      >
+      <div style={{ textAlign: "center", marginTop: 8, animation: "fadeIn 0.4s ease 0.6s both" }}>
         <Mono size={8} color={C.muted}>
-          Kalori v1.0.0 · Made with 🤍
+          Kalori v1.0.0
         </Mono>
       </div>
       <Modal id={modal} close={() => setModal(null)}>

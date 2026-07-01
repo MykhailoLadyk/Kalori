@@ -35,8 +35,10 @@ export function processProgress(trigger, payload, contextBag) {
   // --- Process Achievements ---
   for (const def of achDefs) {
     if (!def.triggers || !def.triggers.includes(trigger)) continue;
-    const userA = achProgressMap.get(def.id);
-    if (!userA) continue; // not an active achievement for this user
+    let userA = achProgressMap.get(def.id);
+    if (!userA) {
+      userA = { id: def.id, progress: 0 }; // Initialize dynamically
+    }
     if (userA.completedAt) continue; // already done
 
     const ctx = { ...contextBag, item: userA };

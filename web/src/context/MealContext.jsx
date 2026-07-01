@@ -1,5 +1,5 @@
 import { createContext, useEffect, useState } from "react";
-import { fetchMeals, addMeal, deleteMeal, updateMeal } from "../services/mealService";
+import { fetchMeals as apiFetchMeals, addMeal, deleteMeal, updateMeal } from "../services/mealService";
 import { useUser } from "../hooks/useUser";
 
 export const MealContext = createContext(null);
@@ -10,6 +10,28 @@ export function MealProvider({ children }) {
   const [error, setError] = useState(null);
   const [updating, setUpdating] = useState(false);
   const [meals, setMeals] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+
+  const getLocalYMD = (d) => {
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
+  };
+
+  const handleFetchMeals = async (dateObj) => {
+    try {
+      setLoading(true);
+      const dateStr = dateObj ? getLocalYMD(dateObj) : undefined;
+      const fetchedMeals = await apiFetchMeals(dateStr);
+      setMeals(fetchedMeals);
+    } catch (error) {
+      console.error("Failed to fetch meals", error);
+      setError(error.message || "Failed to fetch meals");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     // Only fetch meals if we have an authenticated user
@@ -17,26 +39,14 @@ export function MealProvider({ children }) {
       setMeals([]);
       return;
     }
-
-    const loadMeals = async () => {
-      try {
-        setLoading(true);
-        const fetchedMeals = await fetchMeals();
-        setMeals(fetchedMeals);
-      } catch (error) {
-        console.error("Failed to fetch meals", error);
-        setError(error.message || "Failed to fetch meals");
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadMeals();
-  }, [user?.userAuth]);
+    handleFetchMeals(selectedDate);
+  }, [user?.userAuth, selectedDate]);
 
   const handleAddMeal = async (meal) => {
     try {
       setUpdating(true);
-      const newMeal = await addMeal(meal);
+      const mealWithDate = { ...meal, date: meal.date || getLocalYMD(selectedDate) };
+      const newMeal = await addMeal(mealWithDate);
       setMeals((prev) => [...prev, newMeal]);
     } catch (error) {
       console.error("Failed to add meal", error);
@@ -79,7 +89,9 @@ export function MealProvider({ children }) {
     <MealContext.Provider
       value={{
         meals,
-        setMeals,
+        fetchMeals: handleFetchMeals,
+        selectedDate,
+        setSelectedDate,
         error,
         loading,
         updating,

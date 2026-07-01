@@ -5,6 +5,13 @@ import { fetchMealsByRange } from "../services/mealService";
 
 export const StatsContext = createContext(null);
 
+const getLocalYMD = (d) => {
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+};
+
 export function StatsProvider({ children }) {
   const { meals } = useMeals(); // Today's meals
   const { user } = useUser();
@@ -24,8 +31,8 @@ export function StatsProvider({ children }) {
         const ninetyDaysAgo = new Date(today);
         ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 89);
 
-        const endDate = today.toISOString().split("T")[0];
-        const startDate = ninetyDaysAgo.toISOString().split("T")[0];
+        const endDate = getLocalYMD(today);
+        const startDate = getLocalYMD(ninetyDaysAgo);
 
         const data = await fetchMealsByRange(startDate, endDate);
         setHistoricalMeals(data);
@@ -48,15 +55,8 @@ export function StatsProvider({ children }) {
     for (let i = 89; i >= 0; i--) {
       const d = new Date(today);
       d.setDate(d.getDate() - i);
-      const dateStr = d.toISOString().slice(0, 10);
-      dataMap.set(dateStr, {
-        date: dateStr,
-        calories: 0,
-        protein: 0,
-        carbs: 0,
-        fat: 0,
-        water: 0,
-      });
+      const dateStr = getLocalYMD(d);
+      dataMap.set(dateStr, { date: dateStr, calories: 0, protein: 0, carbs: 0, fat: 0, water: 0 });
     }
 
     // Process historical meals
@@ -75,7 +75,7 @@ export function StatsProvider({ children }) {
     });
 
     // Override today's data with the live 'meals' state to ensure it's up to date
-    const todayStr = today.toISOString().slice(0, 10);
+    const todayStr = getLocalYMD(today);
     if (dataMap.has(todayStr)) {
       const day = dataMap.get(todayStr);
       day.calories = 0;
@@ -113,46 +113,20 @@ export function StatsProvider({ children }) {
       const midIndex = Math.floor(chunk.length / 2);
       weeks.push({
         date: chunk[midIndex].date,
-        calories: Math.round(
-          chunk.reduce((s, d) => s + d.calories, 0) / chunk.length,
-        ),
-        protein: Math.round(
-          chunk.reduce((s, d) => s + d.protein, 0) / chunk.length,
-        ),
-        carbs: Math.round(
-          chunk.reduce((s, d) => s + d.carbs, 0) / chunk.length,
-        ),
+        calories: Math.round(chunk.reduce((s, d) => s + d.calories, 0) / chunk.length),
+        protein: Math.round(chunk.reduce((s, d) => s + d.protein, 0) / chunk.length),
+        carbs: Math.round(chunk.reduce((s, d) => s + d.carbs, 0) / chunk.length),
         fat: Math.round(chunk.reduce((s, d) => s + d.fat, 0) / chunk.length),
-        water: Math.round(
-          chunk.reduce((s, d) => s + d.water, 0) / chunk.length,
-        ),
+        water: Math.round(chunk.reduce((s, d) => s + d.water, 0) / chunk.length),
       });
     }
     return weeks;
   }, [dailyData]);
 
   const contextValue = useMemo(
-    () => ({
-      dailyData,
-      loadingStats,
-      getWeekData,
-      getMonthData,
-      get3MonthData,
-      get3MonthWeeklyAverages,
-    }),
-    [
-      dailyData,
-      loadingStats,
-      getWeekData,
-      getMonthData,
-      get3MonthData,
-      get3MonthWeeklyAverages,
-    ],
+    () => ({ dailyData, loadingStats, getWeekData, getMonthData, get3MonthData, get3MonthWeeklyAverages }),
+    [dailyData, loadingStats, getWeekData, getMonthData, get3MonthData, get3MonthWeeklyAverages],
   );
 
-  return (
-    <StatsContext.Provider value={contextValue}>
-      {children}
-    </StatsContext.Provider>
-  );
+  return <StatsContext.Provider value={contextValue}>{children}</StatsContext.Provider>;
 }

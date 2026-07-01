@@ -3,6 +3,8 @@ import { useState } from "react";
 import { C, F, alpha } from "../lib/constans";
 import { Mono } from "../components/shared/Primitives";
 import { supabase } from "../services/supabase";
+import { Modal } from "../components/modals/Modal";
+import LegalModal from "../components/modals/settings/LegalModal";
 
 // ── Kalori wordmark ───────────────────────────────────────────
 const KaloriMark = () => (
@@ -97,11 +99,11 @@ export default function Login() {
   const [mode, setMode] = useState("login"); // "login" | "signup" | "forgot"
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState(null); // success message
   const [authError, setAuthError] = useState(null); // server error
+  const [showLegal, setShowLegal] = useState(false);
 
   const isLogin = mode === "login";
   const isSignup = mode === "signup";
@@ -121,7 +123,6 @@ export default function Login() {
   // ── Validation ───────────────────────────────────────────────
   const validate = () => {
     const e = {};
-    if (isSignup && !name.trim()) e.name = "Required";
     if (!email.trim()) e.email = "Required";
     else if (!/\S+@\S+\.\S+/.test(email)) e.email = "Invalid email";
     if (!isForgot && !password) e.password = "Required";
@@ -151,7 +152,6 @@ export default function Login() {
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
-          options: { data: { name } }, // stored in auth.users.user_metadata
         });
         if (error) throw error;
         
@@ -358,16 +358,6 @@ export default function Login() {
 
           {/* fields */}
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }} onKeyDown={handleKeyDown}>
-            {isSignup && (
-              <AuthInput
-                label="Name"
-                value={name}
-                onChange={setName}
-                placeholder="Your name"
-                error={errors.name}
-                autoComplete="name"
-              />
-            )}
             <AuthInput
               label="Email"
               type="email"
@@ -445,14 +435,18 @@ export default function Login() {
           >
             <span style={{ fontFamily: F.body, fontSize: 11, color: C.muted }}>
               By signing up you agree to our{" "}
-              <span style={{ color: C.mutedLight, textDecoration: "underline", cursor: "pointer" }}>Terms</span> and{" "}
-              <span style={{ color: C.mutedLight, textDecoration: "underline", cursor: "pointer" }}>
+              <span onClick={() => setShowLegal(true)} style={{ color: C.mutedLight, textDecoration: "underline", cursor: "pointer" }}>Terms</span> and{" "}
+              <span onClick={() => setShowLegal(true)} style={{ color: C.mutedLight, textDecoration: "underline", cursor: "pointer" }}>
                 Privacy Policy
               </span>
             </span>
           </div>
         )}
       </div>
+
+      <Modal id={showLegal ? "legal" : null} close={() => setShowLegal(false)}>
+        <LegalModal handleClose={() => setShowLegal(false)} />
+      </Modal>
     </div>
   );
 }

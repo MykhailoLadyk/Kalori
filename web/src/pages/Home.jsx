@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { C, F } from "../lib/constans";
+import { useMeals } from "../hooks/useMeals";
 
 import { SectionLabel, Stagger } from "../components/shared/Primitives";
 import { QuestList } from "../components/shared/QuestList";
@@ -18,7 +19,7 @@ import { Meals } from "../components/home/Meals";
 
 export default function Home({ setCurrentPage, setMealConfirm }) {
   const [modal, setModal] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const { selectedDate, setSelectedDate } = useMeals();
   const modals = {
     datepicker: <DateModal date={selectedDate} setDate={setSelectedDate} />,
     select_add_meal: (

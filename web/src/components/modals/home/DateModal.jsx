@@ -7,7 +7,7 @@ export function DateModal({ handleClose, date, setDate }) {
   const [localDate, setLocalDate] = useState(date.getDate());
   const [localMonth, setLocalMonth] = useState(date.getMonth());
   const [selectedMonth, setSelectedMonth] = useState(date.getMonth());
-  const { setMeals } = useMeals();
+  const { fetchMeals } = useMeals();
 
   const today = new Date();
   const todayYear = today.getFullYear();
@@ -21,7 +21,7 @@ export function DateModal({ handleClose, date, setDate }) {
   const leadingEmptyDays = (firstDayOfMonth + 6) % 7;
 
   const isPrevDisabled = localMonth === 0;
-  const isNextDisabled = localMonth === date.getMonth();
+  const isNextDisabled = currentYear === todayYear && localMonth === todayMonth;
 
   const selectedCandidate = new Date(currentYear, selectedMonth, localDate);
   const isSelectedFuture = selectedCandidate > todayStart;
@@ -170,8 +170,8 @@ export function DateModal({ handleClose, date, setDate }) {
       <div
         onClick={() => {
           if (isSelectedFuture) return;
-          setDate(new Date(date.getFullYear(), selectedMonth, localDate));
-          if (localDate !== date.getDate()) setMeals([]); /// Change to fetch meals later
+          const newDate = new Date(currentYear, selectedMonth, localDate);
+          setDate(newDate);
           handleClose();
         }}
         className="hover-btn press"

@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { C, F } from "../../../lib/constans";
+import { Mono } from "../../shared/Primitives";
 import { Tag } from "../../shared/Primitives";
 import { IconCoin } from "../../shared/DuoIcon";
 import { useUser } from "../../../hooks/useUser";
@@ -6,17 +8,26 @@ import { useGameStats } from "../../../hooks/useGameStats";
 export default function ShopThemesModal({ themes = [], currentTheme, coins }) {
   const { updateUser } = useUser();
   const { updateShopItems, shopItems, updateGameData, gameData } = useGameStats();
+  const [error, setError] = useState(null);
+  const [message, setMessage] = useState(null);
+
   const onPurchase = async (themeId) => {
+    setError(null);
+    setMessage(null);
+
     const theme = themes.find((t) => t.id === themeId);
     if (!theme) return;
     if (coins < theme.price) {
-      alert("Not enough coins to purchase this theme.");
+      setError("Not enough coins to purchase this theme.");
       return;
     }
 
     await updateUser({ settings: { theme: theme.id } });
     await updateShopItems({ themesOwned: [...(shopItems?.themesOwned || []), theme.id] });
     await updateGameData({ coins: gameData.coins - theme.price });
+
+    setMessage(`Unlocked ${theme.name} theme!`);
+    setTimeout(() => setMessage(null), 3000);
   };
 
   const handleThemeClick = async (theme, isLocked, isCurrent, isOwned) => {
@@ -35,6 +46,14 @@ export default function ShopThemesModal({ themes = [], currentTheme, coins }) {
   return (
     <div>
       <div style={{ fontFamily: F.head, fontSize: 20, fontWeight: 900, color: C.text, marginBottom: 16 }}>Themes</div>
+
+      {(error || message) && (
+        <div style={{ marginBottom: 16, textAlign: "center", animation: "fadeIn 0.3s ease" }}>
+          <Mono size={9} color={error ? C.red : C.accent}>
+            {error || message}
+          </Mono>
+        </div>
+      )}
 
       {themes.map(({ id, name, colors, price, lock, owned }, i) => {
         const isCurrent = String(id) === String(currentTheme);

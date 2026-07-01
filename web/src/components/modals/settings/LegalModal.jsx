@@ -3,11 +3,11 @@ import { C, F } from "../../../lib/constans";
 const SECTIONS = [
   {
     title: "Terms of Service",
-    body: "By using Kalori you agree to use it for personal health tracking only. We are not liable for any health decisions made based on the app's data.",
+    body: "Welcome to Kalori! By using our app, you agree to track your meals and health data responsibly. Kalori is designed for gamified fitness tracking and general wellness, not as a substitute for professional medical advice. We are not liable for any health decisions, dietary changes, or physical outcomes resulting from your use of the app. Please consult a doctor before starting any new diet or exercise routine.",
   },
   {
     title: "Privacy Policy",
-    body: "We collect only the data necessary to run the app. See the Privacy section for full details on what we collect and how we use it.",
+    body: "We value your privacy. Kalori securely stores your dietary goals and meal logs exclusively to provide and improve your tracking experience. We do not sell your personal health data to third parties. Our AI features analyze food descriptions to estimate macros but do not use your personal data for public model training.",
   },
   {
     title: "Open Source",

@@ -1,11 +1,23 @@
 import { useState } from "react";
 import { C, F } from "../../../lib/constans";
 import { IconSignOut } from "../../../components/shared/DuoIcon";
+import { supabase } from "../../../services/supabase";
 
 export default function LogOutModal({ handleClose }) {
   const [loading, setLoading] = useState(false);
 
-  const handleLogOut = async () => {};
+  const handleLogOut = async () => {
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      handleClose();
+    } catch (err) {
+      console.error("Error logging out:", err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div>

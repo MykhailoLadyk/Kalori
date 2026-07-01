@@ -8,6 +8,13 @@ export default async function analyzeFoodImage(description) {
   });
 
   if (error) throw error;
-  if (data.error) throw new Error(data.error);
-  return data;
+  if (data?.error) throw new Error(data.error);
+  
+  const normalized = typeof data === "object" && data?.body ? data.body : data;
+  
+  if (typeof normalized === "string") {
+    return normalized.replace(/```json/gi, "").replace(/```/g, "").trim();
+  }
+
+  return normalized;
 }

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { C, F } from "../../../lib/constans";
 import { Mono } from "../../../components/shared/Primitives";
 import { useUser } from "../../../hooks/useUser";
+import { calcMacros } from "../../../lib/macroCalc";
 
 export default function CalorieGoalModal({ handleClose }) {
   const { user, updateUser } = useUser();
@@ -45,6 +46,7 @@ export default function CalorieGoalModal({ handleClose }) {
         targets: {
           calories: Number(calorieGoal),
           water: Number(waterGoal),
+          ...calcMacros({ weight: user?.settings?.weight, calories: Number(calorieGoal), goal: form.goal }),
         },
         settings: {
           weight_goal: form.goal,

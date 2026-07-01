@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { C, F, alpha } from "../../../lib/constans";
 import { Mono } from "../../shared/Primitives";
 import { IconShield, IconCoin } from "../../shared/DuoIcon";
@@ -5,18 +6,25 @@ import { shieldPacks } from "../../../lib/constans";
 import { useGameStats } from "../../../hooks/useGameStats";
 
 export default function ShopOtherModal() {
-  const { shopItems, updateShopItems, gameData, updateGameData } =
-    useGameStats();
+  const { shopItems, updateShopItems, gameData, updateGameData } = useGameStats();
+  const [error, setError] = useState(null);
+  const [message, setMessage] = useState(null);
+
   async function onPurchase(price, qty) {
+    setError(null);
+    setMessage(null);
+    
     const newCoiins = gameData.coins - price;
     if (newCoiins < 0) {
-      alert("Not enough coins");
+      setError("Not enough coins.");
       return;
     }
     const newStreakShields = shopItems.streak_shields + parseInt(qty);
     await updateShopItems({ streak_shields: newStreakShields });
     await updateGameData({ coins: newCoiins });
-    alert(`Purchased ${qty} Streak Shield(s) for ${price} coins!`);
+    setMessage(`Purchased ${qty} Streak Shield(s) for ${price} coins!`);
+    
+    setTimeout(() => setMessage(null), 3000);
   }
   return (
     <div>
@@ -144,6 +152,14 @@ export default function ShopOtherModal() {
             </div>
           ))}
         </div>
+        
+        {(error || message) && (
+          <div style={{ marginTop: 16, textAlign: "center", animation: "fadeIn 0.3s ease" }}>
+            <Mono size={9} color={error ? C.red : C.accent}>
+              {error || message}
+            </Mono>
+          </div>
+        )}
       </div>
     </div>
   );

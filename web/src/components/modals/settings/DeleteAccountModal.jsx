@@ -2,6 +2,7 @@ import { useState } from "react";
 import { C, F, alpha } from "../../../lib/constans";
 import { Mono } from "../../../components/shared/Primitives";
 import { IconTrash } from "../../../components/shared/DuoIcon";
+import { supabase } from "../../../services/supabase";
 
 export default function DeleteAccountModal({ handleClose }) {
   const [confirm, setConfirm] = useState("");
@@ -11,7 +12,22 @@ export default function DeleteAccountModal({ handleClose }) {
   const isConfirmed = confirm === "DELETE";
 
   const handleDelete = async () => {
-    console.log("Deleting account...");
+    try {
+      setLoading(true);
+      setError(null);
+      const { error: rpcError } = await supabase.rpc('delete_user_account');
+      if (rpcError) throw rpcError;
+      
+      // Account deleted, now sign out client side
+      await supabase.auth.signOut();
+      
+      // Close modal (app will re-render to login page because session is null)
+      handleClose();
+    } catch (err) {
+      console.error(err);
+      setError("Failed to delete account. Please try again.");
+      setLoading(false);
+    }
   };
 
   return (

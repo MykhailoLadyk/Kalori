@@ -79,7 +79,8 @@ export async function addMeal(meal) {
       carbs: meal.carbs,
       fat: meal.fat,
       type: meal.type, // "breakfast" | "lunch" | "dinner" | "snacks"
-      date: meal.date,
+      date: meal.date || todayYmd(),
+      amount: meal.amount,
     })
     .select()
     .single();

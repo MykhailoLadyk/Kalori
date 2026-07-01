@@ -1,11 +1,12 @@
 // pages/OnboardingPage.jsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { C, F, alpha } from "../lib/constans";
 import { Mono } from "../components/shared/Primitives";
 import { AnimBar } from "../components/shared/AnimBar";
 import { useUser } from "../hooks/useUser";
 import { supabase } from "../services/supabase";
 import { useNavigate } from "react-router-dom";
+import { calcMacros } from "../lib/macroCalc";
 
 // ── Step indicator ────────────────────────────────────────────
 function StepDots({ current, total }) {
@@ -239,6 +240,41 @@ export default function OnboardingPage() {
   const currentStep = STEPS[step];
   const totalDots = STEPS.length - 2; // exclude welcome + done from dots
 
+  useEffect(() => {
+    if (!form.weight || !form.height || !form.age) return;
+
+    // Estimate BMR (average between male and female Mifflin-St Jeor)
+    let bmr = (10 * Number(form.weight)) + (6.25 * Number(form.height)) - (5 * Number(form.age)) - 78;
+    
+    let multiplier = 1.2;
+    switch (form.activity_level) {
+      case "sedentary": multiplier = 1.2; break;
+      case "light": multiplier = 1.375; break;
+      case "moderate": multiplier = 1.55; break;
+      case "active": multiplier = 1.725; break;
+      case "very_active": multiplier = 1.9; break;
+      default: multiplier = 1.2;
+    }
+    
+    let tdee = bmr * multiplier;
+    
+    if (form.goal === "lose") tdee -= 500;
+    if (form.goal === "gain") tdee += 500;
+    
+    let calories = Math.max(1200, Math.round(tdee));
+    
+    // Water goal in ml (~35ml per kg)
+    let water = Math.round(Number(form.weight) * 35);
+    water = Math.max(2000, Math.min(4000, water));
+
+    setForm(prev => {
+       if (prev.calorie_goal !== calories || prev.water_goal !== water) {
+          return { ...prev, calorie_goal: calories, water_goal: water };
+       }
+       return prev;
+    });
+  }, [form.weight, form.height, form.age, form.activity_level, form.goal]);
+
   // ── Validate per step ───────────────────────────────────────
   const validate = () => {
     const e = {};
@@ -276,13 +312,14 @@ export default function OnboardingPage() {
         completedOnboarding: true,
         settings: {
           activity_level: form.activity_level,
-          goal: form.goal,
+          weight_goal: form.goal,
           weight: Number(form.weight),
           height: Number(form.height),
         },
         targets: {
           calories: form.calorie_goal,
           water: form.water_goal,
+          ...calcMacros({ weight: form.weight, calories: form.calorie_goal, goal: form.goal }),
         },
       });
 
@@ -1041,24 +1078,6 @@ export default function OnboardingPage() {
           </div>
         </div>
 
-        {/* skip — only on game intro */}
-        {currentStep === "game" && (
-          <div style={{ textAlign: "center", marginTop: 14 }}>
-            <span
-              onClick={next}
-              className="press"
-              style={{
-                fontFamily: F.mono,
-                fontSize: 8,
-                color: C.muted,
-                cursor: "pointer",
-                letterSpacing: 1,
-              }}
-            >
-              SKIP →
-            </span>
-          </div>
-        )}
       </div>
     </div>
   );

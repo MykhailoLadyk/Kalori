@@ -56,6 +56,9 @@ export default async function analyzeFood(imageInput) {
   // try to normalize: if data.body exists use it, otherwise return data itself.
   const normalized = typeof data === "object" && data?.body ? data.body : data;
 
-  // normalized is expected to be a JSON string (the function returns JSON.stringify(text))
+  if (typeof normalized === "string") {
+    return normalized.replace(/```json/gi, "").replace(/```/g, "").trim();
+  }
+
   return normalized;
 }

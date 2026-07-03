@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { C, F, alpha } from "../lib/constans";
+import { C, F, alpha } from "../lib/constants";
 import { Mono } from "../components/shared/Primitives";
 import { useMeals } from "../hooks/useMeals";
 import { useGameStats } from "../hooks/useGameStats";
@@ -135,7 +135,6 @@ export default function ManualMealPage() {
 
       navigate("/");
     } catch (err) {
-      console.error(err);
     } finally {
       setLoading(false);
     }

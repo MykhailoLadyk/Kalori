@@ -1,5 +1,5 @@
 import { IconTrophy } from "../shared/DuoIcon";
-import { alpha } from "../../lib/constans";
+import { alpha } from "../../lib/constants";
 
 export default function ShopItemChests({ colors = [] }) {
   return (

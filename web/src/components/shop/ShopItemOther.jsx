@@ -1,4 +1,4 @@
-import { C, F } from "../../lib/constans";
+import { C, F } from "../../lib/constants";
 import { Mono } from "../shared/Primitives";
 import { IconShield, IconCoin } from "../shared/DuoIcon";
 export default function ShopItemOther({ price = 150 }) {

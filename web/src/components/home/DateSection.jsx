@@ -1,4 +1,4 @@
-import { C, F } from "../../lib/constans";
+import { C, F } from "../../lib/constants";
 import { IconCalendar } from "../../components/shared/DuoIcon";
 import { getDayName, getMonthName } from "../../lib/utils";
 export function DateSection({ setModal, date }) {

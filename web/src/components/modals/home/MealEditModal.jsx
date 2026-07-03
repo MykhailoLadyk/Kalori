@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { C, F, alpha } from "../../../lib/constans";
+import { C, F, alpha } from "../../../lib/constants";
 import { useMeals } from "../../../hooks/useMeals";
 import { Mono } from "../../shared/Primitives";
 

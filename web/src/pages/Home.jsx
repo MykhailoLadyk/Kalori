@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { C, F } from "../lib/constans";
+import { C, F } from "../lib/constants";
 import { useMeals } from "../hooks/useMeals";
 
 import { SectionLabel, Stagger } from "../components/shared/Primitives";

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { C, F, alpha } from "../../../lib/constans";
+import { C, F, alpha } from "../../../lib/constants";
 import { Mono } from "../../../components/shared/Primitives";
 import { IconTrash } from "../../../components/shared/DuoIcon";
 import { supabase } from "../../../services/supabase";
@@ -24,7 +24,6 @@ export default function DeleteAccountModal({ handleClose }) {
       // Close modal (app will re-render to login page because session is null)
       handleClose();
     } catch (err) {
-      console.error(err);
       setError("Failed to delete account. Please try again.");
       setLoading(false);
     }

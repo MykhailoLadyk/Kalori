@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { C, F, alpha } from "../../lib/constans";
+import { C, F, alpha } from "../../lib/constants";
 import { IconPencil, IconTrash } from "../shared/DuoIcon";
 import { MealDeleteModal } from "../modals/home/MealDeleteModal";
 import { MealEditModal } from "../modals/home/MealEditModal";

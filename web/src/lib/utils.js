@@ -19,7 +19,7 @@ export function getDayName(date) {
   }
 }
 
-import { MONTHS } from "./constans.js";
+import { MONTHS } from "./constants.js";
 export function getMonthName(date) {
   const index = typeof date === "number" ? date : date instanceof Date ? date.getMonth() : -1;
   return MONTHS[index] || "";

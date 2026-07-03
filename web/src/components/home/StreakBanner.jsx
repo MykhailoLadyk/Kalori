@@ -1,4 +1,4 @@
-import { C, F, alpha } from "../../lib/constans";
+import { C, F, alpha } from "../../lib/constants";
 import { Mono } from "../shared/Primitives";
 import { IconFire, IconShield } from "../shared/DuoIcon";
 import { useGameStats } from "../../hooks/useGameStats";

@@ -1,4 +1,4 @@
-import { C, F } from "../../lib/constans";
+import { C, F } from "../../lib/constants";
 import { MealCard } from "./MealCard";
 import { useMeals } from "../../hooks/useMeals";
 const MEAL_TYPES = [

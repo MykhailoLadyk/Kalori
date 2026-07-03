@@ -1,5 +1,5 @@
 import { Mono } from "../shared/Primitives";
-import { C, F } from "../../lib/constans";
+import { C, F } from "../../lib/constants";
 import { AnimBar } from "../shared/AnimBar";
 export default function StatsMacroSplit({ label, val, max: m, color, i }) {
   return (

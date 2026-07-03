@@ -5,7 +5,7 @@ import {
   QuestProteinIcon,
   QuestFireIcon,
 } from "./DuoIcon";
-import { C, quests as questDefinitions } from "../../lib/constans";
+import { C, quests as questDefinitions } from "../../lib/constants";
 import { useGameStats } from "../../hooks/useGameStats";
 const QUEST_ICON_MAP = {
   meal: QuestMealIcon,

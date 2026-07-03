@@ -1,6 +1,6 @@
 import { Mono } from "../shared/Primitives";
 import CountUp from "../shared/CountUp";
-import { C, F } from "../../lib/constans";
+import { C, F } from "../../lib/constants";
 
 export default function StatsItemQuick(props) {
   const { label, val, suffix, sub, color, i } = props;

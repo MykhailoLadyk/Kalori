@@ -1,6 +1,6 @@
 // pages/OnboardingPage.jsx
 import { useState, useEffect } from "react";
-import { C, F, alpha } from "../lib/constans";
+import { C, F, alpha } from "../lib/constants";
 import { Mono } from "../components/shared/Primitives";
 import { AnimBar } from "../components/shared/AnimBar";
 import { useUser } from "../hooks/useUser";
@@ -325,7 +325,6 @@ export default function OnboardingPage() {
 
       navigate("/");
     } catch (err) {
-      console.error(err);
     } finally {
       setSaving(false);
     }

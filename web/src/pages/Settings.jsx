@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { Mono } from "../components/shared/Primitives";
-import { C, F } from "../lib/constans";
+import { C, F } from "../lib/constants";
 import { useUser } from "../hooks/useUser";
 import { useGameStats } from "../hooks/useGameStats";
 

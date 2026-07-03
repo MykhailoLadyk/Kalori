@@ -1,5 +1,5 @@
 // modals/home/MealDeleteModal.jsx
-import { C, F, alpha } from "../../../lib/constans";
+import { C, F, alpha } from "../../../lib/constants";
 import { IconTrash } from "../../shared/DuoIcon";
 import { useMeals } from "../../../hooks/useMeals";
 

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useGameStats } from "../hooks/useGameStats";
 import { useUser } from "../hooks/useUser";
-import { C, F, levels, themesDefinitions } from "../lib/constans";
+import { C, F, levels, themesDefinitions } from "../lib/constants";
 import { Modal } from "../components/modals/Modal";
 import { Mono, Tag } from "../components/shared/Primitives";
 import { IconCoin, IconPalette, IconTrophy, IconShield } from "../components/shared/DuoIcon";

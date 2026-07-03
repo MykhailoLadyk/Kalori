@@ -1,7 +1,7 @@
 import { createContext, useState, useEffect } from "react";
 import { useNotifications } from "./NotificationContext";
 import { fetchGameData, updateGameData } from "../services/gameService";
-import { achievements as achievementDefinitions, quests as questDefinitions } from "../lib/constans";
+import { achievements as achievementDefinitions, quests as questDefinitions } from "../lib/constants";
 import { useUser } from "../hooks/useUser";
 import { supabase } from "../services/supabase";
 import { getTodayDateString, getDaysBetweenDates } from "../lib/dateUtils";
@@ -100,7 +100,6 @@ export function GameProvider({ children }) {
         setGameData(baseData);
       } catch (error) {
         setError("Failed to fetch game data");
-        console.error(error);
       } finally {
         setLoading(false);
       }
@@ -135,11 +134,9 @@ export function GameProvider({ children }) {
           addNotification({ type: "levelup", level: updates.level });
         }
       } catch (e) {
-        console.error("addNotification failed", e);
       }
     } catch (error) {
       setError(error.message || "Failed to update game data");
-      console.error(error);
     } finally {
       setUpdating(false);
     }
@@ -160,7 +157,6 @@ export function GameProvider({ children }) {
           try {
             addNotification({ ...def, ...a, ...update, type: "achievement" });
           } catch (e) {
-            console.error("addNotification failed", e);
           }
         }
       } else {
@@ -168,7 +164,6 @@ export function GameProvider({ children }) {
           try {
             addNotification({ ...def, ...update, type: "achievement" });
           } catch (e) {
-            console.error("addNotification failed", e);
           }
         }
       }
@@ -203,7 +198,6 @@ export function GameProvider({ children }) {
       setUpdating(true);
       await updateGameData({ achievements: merged });
     } catch (e) {
-      console.error("Failed to persist achievements", e);
     } finally {
       setUpdating(false);
     }
@@ -233,7 +227,6 @@ export function GameProvider({ children }) {
               coins: def.reward,
             });
           } catch (e) {
-            console.error("addNotification failed", e);
           }
         }
       }
@@ -269,7 +262,6 @@ export function GameProvider({ children }) {
       setUpdating(true);
       await updateGameData(dbUpdates);
     } catch (e) {
-      console.error("Failed to persist quests", e);
     } finally {
       setUpdating(false);
     }
@@ -293,7 +285,6 @@ export function GameProvider({ children }) {
       await updateGameData(newItems);
     } catch (error) {
       setError(error.message || "Failed to update shop items");
-      console.error(error);
     } finally {
       setUpdating(false);
     }

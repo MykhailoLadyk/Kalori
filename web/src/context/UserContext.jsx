@@ -35,7 +35,6 @@ export function UserProvider({ children }) {
       } catch (error) {
         if (mounted) {
           setError(error.message || "Failed to fetch user");
-          console.error("Failed to fetch user", error);
         }
       } finally {
         if (mounted) setLoading(false);
@@ -88,7 +87,6 @@ export function UserProvider({ children }) {
       await updateUser(dbUpdates);
     } catch (error) {
       setError(error.message || "Failed to update user");
-      console.error("Failed to update user", error);
     } finally {
       setUpdating(false);
     }

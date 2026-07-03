@@ -37,7 +37,6 @@ export function StatsProvider({ children }) {
         const data = await fetchMealsByRange(startDate, endDate);
         setHistoricalMeals(data);
       } catch (err) {
-        console.error("Failed to load historical stats", err);
       } finally {
         setLoadingStats(false);
       }

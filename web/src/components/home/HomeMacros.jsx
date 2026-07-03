@@ -1,5 +1,5 @@
 import { Mono } from "../shared/Primitives";
-import { C } from "../../lib/constans";
+import { C } from "../../lib/constants";
 import { AnimBar } from "../shared/AnimBar";
 import { useMeals } from "../../hooks/useMeals";
 import { useUser } from "../../hooks/useUser";

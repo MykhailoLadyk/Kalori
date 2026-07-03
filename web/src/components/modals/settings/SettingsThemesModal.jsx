@@ -1,4 +1,4 @@
-import { C, F, themesDefinitions } from "../../../lib/constans";
+import { C, F, themesDefinitions } from "../../../lib/constants";
 import { Tag } from "../../../components/shared/Primitives";
 import { useState, useEffect } from "react";
 import { useUser } from "../../../hooks/useUser";

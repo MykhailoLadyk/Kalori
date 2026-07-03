@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { C, F, alpha } from "../../../lib/constans";
+import { C, F, alpha } from "../../../lib/constants";
 import { Mono } from "../../../components/shared/Primitives";
 import analyzeFood from "../../../services/analyzeFood";
 
@@ -136,7 +136,6 @@ export function MealAddOptionSelectModal() {
     reader.onload = async () => {
       const photoDataUrl = reader.result;
       const res = await analyzeFood(photoDataUrl);
-      console.log("Analyze response:", res);
       const parsed = JSON.parse(res);
 
       setAlbumLoading(false);

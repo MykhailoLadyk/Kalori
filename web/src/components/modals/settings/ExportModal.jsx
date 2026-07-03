@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { C, F } from "../../../lib/constans";
+import { C, F } from "../../../lib/constants";
 import { Mono } from "../../../components/shared/Primitives";
 
 const EXPORT_OPTIONS = [

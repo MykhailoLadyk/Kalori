@@ -10,7 +10,7 @@ import {
 } from "../shared/DuoIcon";
 import { MealAddOptionSelectModal } from "../modals/home/MealAddOptionSelectModal";
 import { Modal } from "../modals/Modal";
-import { C, F } from "../../lib/constans";
+import { C, F } from "../../lib/constants";
 
 export default function Nav() {
   const navigate = useNavigate();

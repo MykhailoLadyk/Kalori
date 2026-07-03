@@ -1,4 +1,4 @@
-import { C, F, alpha } from "../../lib/constans";
+import { C, F, alpha } from "../../lib/constants";
 export function Mono({ children, size = 9, color = C.soft, weight = 700 }) {
   return (
     <span

@@ -1,6 +1,6 @@
 // pages/AuthPage.jsx
 import { useState } from "react";
-import { C, F, alpha } from "../lib/constans";
+import { C, F, alpha } from "../lib/constants";
 import { Mono } from "../components/shared/Primitives";
 import { supabase } from "../services/supabase";
 import { Modal } from "../components/modals/Modal";

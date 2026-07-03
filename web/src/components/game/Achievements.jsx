@@ -1,4 +1,4 @@
-import { C, F } from "../../lib/constans";
+import { C, F } from "../../lib/constants";
 import { IconTrophy } from "../shared/DuoIcon";
 
 export default function Achievements({ achievements, onViewAll }) {

@@ -1,4 +1,4 @@
-import { C, F } from "../../../lib/constans";
+import { C, F } from "../../../lib/constants";
 import { Mono } from "../../shared/Primitives";
 import { useState } from "react";
 import { getNumberOfDaysInMonth, getMonthName } from "../../../lib/utils";

@@ -1,4 +1,4 @@
-import { C, F, alpha } from "../../../lib/constans";
+import { C, F, alpha } from "../../../lib/constants";
 import { Tag, Mono } from "../../shared/Primitives";
 import {
   IconCoin,

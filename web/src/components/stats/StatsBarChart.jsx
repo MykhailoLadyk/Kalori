@@ -1,5 +1,5 @@
 import { Mono } from "../shared/Primitives";
-import { C, F, alpha } from "../../lib/constans";
+import { C, F, alpha } from "../../lib/constants";
 import { useEffect, useState } from "react";
 
 const SHORT_DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { C, F } from "../../lib/constans";
+import { C, F } from "../../lib/constants";
 import { IconStar } from "../shared/DuoIcon";
 
 export default function GameCard({ level, xp, xpToNext, totalXp = xp }) {

@@ -1,5 +1,5 @@
 import { useEffect, useState, cloneElement, isValidElement } from "react";
-import { C, alpha } from "../../lib/constans";
+import { C, alpha } from "../../lib/constants";
 export function Modal({ id, close, children }) {
   const [visible, setVisible] = useState(false);
   const [closing, setClosing] = useState(false);

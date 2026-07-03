@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 
-import { C, F } from "../lib/constans";
+import { C, F } from "../lib/constants";
 
 import { IconFire } from "../components/shared/DuoIcon";
 import { Mono } from "../components/shared/Primitives";

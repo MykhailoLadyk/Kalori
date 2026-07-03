@@ -26,7 +26,6 @@ export function MealProvider({ children }) {
       const fetchedMeals = await apiFetchMeals(dateStr);
       setMeals(fetchedMeals);
     } catch (error) {
-      console.error("Failed to fetch meals", error);
       setError(error.message || "Failed to fetch meals");
     } finally {
       setLoading(false);
@@ -49,7 +48,6 @@ export function MealProvider({ children }) {
       const newMeal = await addMeal(mealWithDate);
       setMeals((prev) => [...prev, newMeal]);
     } catch (error) {
-      console.error("Failed to add meal", error);
       setError(error.message || "Failed to add meal");
       throw error; // Re-throw to let components handle it if needed
     } finally {
@@ -63,7 +61,6 @@ export function MealProvider({ children }) {
       await deleteMeal(id);
       setMeals((prev) => prev.filter((meal) => meal.id !== id));
     } catch (error) {
-      console.error("Failed to delete meal", error);
       setError(error.message || "Failed to delete meal");
       throw error;
     } finally {
@@ -77,7 +74,6 @@ export function MealProvider({ children }) {
       const newMeal = await updateMeal(id, updates);
       setMeals((prev) => prev.map((m) => (m.id === id ? newMeal : m)));
     } catch (error) {
-      console.error("Failed to edit meal", error);
       setError(error.message || "Failed to edit meal");
       throw error;
     } finally {

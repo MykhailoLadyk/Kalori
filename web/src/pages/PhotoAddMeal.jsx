@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { C, F, alpha } from "../lib/constans";
+import { C, F, alpha } from "../lib/constants";
 import { Mono } from "../components/shared/Primitives";
 import analyzeFood from "../services/analyzeFood";
 const ChevronLeft = () => (
@@ -98,10 +98,8 @@ export default function PhotoAddMeal() {
       setAnalyzing(true);
       setError(null);
       const res = await analyzeFood(photo);
-      console.log("Analyze response:", res);
 
       const parsed = JSON.parse(res);
-      console.log("Analyze response:", parsed);
       setResult(true);
 
       navigate("/add-meal/confirm", {
@@ -112,7 +110,6 @@ export default function PhotoAddMeal() {
         },
       });
     } catch (err) {
-      console.error(err);
       setError("Couldn't analyze the photo. Try retaking it.");
     } finally {
       setAnalyzing(false);

@@ -20,7 +20,7 @@ import { GameProvider } from "./context/GameContext";
 import { StatsProvider } from "./context/StatsContext";
 import { NotificationProvider } from "./context/NotificationContext";
 import { ThemeProvider } from "./context/ThemeContext";
-import { C, alpha } from "./lib/constans";
+import { C, alpha } from "./lib/constants";
 
 // Global loading screen component
 function AuthLoader({ children }) {

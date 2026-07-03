@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { C, F } from "../../../lib/constans";
+import { C, F } from "../../../lib/constants";
 import { useUser } from "../../../hooks/useUser";
 
 const LANGUAGES = [

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { C } from "../../lib/constans";
+import { C } from "../../lib/constants";
 export function AnimBar({ pct, color, height = 4, delay = 0 }) {
   const [show, setShow] = useState(false);
   useEffect(() => {

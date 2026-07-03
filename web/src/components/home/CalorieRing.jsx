@@ -1,4 +1,4 @@
-import { C, F } from "../../lib/constans";
+import { C, F } from "../../lib/constants";
 import { useState, useEffect } from "react";
 import CountUp from "../shared/CountUp";
 import { Mono } from "../shared/Primitives";

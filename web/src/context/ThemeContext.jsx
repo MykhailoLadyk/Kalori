@@ -1,6 +1,6 @@
 import { createContext, useEffect } from "react";
 import { useUser } from "../hooks/useUser";
-import { themesDefinitions } from "../lib/constans";
+import { themesDefinitions } from "../lib/constants";
 
 export const ThemeContext = createContext(null);
 

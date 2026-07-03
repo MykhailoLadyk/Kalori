@@ -1,4 +1,4 @@
-import { C, F, alpha } from "../../../lib/constans";
+import { C, F, alpha } from "../../../lib/constants";
 import { IconTrophy } from "../../../components/shared/DuoIcon";
 
 export default function AchievementsModal({ achievements, handleClose }) {

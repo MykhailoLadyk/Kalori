@@ -103,10 +103,20 @@ Deno.serve(async (req) => {
     }
 
     // Increment usage
-    await supabase.from("ai_usage").upsert(
+    const { error: upsertError } = await supabase.from("ai_usage").upsert(
       { user_id: user.id, date: today, request_count: (usage?.request_count || 0) + 1 },
-      { onConflict: "user_id,date" }
+      { onConflict: "ai_usage_user_id_date_key" }
     );
+
+    if (upsertError) {
+      console.error("Upsert Error:", upsertError);
+      // We don't necessarily want to block the user if analytics fail, but for debugging we can return it
+      // or we can just log it. Let's return it so we can see the exact error.
+      return new Response(
+        JSON.stringify({ error: "Failed to track AI usage", details: upsertError }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     const projectId = Deno.env.get("GOOGLE_CLOUD_PROJECT_ID")!;
     const accessToken = await getAccessToken();

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { C, F, alpha } from "../lib/constans";
+import { C, F, alpha } from "../lib/constants";
 import { Mono } from "../components/shared/Primitives";
 import analyzeFoodDesc from "../services/analyzeFoodDesc";
 
@@ -32,13 +32,11 @@ export default function DescribeAddMeal() {
       setLoading(true);
       setError(null);
       const res = await analyzeFoodDesc(text);
-      console.log("Analyze response:", res);
 
       const parsed = JSON.parse(res);
       navigate("/add-meal/confirm", { state: { meal: parsed } });
     } catch (err) {
       setError("Couldn't analyze that. Try being more specific.");
-      console.error(err);
     } finally {
       setLoading(false);
     }

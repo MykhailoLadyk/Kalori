@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { C, F, alpha } from "../../../lib/constans";
+import { C, F, alpha } from "../../../lib/constants";
 import { Mono } from "../../shared/Primitives";
 import { IconShield, IconCoin } from "../../shared/DuoIcon";
-import { shieldPacks } from "../../../lib/constans";
+import { shieldPacks } from "../../../lib/constants";
 import { useGameStats } from "../../../hooks/useGameStats";
 
 export default function ShopOtherModal() {

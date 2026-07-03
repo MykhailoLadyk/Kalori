@@ -1,4 +1,4 @@
-import { C } from "../../lib/constans";
+import { C } from "../../lib/constants";
 
 export default function ShopItemThemes({ previewColors = [] }) {
   return (

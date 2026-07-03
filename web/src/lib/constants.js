@@ -1,9 +1,3 @@
-// - DEFAULT_CALORIE_GOAL
-// - MACRO_RATIOS
-// - XP_VALUES { mealLogged, questComplete, streakDay }
-// - QUEST_DEFINITIONS[]
-// - ACHIEVEMENT_DEFINITIONS[]
-
 // ══════════════════════════════════════════════════
 // COLORS AND FONTS
 // ══════════════════════════════════════════════════
@@ -774,38 +768,3 @@ export const shieldPacks = [
   { qty: "3×", price: 400 },
   { qty: "5×", price: 600 },
 ];
-// Context does this: recieves an array of objets(updated achievements/quests)
-
-// If any objects progress = max progress add date to the object to mark as completed
-
-// calls addNotifcation
-
-// Update DB
-
-// Update context
-
-// each Component where user aaction can complete quest/ach does this:
-
-// Calls function and assigns result to const upddatedQuests or ach
-
-// Calls context and gives it updatedQue or Ach
-
-// Function does this:
-
-// Recieves trigger type and payload(added meal,  water)
-
-// filters out all irrelevant que/ach(completed or differet trigger)
-
-// iterates through all quests/ach calling their function
-
-// add to quest or ach definitions:
-
-// Trigger, like ADD_MEAL, ADD_WATER etc.
-
-// Add function to calculate progress requiemnts which will take  payload and calculate whether reqs to progress are completed. For example, requiremnts reach macros targets for 10 days:
-
-// Was target macros reached today?
-
-// Will adding payload to current meals context reach macro targets?
-
-// If yes, then +1 to progress

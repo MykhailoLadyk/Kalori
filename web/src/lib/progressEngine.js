@@ -1,4 +1,4 @@
-import { quests as questDefs, achievements as achDefs } from "./constans";
+import { quests as questDefs, achievements as achDefs } from "./constants";
 
 /**
  * @param {string}  trigger  - e.g. "ADD_MEAL"

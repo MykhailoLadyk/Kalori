@@ -3,7 +3,7 @@ import {
   C,
   achievements as achievementDefinitions,
   levels,
-} from "../lib/constans";
+} from "../lib/constants";
 import { SectionLabel } from "../components/shared/Primitives";
 import { QuestList } from "../components/shared/QuestList";
 import GameCard from "../components/game/GameCard";

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { C, F } from "../../../lib/constans";
+import { C, F } from "../../../lib/constants";
 import { Mono } from "../../shared/Primitives";
 import { Tag } from "../../shared/Primitives";
 import { IconCoin } from "../../shared/DuoIcon";

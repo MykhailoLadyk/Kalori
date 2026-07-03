@@ -1,5 +1,5 @@
 import { Mono } from "../shared/Primitives";
-import { C, F, alpha } from "../../lib/constans";
+import { C, F, alpha } from "../../lib/constants";
 
 export default function SettingsCard({
   icon,

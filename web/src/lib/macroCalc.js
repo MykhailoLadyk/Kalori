@@ -38,3 +38,38 @@ export function calcMacros({ weight, calories, goal = "maintain" }) {
 
   return { protein, carbs, fat };
 }
+
+/**
+ * Calculate calorie and water targets based on body stats.
+ */
+export function calculateTargets({ weight, height, age, activity_level, goal }) {
+  if (!weight || !height || !age) {
+    return { calories: 2000, water: 2000 };
+  }
+
+  // Estimate BMR (average between male and female Mifflin-St Jeor)
+  let bmr = (10 * Number(weight)) + (6.25 * Number(height)) - (5 * Number(age)) - 78;
+  
+  let multiplier = 1.2;
+  switch (activity_level) {
+    case "sedentary": multiplier = 1.2; break;
+    case "light": multiplier = 1.375; break;
+    case "moderate": multiplier = 1.55; break;
+    case "active": multiplier = 1.725; break;
+    case "very_active": multiplier = 1.9; break;
+    default: multiplier = 1.2;
+  }
+  
+  let tdee = bmr * multiplier;
+  
+  if (goal === "lose") tdee -= 500;
+  if (goal === "gain") tdee += 500;
+  
+  let calories = Math.max(1200, Math.round(tdee));
+  
+  // Water goal in ml (~35ml per kg)
+  let water = Math.round(Number(weight) * 35);
+  water = Math.max(2000, Math.min(4000, water));
+
+  return { calories, water };
+}

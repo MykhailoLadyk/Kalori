@@ -2,9 +2,12 @@ import { useState, useEffect } from "react";
 import { C, F } from "../../../lib/constans";
 import { Mono } from "../../../components/shared/Primitives";
 import { useUser } from "../../../hooks/useUser";
+import { calculateTargets, calcMacros } from "../../../lib/macroCalc";
+import { useNotifications } from "../../../context/NotificationContext";
 
 export default function BodyStatsModal({ handleClose }) {
   const { user, updateUser } = useUser();
+  const { addNotification } = useNotifications();
 
   const [form, setForm] = useState({
     weight: "",
@@ -33,6 +36,20 @@ export default function BodyStatsModal({ handleClose }) {
   const handleSave = async () => {
     try {
       setLoading(true);
+      const { calories, water } = calculateTargets({
+        weight: Number(form.weight),
+        height: Number(form.height),
+        age: Number(form.age),
+        activity_level: form.activity_level,
+        goal: form.goal,
+      });
+
+      const macros = calcMacros({
+        weight: Number(form.weight),
+        calories,
+        goal: form.goal,
+      });
+
       await updateUser({
         settings: {
           weight: Number(form.weight),
@@ -41,7 +58,13 @@ export default function BodyStatsModal({ handleClose }) {
           activity_level: form.activity_level,
         },
         age: Number(form.age),
+        targets: {
+          calories,
+          water,
+          ...macros,
+        },
       });
+      addNotification({ type: "success", name: "Stats updated successfully!" });
       handleClose();
     } finally {
       setLoading(false);

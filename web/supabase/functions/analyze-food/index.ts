@@ -1,5 +1,6 @@
 import "@supabase/functions-js/edge-runtime.d.ts";
-import { importPKCS8, SignJWT } from "npm:jose@5.9.6";
+import { importPKCS8, SignJWT } from "jose";
+import { createClient } from "@supabase/supabase-js";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -61,6 +62,51 @@ Deno.serve(async (req) => {
         },
       );
     }
+
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+    );
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser(
+      authHeader.replace("Bearer ", "")
+    );
+
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const today = new Date().toISOString().slice(0, 10);
+    const { data: usage } = await supabase
+      .from("ai_usage")
+      .select("request_count")
+      .eq("user_id", user.id)
+      .eq("date", today)
+      .single();
+
+    if (usage && usage.request_count >= 20) {
+      return new Response(
+        JSON.stringify({ error: "Daily AI limit reached (20 requests per day)" }),
+        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Increment usage
+    await supabase.from("ai_usage").upsert(
+      { user_id: user.id, date: today, request_count: (usage?.request_count || 0) + 1 },
+      { onConflict: "user_id,date" }
+    );
 
     const projectId = Deno.env.get("GOOGLE_CLOUD_PROJECT_ID")!;
     const accessToken = await getAccessToken();

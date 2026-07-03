@@ -9,6 +9,7 @@ const CONFIGS = {
   achievement: { color: C.gold, icon: "🏆", duration: 5000 },
   levelup: { color: C.accent, icon: "⬆️", duration: 5000 },
   streak: { color: C.orange, icon: "🔥", duration: 4000 },
+  success: { color: "#10B981", icon: "✅", duration: 3000 },
 };
 
 function ToastContent({ notification }) {
@@ -34,6 +35,29 @@ function ToastContent({ notification }) {
         <span style={{ fontSize: 14 }}>{cfg.icon}</span>
         <span style={{ fontFamily: F.mono, fontSize: 12, fontWeight: 700, color }}>
           +{amount} {type === "xp" ? "XP" : "coins"}
+        </span>
+      </div>
+    );
+  }
+
+  // success generic toast
+  if (type === "success") {
+    return (
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          background: C.panel,
+          border: `1px solid ${alpha(color, 25)}`,
+          borderRadius: 10,
+          padding: "10px 14px",
+          boxShadow: `0 4px 20px ${alpha("#000", 38)}`,
+        }}
+      >
+        <span style={{ fontSize: 16 }}>{cfg.icon}</span>
+        <span style={{ fontFamily: F.body, fontSize: 13, fontWeight: 600, color: C.text }}>
+          {name || "Success"}
         </span>
       </div>
     );

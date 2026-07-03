@@ -2,10 +2,12 @@ import { useState, useEffect } from "react";
 import { C, F } from "../../../lib/constans";
 import { Mono } from "../../../components/shared/Primitives";
 import { useUser } from "../../../hooks/useUser";
-import { calcMacros } from "../../../lib/macroCalc";
+import { calcMacros, calculateTargets } from "../../../lib/macroCalc";
+import { useNotifications } from "../../../context/NotificationContext";
 
 export default function CalorieGoalModal({ handleClose }) {
   const { user, updateUser } = useUser();
+  const { addNotification } = useNotifications();
 
   const GOALS = [
     { key: "lose", label: "Lose weight" },
@@ -22,6 +24,11 @@ export default function CalorieGoalModal({ handleClose }) {
 
   const [calorieGoal, setCalorieGoal] = useState(user.targets.calories || 2000);
   const [waterGoal, setWaterGoal] = useState(user.targets.water || 2000);
+  const [macroGoals, setMacroGoals] = useState({
+    protein: user?.targets?.protein || 0,
+    carbs: user?.targets?.carbs || 0,
+    fat: user?.targets?.fat || 0,
+  });
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     goal: user?.settings?.weight_goal || "maintain",
@@ -32,12 +39,35 @@ export default function CalorieGoalModal({ handleClose }) {
     if (user?.settings) {
       setCalorieGoal(user.targets.calories);
       setWaterGoal(user.targets.water);
+      setMacroGoals({
+        protein: user.targets.protein || 0,
+        carbs: user.targets.carbs || 0,
+        fat: user.targets.fat || 0,
+      });
       setForm({
         goal: user.settings.weight_goal || "maintain",
         activity_level: user.settings.activity_level || "moderate",
       });
     }
   }, [user]);
+
+  const handleFormChange = (key, val) => {
+    const newForm = { ...form, [key]: val };
+    setForm(newForm);
+    
+    if (user?.settings && user.age) {
+       const { calories, water } = calculateTargets({
+         weight: user.settings.weight,
+         height: user.settings.height,
+         age: user.age,
+         activity_level: newForm.activity_level,
+         goal: newForm.goal
+       });
+       setCalorieGoal(calories);
+       setWaterGoal(water);
+       setMacroGoals(calcMacros({ weight: user.settings.weight, calories, goal: newForm.goal }));
+    }
+  };
 
   const handleSave = async () => {
     try {
@@ -46,13 +76,14 @@ export default function CalorieGoalModal({ handleClose }) {
         targets: {
           calories: Number(calorieGoal),
           water: Number(waterGoal),
-          ...calcMacros({ weight: user?.settings?.weight, calories: Number(calorieGoal), goal: form.goal }),
+          ...macroGoals,
         },
         settings: {
           weight_goal: form.goal,
           activity_level: form.activity_level,
         },
       });
+      addNotification({ type: "success", name: "Goals saved successfully!" });
       handleClose();
     } finally {
       setLoading(false);
@@ -83,7 +114,7 @@ export default function CalorieGoalModal({ handleClose }) {
             {GOALS.map(({ key, label }) => (
               <div
                 key={key}
-                onClick={() => setForm({ ...form, goal: key })}
+                onClick={() => handleFormChange("goal", key)}
                 className="press"
                 style={{
                   flex: 1,
@@ -140,7 +171,7 @@ export default function CalorieGoalModal({ handleClose }) {
           {ACTIVITY_LEVELS.map(({ key, label, sub }) => (
             <div
               key={key}
-              onClick={() => setForm({ ...form, activity_level: key })}
+              onClick={() => handleFormChange("activity_level", key)}
               className="press"
               style={{
                 display: "flex",
@@ -232,7 +263,11 @@ export default function CalorieGoalModal({ handleClose }) {
             <input
               type="number"
               value={calorieGoal}
-              onChange={(e) => setCalorieGoal(Number(e.target.value))}
+              onChange={(e) => {
+                const val = Number(e.target.value);
+                setCalorieGoal(val);
+                setMacroGoals(calcMacros({ weight: user?.settings?.weight, calories: val, goal: form.goal }));
+              }}
               placeholder="Enter calorie goal"
               style={{
                 flex: 1,
@@ -333,6 +368,72 @@ export default function CalorieGoalModal({ handleClose }) {
             </div>
           </div>
         </div>
+
+        {/* divider */}
+        <div
+          style={{
+            height: 0,
+            background: C.border,
+            marginBottom: 12,
+            marginTop: 12,
+          }}
+        />
+
+        {/* ── Macros breakdown ── */}
+        <details
+          style={{
+            background: C.card,
+            border: `1px solid ${C.border}`,
+            borderRadius: 10,
+            overflow: "hidden",
+            marginTop: 6,
+          }}
+        >
+          <summary
+            className="press"
+            style={{
+              padding: "14px",
+              fontFamily: F.body,
+              fontSize: 14,
+              color: C.text,
+              cursor: "pointer",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              outline: "none",
+            }}
+          >
+            <div>
+              <span style={{ fontWeight: 600 }}>Daily Macros Breakdown</span>
+              <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
+                 <Mono size={9} color={C.muted}>P: {macroGoals.protein}g</Mono>
+                 <Mono size={9} color={C.muted}>C: {macroGoals.carbs}g</Mono>
+                 <Mono size={9} color={C.muted}>F: {macroGoals.fat}g</Mono>
+              </div>
+            </div>
+            <Mono size={12} color={C.muted}>▼</Mono>
+          </summary>
+          <div style={{ padding: "0 14px 14px 14px", display: "flex", flexDirection: "column", gap: 8 }}>
+             {[
+               { key: "protein", label: "Protein" },
+               { key: "carbs", label: "Carbs" },
+               { key: "fat", label: "Fat" },
+             ].map(({ key, label }) => (
+               <div key={key} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                 <Mono size={10} color={C.text}>{label}</Mono>
+                 <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                   <input 
+                     type="number" 
+                     value={macroGoals[key]} 
+                     onChange={(e) => setMacroGoals({ ...macroGoals, [key]: Number(e.target.value) })}
+                     style={{ width: 50, background: "transparent", border: `1px solid ${C.border}`, borderRadius: 4, padding: "4px", color: C.text, fontFamily: F.mono, fontSize: 10, outline: "none", textAlign: "right" }}
+                   />
+                   <Mono size={10} color={C.muted}>g</Mono>
+                 </div>
+               </div>
+             ))}
+          </div>
+        </details>
       </div>
       <div
         onClick={!loading ? handleSave : undefined}

@@ -5,7 +5,7 @@ export function NotificationLayer({ notifications }) {
       style={{
         position: "fixed",
         top: 60,
-        right: 16,
+        right: "max(16px, calc(50vw - 240px + 16px))",
         zIndex: 9999,
         display: "flex",
         flexDirection: "column",

@@ -85,70 +85,33 @@ export default function DescribeAddMeal() {
 
   return (
     <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        flex: 1,
-        animation: "fadeIn 0.22s ease both",
-      }}
+      className="flex flex-col flex-1"
+      style={{ animation: "fadeIn 0.22s ease both" }}
     >
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 12,
-          padding: "8px 22px 16px",
-        }}
-      >
+      <div className="flex items-center" style={{ gap: 12, padding: "8px 22px 16px" }}>
         <div
           onClick={() => navigate("/")}
-          className="press"
+          className="press flex items-center justify-center bg-card"
           style={{
             width: 36,
             height: 36,
-            background: C.card,
             border: `1px solid ${C.border}`,
             borderRadius: 11,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
             color: C.soft,
             cursor: "pointer",
           }}
         >
           <ChevronLeft />
         </div>
-        <div
-          style={{
-            fontFamily: F.head,
-            fontSize: 18,
-            fontWeight: 900,
-            color: C.text,
-          }}
-        >
+        <div className="font-head font-black text-primary" style={{ fontSize: 18 }}>
           Describe Your Meal
         </div>
       </div>
 
-      <div
-        style={{
-          padding: "0 22px",
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
+      <div className="flex-1 flex flex-col" style={{ padding: "0 22px" }}>
         {!result ? (
           <>
-            <div
-              style={{
-                fontFamily: F.body,
-                fontSize: 13,
-                color: C.soft,
-                marginBottom: 14,
-                lineHeight: 1.6,
-              }}
-            >
+            <div className="font-body text-soft" style={{ fontSize: 13, marginBottom: 14, lineHeight: 1.6 }}>
               Tell us what you ate in plain language. We'll estimate the
               calories and macros.
             </div>
@@ -157,16 +120,13 @@ export default function DescribeAddMeal() {
               value={text}
               onChange={(e) => setText(e.target.value)}
               placeholder="e.g. Grilled salmon with rice and steamed vegetables"
+              className="w-full bg-card font-body text-primary"
               style={{
-                width: "100%",
                 minHeight: 120,
-                background: C.card,
                 border: `1px solid ${C.border}`,
                 borderRadius: 14,
                 padding: "14px",
-                fontFamily: F.body,
                 fontSize: 14,
-                color: C.text,
                 outline: "none",
                 resize: "none",
                 transition: "border-color 0.2s",
@@ -183,91 +143,53 @@ export default function DescribeAddMeal() {
               </div>
             )}
 
-            <div style={{ flex: 1 }} />
+            <div className="flex-1" />
 
             <div
               onClick={!loading && text.trim() ? handleAnalyze : undefined}
-              className="hover-btn press"
+              className="hover-btn press flex items-center justify-center"
               style={{
                 background: loading || !text.trim() ? C.accentDim : C.accent,
                 borderRadius: 12,
                 padding: "14px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
                 gap: 8,
                 cursor: loading ? "not-allowed" : (text.trim() ? "pointer" : "not-allowed"),
                 margin: "16px 0",
               }}
             >
               {loading && <Spinner color={C.accent} size={14} />}
-              <span
-                style={{
-                  fontFamily: F.mono,
-                  fontSize: 11,
-                  fontWeight: 700,
-                  color: loading ? C.accent : "#000",
-                }}
-              >
+              <span className="font-mono font-bold" style={{ fontSize: 11, color: loading ? C.accent : "#000" }}>
                 {loading ? loadingSteps[loadingStepIndex].toUpperCase() : "ANALYZE"}
               </span>
             </div>
           </>
         ) : (
           <>
-            <div
-              style={{
-                fontFamily: F.body,
-                fontSize: 13,
-                color: C.soft,
-                marginBottom: 14,
-              }}
-            >
+            <div className="font-body text-soft" style={{ fontSize: 13, marginBottom: 14 }}>
               Here's what we found — adjust if needed before saving.
             </div>
 
             <div
+              className="bg-card"
               style={{
-                background: C.card,
                 border: `1px solid ${C.border}`,
                 borderRadius: 16,
                 padding: "16px",
                 marginBottom: 16,
               }}
             >
-              <div
-                style={{
-                  fontFamily: F.body,
-                  fontSize: 15,
-                  fontWeight: 700,
-                  color: C.text,
-                  marginBottom: 12,
-                }}
-              >
+              <div className="font-body font-bold text-primary" style={{ fontSize: 15, marginBottom: 12 }}>
                 {result.name}
               </div>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  marginBottom: 12,
-                }}
-              >
+              <div className="flex justify-between" style={{ marginBottom: 12 }}>
                 <Mono size={9} color={C.mutedLight}>
                   Calories
                 </Mono>
-                <span
-                  style={{
-                    fontFamily: F.head,
-                    fontSize: 18,
-                    fontWeight: 900,
-                    color: C.accent,
-                  }}
-                >
+                <span className="font-head font-black text-accent" style={{ fontSize: 18 }}>
                   {result.calories} kcal
                 </span>
               </div>
-              <div style={{ display: "flex", gap: 8 }}>
+              <div className="flex" style={{ gap: 8 }}>
                 {[
                   { l: "Protein", v: result.protein, col: C.blue },
                   { l: "Carbs", v: result.carbs, col: C.gold },
@@ -275,27 +197,18 @@ export default function DescribeAddMeal() {
                 ].map(({ l, v, col }) => (
                   <div
                     key={l}
+                    className="flex-1 text-center"
                     style={{
-                      flex: 1,
                       background: alpha(col, 7),
                       border: `1px solid ${alpha(col, 19)}`,
                       borderRadius: 10,
                       padding: "8px",
-                      textAlign: "center",
                     }}
                   >
                     <Mono size={7} color={col}>
                       {l}
                     </Mono>
-                    <div
-                      style={{
-                        fontFamily: F.head,
-                        fontSize: 14,
-                        fontWeight: 800,
-                        color: C.text,
-                        marginTop: 2,
-                      }}
-                    >
+                    <div className="font-head text-primary font-extrabold" style={{ fontSize: 14, marginTop: 2 }}>
                       {v}g
                     </div>
                   </div>
@@ -303,57 +216,36 @@ export default function DescribeAddMeal() {
               </div>
             </div>
 
-            <div style={{ flex: 1 }} />
+            <div className="flex-1" />
 
-            <div style={{ display: "flex", gap: 10, margin: "16px 0" }}>
+            <div className="flex" style={{ gap: 10, margin: "16px 0" }}>
               <div
                 onClick={() => setResult(null)}
-                className="hover-btn press"
+                className="hover-btn press flex-1 bg-card text-center cursor-pointer"
                 style={{
-                  flex: 1,
-                  background: C.card,
                   border: `1px solid ${C.border}`,
                   borderRadius: 12,
                   padding: "14px",
-                  textAlign: "center",
-                  cursor: "pointer",
                 }}
               >
-                <span
-                  style={{
-                    fontFamily: F.mono,
-                    fontSize: 10,
-                    fontWeight: 700,
-                    color: C.soft,
-                  }}
-                >
+                <span className="font-mono font-bold" style={{ fontSize: 10, color: C.soft }}>
                   EDIT
                 </span>
               </div>
               <div
                 onClick={!loading ? handleConfirm : undefined}
-                className="hover-btn press"
+                className="hover-btn press flex items-center justify-center"
                 style={{
                   flex: 2,
                   background: loading ? C.accentDim : C.accent,
                   borderRadius: 12,
                   padding: "14px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
                   gap: 8,
                   cursor: loading ? "not-allowed" : "pointer",
                 }}
               >
                 {loading && <Spinner color={C.accent} size={14} />}
-                <span
-                  style={{
-                    fontFamily: F.mono,
-                    fontSize: 11,
-                    fontWeight: 700,
-                    color: loading ? C.accent : "#000",
-                  }}
-                >
+                <span className="font-mono font-bold" style={{ fontSize: 11, color: loading ? C.accent : "#000" }}>
                   {loading ? "SAVING..." : "ADD MEAL"}
                 </span>
               </div>

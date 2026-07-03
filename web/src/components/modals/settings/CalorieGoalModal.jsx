@@ -100,103 +100,54 @@ export default function CalorieGoalModal({ handleClose }) {
       >
         {/* goal */}
         <div style={{ marginBottom: 16 }}>
-          <div
-            style={{
-              fontFamily: F.head,
-              fontSize: 20,
-              fontWeight: 900,
-              color: C.text,
-              marginBottom: 24,
-            }}
-          >
+          <div className="font-head font-black text-primary" style={{ fontSize: 20, marginBottom: 24 }}>
             Weight Goals
           </div>
-          <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
+          <div className="flex" style={{ gap: 6, marginTop: 8 }}>
             {GOALS.map(({ key, label }) => (
               <div
                 key={key}
                 onClick={() => handleFormChange("goal", key)}
-                className="press"
+                className="press flex-1 flex items-center justify-center text-center cursor-pointer"
                 style={{
-                  flex: 1,
                   padding: "10px 4px",
                   borderRadius: 10,
-                  textAlign: "center",
-                  cursor: "pointer",
                   background: form.goal === key ? C.accent : C.card,
                   border: `1px solid ${form.goal === key ? C.accent : C.border}`,
                   transition: "all 0.2s",
-                  // min height for touch
                   minHeight: 44,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
                 }}
               >
-                <span
-                  style={{
-                    fontFamily: F.mono,
-                    fontSize: 8,
-                    fontWeight: 700,
-                    color: form.goal === key ? "#000" : C.muted,
-                  }}
-                >
+                <span className="font-mono font-bold" style={{ fontSize: 8, color: form.goal === key ? "#000" : C.muted }}>
                   {label.toUpperCase()}
                 </span>
               </div>
             ))}
           </div>
         </div>
-        <div
-          style={{
-            fontFamily: F.head,
-            fontSize: 20,
-            fontWeight: 900,
-            color: C.text,
-            marginBottom: 24,
-          }}
-        >
+        <div className="font-head font-black text-primary" style={{ fontSize: 20, marginBottom: 24 }}>
           Activity Level
         </div>
       </div>
       {/* activity level */}
       <div style={{ marginBottom: 20 }}>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 6,
-            marginTop: 8,
-          }}
-        >
+        <div className="flex flex-col" style={{ gap: 6, marginTop: 8 }}>
           {ACTIVITY_LEVELS.map(({ key, label, sub }) => (
             <div
               key={key}
               onClick={() => handleFormChange("activity_level", key)}
-              className="press"
+              className="press flex items-center justify-between cursor-pointer"
               style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
                 background: form.activity_level === key ? C.accentDim : C.card,
                 border: `1px solid ${form.activity_level === key ? C.accentMid : C.border}`,
                 borderRadius: 10,
                 padding: "12px 14px",
-                cursor: "pointer",
                 transition: "all 0.2s",
-                // min height for touch
                 minHeight: 52,
               }}
             >
               <div>
-                <div
-                  style={{
-                    fontFamily: F.body,
-                    fontSize: 13,
-                    fontWeight: 600,
-                    color: C.text,
-                  }}
-                >
+                <div className="font-body font-semibold text-primary" style={{ fontSize: 13 }}>
                   {label}
                 </div>
                 <Mono size={7} color={C.muted}>
@@ -204,29 +155,18 @@ export default function CalorieGoalModal({ handleClose }) {
                 </Mono>
               </div>
               <div
+                className="flex items-center justify-center flex-shrink-0"
                 style={{
                   width: 20,
                   height: 20,
                   borderRadius: "50%",
                   border: `2px solid ${form.activity_level === key ? C.accent : C.border}`,
-                  background:
-                    form.activity_level === key ? C.accent : "transparent",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
+                  background: form.activity_level === key ? C.accent : "transparent",
                   transition: "all 0.2s",
-                  flexShrink: 0,
                 }}
               >
                 {form.activity_level === key && (
-                  <div
-                    style={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: "50%",
-                      background: "#000",
-                    }}
-                  />
+                  <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#000" }} />
                 )}
               </div>
             </div>
@@ -235,29 +175,17 @@ export default function CalorieGoalModal({ handleClose }) {
         {/* ── Calorie goal ── */}
 
         <div>
-          <div
-            style={{
-              fontFamily: F.head,
-              fontSize: 20,
-              fontWeight: 900,
-              color: C.text,
-              marginBottom: 24,
-              marginTop: 18,
-            }}
-          >
+          <div className="font-head font-black text-primary" style={{ fontSize: 20, marginBottom: 24, marginTop: 18 }}>
             Daily Targets
           </div>
           <Mono size={8} color={C.mutedLight}>
             Calorie Target
           </Mono>
           <div
+            className="flex items-center overflow-hidden bg-card"
             style={{
-              display: "flex",
-              alignItems: "center",
-              background: C.card,
               border: `1px solid ${C.border}`,
               borderRadius: 10,
-              overflow: "hidden",
               marginTop: 6,
             }}
           >
@@ -271,16 +199,13 @@ export default function CalorieGoalModal({ handleClose }) {
                 setMacroGoals(calcMacros({ weight: weightKg, calories: val, goal: form.goal }));
               }}
               placeholder="Enter calorie goal"
+              className="flex-1 font-body text-primary"
               style={{
-                flex: 1,
                 background: "transparent",
                 border: "none",
                 padding: "11px 12px",
-                fontFamily: F.body,
                 fontSize: 14,
-                color: C.text,
                 outline: "none",
-                // larger touch target for mobile
                 minHeight: 44,
               }}
               onFocus={(e) =>
@@ -290,15 +215,7 @@ export default function CalorieGoalModal({ handleClose }) {
                 (e.target.parentElement.style.borderColor = C.border)
               }
             />
-            <div
-              style={{
-                padding: "0 14px",
-                borderLeft: `1px solid ${C.border}`,
-                minHeight: 44,
-                display: "flex",
-                alignItems: "center",
-              }}
-            >
+            <div className="flex items-center" style={{ padding: "0 14px", borderLeft: `1px solid ${C.border}`, minHeight: 44 }}>
               <Mono size={9} color={C.muted}>
                 kcal
               </Mono>
@@ -383,31 +300,20 @@ export default function CalorieGoalModal({ handleClose }) {
 
         {/* ── Macros breakdown ── */}
         <details
+          className="bg-card overflow-hidden"
           style={{
-            background: C.card,
             border: `1px solid ${C.border}`,
             borderRadius: 10,
-            overflow: "hidden",
             marginTop: 6,
           }}
         >
           <summary
-            className="press"
-            style={{
-              padding: "14px",
-              fontFamily: F.body,
-              fontSize: 14,
-              color: C.text,
-              cursor: "pointer",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              outline: "none",
-            }}
+            className="press flex justify-between items-center font-body text-primary cursor-pointer outline-none"
+            style={{ padding: "14px", fontSize: 14 }}
           >
             <div>
-              <span style={{ fontWeight: 600 }}>Daily Macros Breakdown</span>
-              <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
+              <span className="font-semibold">Daily Macros Breakdown</span>
+              <div className="flex" style={{ gap: 8, marginTop: 4 }}>
                  <Mono size={9} color={C.muted}>P: {macroGoals.protein}g</Mono>
                  <Mono size={9} color={C.muted}>C: {macroGoals.carbs}g</Mono>
                  <Mono size={9} color={C.muted}>F: {macroGoals.fat}g</Mono>
@@ -415,20 +321,21 @@ export default function CalorieGoalModal({ handleClose }) {
             </div>
             <Mono size={12} color={C.muted}>▼</Mono>
           </summary>
-          <div style={{ padding: "0 14px 14px 14px", display: "flex", flexDirection: "column", gap: 8 }}>
+          <div className="flex flex-col" style={{ padding: "0 14px 14px 14px", gap: 8 }}>
              {[
                { key: "protein", label: "Protein" },
                { key: "carbs", label: "Carbs" },
                { key: "fat", label: "Fat" },
              ].map(({ key, label }) => (
-               <div key={key} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+               <div key={key} className="flex justify-between items-center">
                  <Mono size={10} color={C.text}>{label}</Mono>
-                 <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                 <div className="flex items-center" style={{ gap: 4 }}>
                    <input 
                      type="number" 
                      value={macroGoals[key]} 
                      onChange={(e) => setMacroGoals({ ...macroGoals, [key]: Number(e.target.value) })}
-                     style={{ width: 50, background: "transparent", border: `1px solid ${C.border}`, borderRadius: 4, padding: "4px", color: C.text, fontFamily: F.mono, fontSize: 10, outline: "none", textAlign: "right" }}
+                     className="font-mono text-primary outline-none text-right"
+                     style={{ width: 50, background: "transparent", border: `1px solid ${C.border}`, borderRadius: 4, padding: "4px", fontSize: 10 }}
                    />
                    <Mono size={10} color={C.muted}>g</Mono>
                  </div>
@@ -439,23 +346,14 @@ export default function CalorieGoalModal({ handleClose }) {
       </div>
       <div
         onClick={!loading ? handleSave : undefined}
-        className="hover-btn press"
+        className="hover-btn press text-center cursor-pointer"
         style={{
           background: loading ? C.accentDim : C.accent,
           borderRadius: 12,
           padding: "13px",
-          textAlign: "center",
-          cursor: "pointer",
         }}
       >
-        <span
-          style={{
-            fontFamily: F.mono,
-            fontSize: 11,
-            fontWeight: 700,
-            color: loading ? C.accent : "#000",
-          }}
-        >
+        <span className="font-mono font-bold" style={{ fontSize: 11, color: loading ? C.accent : "#000" }}>
           {loading ? "SAVING..." : "SAVE GOALS"}
         </span>
       </div>

@@ -46,16 +46,15 @@ export default function Nav() {
     <>
       <Outlet />
       <div
+        className="flex items-center bg-panel border-t"
         style={{
           position: "fixed",
           bottom: 0,
-          left: 0,
-          right: 0,
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: "100%",
+          maxWidth: 480,
           zIndex: 50,
-          background: C.panel,
-          borderTop: `1px solid ${C.border}`,
-          display: "flex",
-          alignItems: "center",
           padding: "10px 0 calc(10px + env(safe-area-inset-bottom))",
           flexShrink: 0,
         }}
@@ -63,25 +62,16 @@ export default function Nav() {
         {/* Home / Add Button */}
         <div
           onClick={handleHomeClick}
-          style={{
-            flex: 1,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: 3,
-            cursor: "pointer",
-            padding: "2px 0",
-          }}
+          className="flex-1 flex flex-col items-center press"
+          style={{ gap: 3, padding: "2px 0" }}
         >
           <div
+            className="flex items-center justify-center"
             style={{
               width: 40,
               height: 40,
               borderRadius: isHome ? 14 : 0,
               background: isHome ? C.accent : "transparent",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
               color: isHome ? "#000" : C.muted,
               transition: "all 0.3s cubic-bezier(0.34,1.56,0.64,1)",
               animation: popped === "home" ? "navPop 0.35s ease" : "none",
@@ -96,10 +86,9 @@ export default function Nav() {
             )}
           </div>
           <span
+            className="font-mono font-bold"
             style={{
-              fontFamily: F.mono,
               fontSize: 7,
-              fontWeight: 700,
               letterSpacing: 1,
               color: isHome ? C.accent : C.muted,
               transition: "color 0.2s",
@@ -131,15 +120,8 @@ export default function Nav() {
                 // 2. Replace state trigger with URL navigation
                 navigate(`/${id}`);
               }}
-              style={{
-                flex: 1,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: 3,
-                cursor: "pointer",
-                padding: "2px 0",
-              }}
+              className="flex-1 flex flex-col items-center press"
+              style={{ gap: 3, padding: "2px 0" }}
             >
               <div
                 style={{
@@ -151,10 +133,9 @@ export default function Nav() {
                 <Icon size={22} color={on ? C.accent : C.muted} />
               </div>
               <span
+                className="font-mono font-bold"
                 style={{
-                  fontFamily: F.mono,
                   fontSize: 7,
-                  fontWeight: 700,
                   letterSpacing: 1,
                   color: on ? C.accent : C.muted,
                   transition: "color 0.2s",

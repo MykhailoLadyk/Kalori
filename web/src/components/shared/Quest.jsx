@@ -15,35 +15,28 @@ export function Quest({
   return (
     <div
       key={name}
-      className="hover-card"
+      className="hover-card flex items-center"
       style={{
         background: done ? alpha(color, 7) : C.card,
         borderRadius: 13,
         padding: "11px 13px",
         border: `1px solid ${done ? alpha(color, 25) : C.border}`,
-        display: "flex",
-        alignItems: "center",
         gap: 10,
         marginBottom: 7,
       }}
     >
-      <div style={{ flexShrink: 0 }}>{Icon && <Icon color={color} />}</div>
-      <div style={{ flex: 1 }}>
+      <div className="flex-shrink-0">{Icon && <Icon color={color} />}</div>
+      <div className="flex-1">
         <div
+          className="flex items-center"
           style={{
-            display: "flex",
-            alignItems: "center",
             gap: 6,
             marginBottom: done ? 0 : (description ? 2 : 5),
           }}
         >
           <span
-            style={{
-              fontFamily: F.body,
-              fontSize: 12,
-              fontWeight: 600,
-              color: C.text,
-            }}
+            className="font-body font-semibold text-primary"
+            style={{ fontSize: 12 }}
           >
             {name}
           </span>
@@ -51,8 +44,8 @@ export function Quest({
         </div>
         {description && (
           <div
+            className="font-body"
             style={{
-              fontFamily: F.body,
               fontSize: 11,
               color: alpha(C.text, 60),
               marginBottom: done ? 0 : 5,
@@ -63,10 +56,10 @@ export function Quest({
           </div>
         )}
         {!done && (
-          <div style={{ height: 3, background: C.border, borderRadius: 3 }}>
+          <div className="w-full relative" style={{ height: 3, background: C.border, borderRadius: 3 }}>
             <div
+              className="absolute h-full"
               style={{
-                height: "100%",
                 background: color,
                 borderRadius: 3,
                 width: `${qpct}%`,
@@ -77,20 +70,19 @@ export function Quest({
         )}
       </div>
       {done ? (
-        <div style={{ color: C.accent }}>
+        <div className="text-accent">
           <IconStar size={18} color={C.accent} />
         </div>
       ) : (
         <div
+          className="font-mono font-bold"
           style={{
             background: alpha(color, 9),
             border: `1px solid ${alpha(color, 21)}`,
             borderRadius: 7,
             padding: "3px 7px",
-            fontFamily: F.mono,
             fontSize: 9,
             color,
-            fontWeight: 700,
           }}
         >
           +{xp}

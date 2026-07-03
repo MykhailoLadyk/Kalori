@@ -21,11 +21,9 @@ function ToastContent({ notification }) {
   if (type === "xp" || type === "coins") {
     return (
       <div
+        className="flex items-center bg-panel"
         style={{
-          display: "flex",
-          alignItems: "center",
           gap: 7,
-          background: C.panel,
           border: `1px solid ${alpha(color, 25)}`,
           borderRadius: 10,
           padding: "8px 12px",
@@ -33,7 +31,7 @@ function ToastContent({ notification }) {
         }}
       >
         <span style={{ fontSize: 14 }}>{cfg.icon}</span>
-        <span style={{ fontFamily: F.mono, fontSize: 12, fontWeight: 700, color }}>
+        <span className="font-mono font-bold" style={{ fontSize: 12, color }}>
           +{amount} {type === "xp" ? "XP" : "coins"}
         </span>
       </div>
@@ -44,11 +42,9 @@ function ToastContent({ notification }) {
   if (type === "success") {
     return (
       <div
+        className="flex items-center bg-panel"
         style={{
-          display: "flex",
-          alignItems: "center",
           gap: 8,
-          background: C.panel,
           border: `1px solid ${alpha(color, 25)}`,
           borderRadius: 10,
           padding: "10px 14px",
@@ -56,7 +52,7 @@ function ToastContent({ notification }) {
         }}
       >
         <span style={{ fontSize: 16 }}>{cfg.icon}</span>
-        <span style={{ fontFamily: F.body, fontSize: 13, fontWeight: 600, color: C.text }}>
+        <span className="font-body font-semibold text-primary" style={{ fontSize: 13 }}>
           {name || "Success"}
         </span>
       </div>
@@ -67,8 +63,8 @@ function ToastContent({ notification }) {
   if (type === "quest") {
     return (
       <div
+        className="bg-panel"
         style={{
-          background: C.panel,
           border: `1px solid ${alpha(color, 25)}`,
           borderRadius: 14,
           padding: "12px 14px",
@@ -76,14 +72,14 @@ function ToastContent({ notification }) {
           boxShadow: `0 4px 20px ${alpha("#000", 38)}`,
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+        <div className="flex items-center mb-2" style={{ gap: 8, marginBottom: 6 }}>
           <span style={{ fontSize: 14 }}>🎯</span>
           <Mono size={8} color={color}>
             Quest Complete
           </Mono>
         </div>
-        <div style={{ fontFamily: F.body, fontSize: 12, fontWeight: 600, color: C.text, marginBottom: 6 }}>{name}</div>
-        <div style={{ display: "flex", gap: 8 }}>
+        <div className="font-body font-semibold text-primary mb-2" style={{ fontSize: 12, marginBottom: 6 }}>{name}</div>
+        <div className="flex" style={{ gap: 8 }}>
           {xp && (
             <Mono size={8} color={C.accent}>
               +{xp} XP
@@ -103,8 +99,8 @@ function ToastContent({ notification }) {
   if (type === "achievement") {
     return (
       <div
+        className="bg-panel"
         style={{
-          background: C.panel,
           border: `1px solid ${alpha(C.gold, 31)}`,
           borderRadius: 14,
           padding: "12px 14px",
@@ -112,13 +108,13 @@ function ToastContent({ notification }) {
           boxShadow: `0 4px 20px ${alpha("#000", 38)}, 0 0 20px ${alpha(C.gold, 13)}`,
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+        <div className="flex items-center mb-2" style={{ gap: 8, marginBottom: 6 }}>
           <span style={{ fontSize: 16, animation: "bounceIn 0.5s ease both" }}>🏆</span>
           <Mono size={8} color={C.gold}>
             Achievement Unlocked
           </Mono>
         </div>
-        <div style={{ fontFamily: F.body, fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 4 }}>{name}</div>
+        <div className="font-body font-bold text-primary mb-1" style={{ fontSize: 13, marginBottom: 4 }}>{name}</div>
         {xp && (
           <Mono size={8} color={C.accent}>
             +{xp} XP
@@ -144,11 +140,11 @@ function ToastContent({ notification }) {
         <Mono size={8} color={C.mutedLight}>
           Level Up!
         </Mono>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 6, marginTop: 4 }}>
-          <span style={{ fontFamily: F.head, fontSize: 32, fontWeight: 900, color: C.accent, lineHeight: 1 }}>
+        <div className="flex mt-1" style={{ alignItems: "baseline", gap: 6, marginTop: 4 }}>
+          <span className="font-head font-black text-accent" style={{ fontSize: 32, lineHeight: 1 }}>
             {level}
           </span>
-          <span style={{ fontFamily: F.body, fontSize: 13, color: C.soft }}>reached</span>
+          <span className="font-body text-soft" style={{ fontSize: 13 }}>reached</span>
         </div>
       </div>
     );
@@ -158,8 +154,8 @@ function ToastContent({ notification }) {
   if (type === "streak") {
     return (
       <div
+        className="bg-panel"
         style={{
-          background: C.panel,
           border: `1px solid ${alpha(C.orange, 25)}`,
           borderRadius: 14,
           padding: "12px 14px",
@@ -167,13 +163,13 @@ function ToastContent({ notification }) {
           boxShadow: `0 4px 20px ${alpha("#000", 38)}`,
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <div className="flex items-center" style={{ gap: 8 }}>
           <span style={{ fontSize: 20, animation: "streakBounce 0.6s ease both" }}>🔥</span>
           <div>
             <Mono size={8} color={C.orange}>
               Streak Milestone
             </Mono>
-            <div style={{ fontFamily: F.head, fontSize: 16, fontWeight: 900, color: C.text, marginTop: 2 }}>
+            <div className="font-head font-black text-primary mt-1" style={{ fontSize: 16, marginTop: 2 }}>
               {days} days!
             </div>
           </div>

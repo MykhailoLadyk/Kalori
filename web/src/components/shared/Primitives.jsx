@@ -1,9 +1,9 @@
-import { C, F, alpha } from "../../lib/constants";
+import { C, alpha } from "../../lib/constants";
 export function Mono({ children, size = 9, color = C.soft, weight = 700 }) {
   return (
     <span
+      className="font-mono"
       style={{
-        fontFamily: F.mono,
         fontSize: size,
         color,
         fontWeight: weight,
@@ -18,16 +18,13 @@ export function Mono({ children, size = 9, color = C.soft, weight = 700 }) {
 export function SectionLabel({ children, delay = 0 }) {
   return (
     <div
+      className="font-mono text-muted-light mb-2 flex"
       style={{
-        fontFamily: F.mono,
         fontSize: 9,
-        color: C.mutedLight,
         letterSpacing: 2,
         textTransform: "uppercase",
-        marginBottom: 10,
         animation: `fadeUp 0.4s ease both`,
         animationDelay: `${delay}ms`,
-        display: "flex",
       }}
     >
       {children}
@@ -37,8 +34,8 @@ export function SectionLabel({ children, delay = 0 }) {
 export function Tag({ children, color = C.accent }) {
   return (
     <span
+      className="font-mono"
       style={{
-        fontFamily: F.mono,
         fontSize: 8,
         fontWeight: 700,
         letterSpacing: 1.2,

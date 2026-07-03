@@ -14,37 +14,24 @@ export function MealCard({ meal, color, type }) {
     <>
       <div
         key={meal.id}
-        className="hover-card meal-card"
+        className="hover-card meal-card bg-card overflow-hidden cursor-pointer"
         onClick={() => setExpandedMeal(expanded ? null : meal.id)}
         style={{
-          background: C.card,
           borderRadius: 13,
           border: `1px solid ${expanded ? alpha(color, 25) : C.border}`,
           marginBottom: 6,
-          overflow: "hidden",
-          cursor: "pointer",
           transition: "all 0.2s",
         }}
       >
-        <div
-          style={{
-            padding: "10px 12px",
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-          }}
-        >
+        <div className="flex items-center" style={{ padding: "10px 12px", gap: 10 }}>
           {" "}
           <div
+            className="flex items-center justify-center flex-shrink-0"
             style={{
               width: 36,
               height: 36,
               borderRadius: 10,
               background: alpha(color, 9),
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
             }}
           >
             <svg width="20" height="20" viewBox="0 0 32 32" fill="none">
@@ -176,19 +163,11 @@ export function MealCard({ meal, color, type }) {
               )}
             </svg>
           </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <span
-              style={{
-                fontFamily: F.body,
-                fontSize: 13,
-                fontWeight: 600,
-                color: C.text,
-                display: "flex",
-              }}
-            >
+          <div className="flex-1" style={{ minWidth: 0 }}>
+            <span className="font-body font-semibold text-primary flex" style={{ fontSize: 13 }}>
               {meal.name}
             </span>
-            <div style={{ display: "flex", gap: 6, marginTop: 4 }}>
+            <div className="flex" style={{ gap: 6, marginTop: 4 }}>
               {[
                 { l: "P", v: meal.protein, col: C.blue },
                 { l: "C", v: meal.carbs, col: C.gold },
@@ -196,12 +175,11 @@ export function MealCard({ meal, color, type }) {
               ].map(({ l, v, col }) => (
                 <span
                   key={l}
+                  className="font-mono rounded"
                   style={{
-                    fontFamily: F.mono,
                     fontSize: 8,
                     color: col,
                     background: alpha(col, 9),
-                    borderRadius: 4,
                     padding: "1px 5px",
                   }}
                 >
@@ -210,26 +188,13 @@ export function MealCard({ meal, color, type }) {
               ))}
             </div>
           </div>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-            }}
-          >
-            <span
-              style={{
-                fontFamily: F.head,
-                fontSize: 16,
-                fontWeight: 800,
-                color: C.soft,
-              }}
-            >
+          <div className="flex items-center" style={{ gap: 8 }}>
+            <span className="font-head font-extrabold text-soft" style={{ fontSize: 16 }}>
               {meal.calories} kcal
             </span>
             <div
+              className="text-muted"
               style={{
-                color: C.muted,
                 fontSize: 10,
                 transition: "transform 0.2s",
                 transform: expanded ? "rotate(180deg)" : "rotate(0deg)",
@@ -241,65 +206,42 @@ export function MealCard({ meal, color, type }) {
         </div>
         {expanded && (
           <div
+            className="flex"
             style={{
               borderTop: `1px solid ${C.border}`,
               padding: "8px 12px",
-              display: "flex",
               gap: 8,
               animation: "fadeIn 0.2s ease both",
             }}
           >
             <div
-              className="hover-btn press"
+              className="hover-btn press flex-1 flex items-center justify-center bg-card"
               style={{
-                flex: 1,
-                background: C.card,
                 border: `1px solid ${C.border}`,
                 borderRadius: 9,
                 padding: "7px 0",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
                 gap: 6,
               }}
               onClick={() => setEditModal(true)}
             >
               <IconPencil size={14} color={C.soft} />
-              <span
-                style={{
-                  fontFamily: F.mono,
-                  fontSize: 8,
-                  color: C.soft,
-                  fontWeight: 700,
-                }}
-              >
+              <span className="font-mono font-bold text-soft" style={{ fontSize: 8 }}>
                 EDIT
               </span>
             </div>
             <div
-              className="hover-btn press"
+              className="hover-btn press flex-1 flex items-center justify-center"
               style={{
-                flex: 1,
                 background: alpha(C.red, 7),
                 border: `1px solid ${alpha(C.red, 19)}`,
                 borderRadius: 9,
                 padding: "7px 0",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
                 gap: 6,
               }}
               onClick={() => setDeleteModal(true)}
             >
               <IconTrash size={14} color={C.red} />
-              <span
-                style={{
-                  fontFamily: F.mono,
-                  fontSize: 8,
-                  color: C.red,
-                  fontWeight: 700,
-                }}
-              >
+              <span className="font-mono font-bold text-red" style={{ fontSize: 8 }}>
                 DELETE
               </span>
             </div>

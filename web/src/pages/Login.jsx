@@ -57,8 +57,8 @@ function AuthInput({ label, type = "text", value, onChange, placeholder, error, 
   const [focused, setFocused] = useState(false);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+    <div className="flex flex-col gap-1">
+      <div className="flex items-center justify-between">
         <Mono size={8} color={C.mutedLight}>
           {label}
         </Mono>
@@ -76,16 +76,11 @@ function AuthInput({ label, type = "text", value, onChange, placeholder, error, 
         autoComplete={autoComplete}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
+        className="w-full input-field bg-card"
         style={{
-          width: "100%",
-          background: C.card,
           border: `1px solid ${error ? alpha(C.red, 50) : focused ? C.accent : C.border}`,
           borderRadius: 12,
           padding: "12px 14px",
-          fontFamily: F.body,
-          fontSize: 14,
-          color: C.text,
-          outline: "none",
           transition: "border-color 0.2s",
           minHeight: 46,
         }}
@@ -194,13 +189,9 @@ export default function Login() {
   // ── Render ───────────────────────────────────────────────────
   return (
     <div
+      className="flex flex-col items-center justify-center min-h-screen"
       style={{
-        minHeight: "100vh",
         background: C.bg,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
         padding: "24px 20px",
       }}
     >
@@ -222,18 +213,16 @@ export default function Login() {
       />
 
       {/* card */}
-      <div style={{ width: "100%", maxWidth: 400, animation: "fadeUp 0.4s ease both" }}>
+      <div className="w-full max-w-full" style={{ maxWidth: 400, animation: "fadeUp 0.4s ease both" }}>
         {/* logo + wordmark */}
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 36 }}>
+        <div className="flex flex-col items-center mb-8">
           <div style={{ animation: "bounceIn 0.6s ease both" }}>
             <KaloriMark />
           </div>
           <div
+            className="font-head font-black text-accent"
             style={{
-              fontFamily: F.head,
               fontSize: 32,
-              fontWeight: 900,
-              color: C.accent,
               letterSpacing: -1,
               marginTop: 12,
               textShadow: `0 0 40px ${C.accentGlow}`,
@@ -251,8 +240,8 @@ export default function Login() {
 
         {/* form card */}
         <div
+          className="bg-panel"
           style={{
-            background: C.panel,
             border: `1px solid ${C.border}`,
             borderRadius: 20,
             padding: "24px",
@@ -262,10 +251,9 @@ export default function Login() {
           {/* tab switcher — login / signup */}
           {!isForgot && (
             <div
+              className="flex bg-card"
               style={{
-                display: "flex",
                 gap: 4,
-                background: C.card,
                 border: `1px solid ${C.border}`,
                 borderRadius: 12,
                 padding: 4,
@@ -279,22 +267,18 @@ export default function Login() {
                 <div
                   key={id}
                   onClick={() => switchMode(id)}
-                  className="press"
+                  className="press flex-1 text-center cursor-pointer"
                   style={{
-                    flex: 1,
-                    textAlign: "center",
                     padding: "8px 0",
                     borderRadius: 9,
-                    cursor: "pointer",
                     background: mode === id ? C.accent : "transparent",
                     transition: "background 0.2s",
                   }}
                 >
                   <span
+                    className="font-mono font-bold"
                     style={{
-                      fontFamily: F.mono,
                       fontSize: 9,
-                      fontWeight: 700,
                       color: mode === id ? "#000" : C.muted,
                       letterSpacing: 1,
                     }}
@@ -357,7 +341,7 @@ export default function Login() {
           )}
 
           {/* fields */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }} onKeyDown={handleKeyDown}>
+          <div className="flex flex-col gap-3" onKeyDown={handleKeyDown}>
             <AuthInput
               label="Email"
               type="email"
@@ -396,20 +380,19 @@ export default function Login() {
           {/* submit */}
           <div
             onClick={!loading ? handleSubmit : undefined}
-            className="hover-btn press"
+            className="hover-btn press text-center"
             style={{
               marginTop: 20,
               background: loading ? C.accentDim : C.accent,
               borderRadius: 12,
               padding: "14px",
-              textAlign: "center",
               cursor: loading ? "not-allowed" : "pointer",
               boxShadow: loading ? "none" : `0 0 24px ${C.accentGlow}`,
               transition: "all 0.2s",
               minHeight: 48,
             }}
           >
-            <span style={{ fontFamily: F.mono, fontSize: 11, fontWeight: 700, color: loading ? C.accent : "#000" }}>
+            <span className="font-mono font-bold" style={{ fontSize: 11, color: loading ? C.accent : "#000" }}>
               {loading ? "PLEASE WAIT..." : isLogin ? "LOG IN" : isSignup ? "CREATE ACCOUNT" : "SEND RESET LINK"}
             </span>
           </div>

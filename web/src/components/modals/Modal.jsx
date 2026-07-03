@@ -37,7 +37,12 @@ export function Modal({ id, close, children }) {
       onClick={handleClose}
       style={{
         position: "fixed",
-        inset: 0,
+        top: 0,
+        bottom: 0,
+        left: "50%",
+        transform: "translateX(-50%)",
+        width: "100%",
+        maxWidth: 480,
         zIndex: 100,
         background: closing ? "transparent" : alpha("#000", 44),
         backdropFilter: visible && !closing ? "blur(4px)" : "none",

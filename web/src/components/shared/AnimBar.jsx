@@ -8,16 +8,16 @@ export function AnimBar({ pct, color, height = 4, delay = 0 }) {
   }, [delay]);
   return (
     <div
+      className="w-full overflow-hidden"
       style={{
         height,
         background: C.border,
         borderRadius: height,
-        overflow: "hidden",
       }}
     >
       <div
+        className="h-full"
         style={{
-          height: "100%",
           background: color,
           borderRadius: height,
           width: show ? `${pct}%` : "0%",

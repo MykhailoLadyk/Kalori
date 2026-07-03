@@ -11,7 +11,7 @@ import { calcMacros } from "../lib/macroCalc";
 // ── Step indicator ────────────────────────────────────────────
 function StepDots({ current, total }) {
   return (
-    <div style={{ display: "flex", gap: 6, justifyContent: "center" }}>
+    <div className="flex justify-center gap-1">
       {[...Array(total)].map((_, i) => (
         <div
           key={i}
@@ -42,13 +42,7 @@ function Field({
   const [focused, setFocused] = useState(false);
   return (
     <div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          marginBottom: 6,
-        }}
-      >
+      <div className="flex justify-between mb-1">
         <Mono size={8} color={C.mutedLight}>
           {label}
         </Mono>
@@ -59,13 +53,10 @@ function Field({
         )}
       </div>
       <div
+        className="flex items-center overflow-hidden bg-card"
         style={{
-          display: "flex",
-          alignItems: "center",
-          background: C.card,
           border: `1px solid ${error ? alpha(C.red, 50) : focused ? C.accent : C.border}`,
           borderRadius: 12,
-          overflow: "hidden",
           transition: "border-color 0.2s",
         }}
       >
@@ -76,22 +67,11 @@ function Field({
           placeholder={placeholder}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
-          style={{
-            flex: 1,
-            background: "transparent",
-            border: "none",
-            padding: "12px 14px",
-            fontFamily: F.body,
-            fontSize: 14,
-            color: C.text,
-            outline: "none",
-            minHeight: 46,
-          }}
+          className="flex-1 input-field"
+          style={{ padding: "12px 14px", minHeight: 46 }}
         />
         {unit && (
-          <div
-            style={{ padding: "0 14px", borderLeft: `1px solid ${C.border}` }}
-          >
+          <div style={{ padding: "0 14px", borderLeft: `1px solid ${C.border}` }}>
             <Mono size={9} color={C.muted}>
               {unit}
             </Mono>
@@ -107,7 +87,7 @@ function Chip({ label, sub, selected, onSelect, color = C.accent }) {
   return (
     <div
       onClick={onSelect}
-      className="press"
+      className="press flex items-center justify-between"
       style={{
         background: selected ? alpha(color, 9) : C.card,
         border: `1px solid ${selected ? alpha(color, 38) : C.border}`,
@@ -115,20 +95,10 @@ function Chip({ label, sub, selected, onSelect, color = C.accent }) {
         padding: "12px 14px",
         cursor: "pointer",
         transition: "all 0.2s",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
       }}
     >
       <div>
-        <div
-          style={{
-            fontFamily: F.body,
-            fontSize: 13,
-            fontWeight: 600,
-            color: C.text,
-          }}
-        >
+        <div className="font-body font-semibold text-primary" style={{ fontSize: 13 }}>
           {label}
         </div>
         {sub && (
@@ -138,16 +108,13 @@ function Chip({ label, sub, selected, onSelect, color = C.accent }) {
         )}
       </div>
       <div
+        className="flex-shrink-0 flex items-center justify-center"
         style={{
           width: 18,
           height: 18,
           borderRadius: "50%",
-          flexShrink: 0,
           border: `2px solid ${selected ? color : C.border}`,
           background: selected ? color : "transparent",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
           transition: "all 0.2s",
         }}
       >

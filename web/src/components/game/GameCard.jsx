@@ -14,134 +14,62 @@ export default function GameCard({ level, xp, xpToNext, totalXp = xp }) {
 
   return (
     <div
-      className="hover-card"
+      className="hover-card relative overflow-hidden"
       style={{
         background: `linear-gradient(135deg, ${C.accentDim}, ${C.pinkDim})`,
         border: `1px solid ${C.accentMid}`,
         borderRadius: 20,
         padding: "18px",
         marginBottom: 14,
-        position: "relative",
-        overflow: "hidden",
       }}
     >
       <div
+        className="absolute rounded-full"
         style={{
-          position: "absolute",
           top: -40,
           right: -40,
           width: 160,
           height: 160,
-          borderRadius: "50%",
           background: C.accent,
           opacity: 0.06,
           filter: "blur(40px)",
           animation: "glowPulse 3s ease infinite",
         }}
       />
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
-          marginBottom: 14,
-        }}
-      >
+      <div className="flex justify-between items-start" style={{ marginBottom: 14 }}>
         <div>
-          <div
-            style={{
-              fontFamily: F.mono,
-              fontSize: 8,
-              color: C.mutedLight,
-              letterSpacing: 1.5,
-              textTransform: "uppercase",
-            }}
-          >
+          <div className="font-mono text-muted-light uppercase" style={{ fontSize: 8, letterSpacing: 1.5 }}>
             Level
           </div>
-          <div
-            style={{
-              fontFamily: F.head,
-              fontSize: 52,
-              fontWeight: 900,
-              color: C.accent,
-              lineHeight: 1,
-            }}
-          >
+          <div className="font-head font-black text-accent" style={{ fontSize: 52, lineHeight: 1 }}>
             {level}
           </div>
         </div>
-        <div style={{ textAlign: "right" }}>
-          <div
-            style={{
-              fontFamily: F.mono,
-              fontSize: 8,
-              color: C.mutedLight,
-              letterSpacing: 1.5,
-              textTransform: "uppercase",
-            }}
-          >
+        <div className="text-right">
+          <div className="font-mono text-muted-light uppercase" style={{ fontSize: 8, letterSpacing: 1.5 }}>
             Total XP
           </div>
-          <div
-            style={{
-              fontFamily: F.head,
-              fontSize: 24,
-              fontWeight: 900,
-              color: C.text,
-            }}
-          >
+          <div className="font-head font-black text-primary" style={{ fontSize: 24 }}>
             {totalXp}
           </div>
-          <div
-            style={{
-              fontFamily: F.mono,
-              fontSize: 7,
-              color: C.muted,
-              letterSpacing: 1.2,
-              textTransform: "uppercase",
-            }}
-          >
+          <div className="font-mono text-muted uppercase" style={{ fontSize: 7, letterSpacing: 1.2 }}>
             {remaining} to Level {level + 1}
           </div>
         </div>
       </div>
 
-      <div
-        style={{
-          marginBottom: 6,
-          display: "flex",
-          justifyContent: "space-between",
-        }}
-      >
-        <div
-          style={{
-            fontFamily: F.mono,
-            fontSize: 8,
-            color: C.soft,
-            letterSpacing: 1.2,
-            textTransform: "uppercase",
-          }}
-        >
+      <div className="flex justify-between" style={{ marginBottom: 6 }}>
+        <div className="font-mono text-soft uppercase" style={{ fontSize: 8, letterSpacing: 1.2 }}>
           {xp} / {xpToNext} XP
         </div>
-        <div
-          style={{
-            fontFamily: F.mono,
-            fontSize: 8,
-            color: C.accent,
-            letterSpacing: 1.2,
-            textTransform: "uppercase",
-          }}
-        >
+        <div className="font-mono text-accent uppercase" style={{ fontSize: 8, letterSpacing: 1.2 }}>
           {Math.round(pct)}%
         </div>
       </div>
       <div style={{ height: 8, background: C.border, borderRadius: 8 }}>
         <div
+          className="h-full rounded-full"
           style={{
-            height: "100%",
-            borderRadius: 8,
             background: `linear-gradient(90deg, ${C.accent}, ${C.pink})`,
             boxShadow: `0 0 16px ${C.accentGlow}`,
             width: `${fillWidth}%`,
@@ -149,19 +77,9 @@ export default function GameCard({ level, xp, xpToNext, totalXp = xp }) {
           }}
         />
       </div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          marginTop: 8,
-        }}
-      >
-        <span style={{ fontFamily: F.mono, fontSize: 7, color: C.muted }}>
-          LV {level}
-        </span>
-        <span style={{ fontFamily: F.mono, fontSize: 7, color: C.muted }}>
-          LV {level + 1}
-        </span>
+      <div className="flex justify-between" style={{ marginTop: 8 }}>
+        <span className="font-mono text-muted" style={{ fontSize: 7 }}>LV {level}</span>
+        <span className="font-mono text-muted" style={{ fontSize: 7 }}>LV {level + 1}</span>
       </div>
     </div>
   );

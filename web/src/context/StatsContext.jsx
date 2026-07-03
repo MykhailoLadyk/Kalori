@@ -34,7 +34,7 @@ export function StatsProvider({ children }) {
         const endDate = getLocalYMD(today);
         const startDate = getLocalYMD(ninetyDaysAgo);
 
-        const data = await fetchMealsByRange(startDate, endDate);
+        const data = await fetchMealsByRange(user.id, startDate, endDate);
         setHistoricalMeals(data);
       } catch (err) {
       } finally {

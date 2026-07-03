@@ -5,6 +5,7 @@ import { IconStar } from "./DuoIcon";
 export function Quest({
   Icon,
   name,
+  description,
   xp,
   pct: qpct,
   type,
@@ -33,7 +34,7 @@ export function Quest({
             display: "flex",
             alignItems: "center",
             gap: 6,
-            marginBottom: done ? 0 : 5,
+            marginBottom: done ? 0 : (description ? 2 : 5),
           }}
         >
           <span
@@ -48,6 +49,19 @@ export function Quest({
           </span>
           <Tag color={color}>{type}</Tag>
         </div>
+        {description && (
+          <div
+            style={{
+              fontFamily: F.body,
+              fontSize: 11,
+              color: alpha(C.text, 60),
+              marginBottom: done ? 0 : 5,
+              lineHeight: 1.2,
+            }}
+          >
+            {description}
+          </div>
+        )}
         {!done && (
           <div style={{ height: 3, background: C.border, borderRadius: 3 }}>
             <div

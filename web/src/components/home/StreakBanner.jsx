@@ -2,10 +2,22 @@ import { C, F, alpha } from "../../lib/constants";
 import { Mono } from "../shared/Primitives";
 import { IconFire, IconShield } from "../shared/DuoIcon";
 import { useGameStats } from "../../hooks/useGameStats";
+
 export function StreakBanner() {
   const { gameData, shopItems } = useGameStats();
-  const streak = gameData?.streak;
+  const streak = gameData?.streak || 0;
   const shields = shopItems?.streak_shields || 0;
+
+  const isActive = streak > 0;
+  const hasShields = shields > 0;
+
+  const bannerBg = isActive
+    ? `linear-gradient(135deg, ${alpha(C.orange, 13)}, ${alpha(C.gold, 6)})`
+    : C.card;
+  const bannerBorder = isActive ? alpha(C.orange, 21) : C.border;
+  const fireColor = isActive ? C.orange : C.mutedLight;
+  const textColor = isActive ? C.orange : C.muted;
+
   return (
     <div
       style={{
@@ -15,8 +27,8 @@ export function StreakBanner() {
     >
       <div
         style={{
-          background: `linear-gradient(135deg, ${alpha(C.orange, 13)}, ${alpha(C.gold, 6)})`,
-          border: `1px solid ${alpha(C.orange, 21)}`,
+          background: bannerBg,
+          border: `1px solid ${bannerBorder}`,
           borderRadius: 14,
           padding: "10px 14px",
           display: "flex",
@@ -26,11 +38,12 @@ export function StreakBanner() {
       >
         <div
           style={{
-            animation: "streakBounce 0.6s ease 0.9s both",
+            animation: isActive ? "streakBounce 0.6s ease 0.9s both" : "none",
             flexShrink: 0,
+            opacity: isActive ? 1 : 0.6,
           }}
         >
-          <IconFire size={28} color={C.orange} />
+          <IconFire size={28} color={fireColor} />
         </div>
         <div
           style={{
@@ -40,7 +53,7 @@ export function StreakBanner() {
             flexDirection: "column",
           }}
         >
-          <Mono size={8} color={C.orange}>
+          <Mono size={8} color={textColor}>
             Current Streak
           </Mono>
           <div
@@ -48,7 +61,7 @@ export function StreakBanner() {
               fontFamily: F.head,
               fontSize: 20,
               fontWeight: 900,
-              color: C.text,
+              color: isActive ? C.text : C.muted,
               lineHeight: 1.2,
             }}
           >
@@ -65,13 +78,13 @@ export function StreakBanner() {
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-            <IconShield size={18} color={C.gold} />
+            <IconShield size={18} color={hasShields ? C.gold : C.mutedLight} />
             <span
               style={{
                 fontFamily: F.head,
                 fontSize: 18,
                 fontWeight: 900,
-                color: C.gold,
+                color: hasShields ? C.gold : C.mutedLight,
               }}
             >
               {shields}

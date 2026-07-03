@@ -11,8 +11,10 @@ export default function BodyStatsModal({ handleClose }) {
 
   const [form, setForm] = useState({
     weight: "",
+    weight_unit: "kg",
     height: "",
     age: "",
+    sex: "male",
     activity_level: "moderate",
     goal: "maintain",
   });
@@ -21,8 +23,10 @@ export default function BodyStatsModal({ handleClose }) {
     if (user?.settings) {
       setForm({
         weight: user.settings.weight || "",
+        weight_unit: user.settings.weight_unit || "kg",
         height: user.settings.height || "",
         age: user.age || "",
+        sex: user.settings.sex || "male",
         activity_level: user.settings.activity_level || "moderate",
         goal: user.settings.weight_goal || "maintain",
       });
@@ -34,18 +38,32 @@ export default function BodyStatsModal({ handleClose }) {
   const set = (key, val) => setForm((prev) => ({ ...prev, [key]: val }));
 
   const handleSave = async () => {
+    const weight = Number(form.weight);
+    const weightKg = form.weight_unit === "lbs" ? weight * 0.453592 : weight;
+    const height = Number(form.height);
+    
+    if (!form.weight || weightKg < 20 || weightKg > 300) {
+      addNotification({ type: "error", name: form.weight_unit === "lbs" ? "Weight must be between 44 and 660 lbs" : "Weight must be between 20 and 300 kg" });
+      return;
+    }
+    if (!form.height || height < 100 || height > 250) {
+      addNotification({ type: "error", name: "Height must be between 100 and 250 cm" });
+      return;
+    }
+
     try {
       setLoading(true);
       const { calories, water } = calculateTargets({
-        weight: Number(form.weight),
-        height: Number(form.height),
+        weight: weightKg,
+        height,
         age: Number(form.age),
+        sex: form.sex,
         activity_level: form.activity_level,
         goal: form.goal,
       });
 
       const macros = calcMacros({
-        weight: Number(form.weight),
+        weight: weightKg,
         calories,
         goal: form.goal,
       });
@@ -53,9 +71,11 @@ export default function BodyStatsModal({ handleClose }) {
       await updateUser({
         settings: {
           weight: Number(form.weight),
+          weight_unit: form.weight_unit,
           height: Number(form.height),
           weight_goal: form.goal,
           activity_level: form.activity_level,
+          sex: form.sex,
         },
         age: Number(form.age),
         targets: {
@@ -85,6 +105,34 @@ export default function BodyStatsModal({ handleClose }) {
         Body Stats
       </div>
 
+      <div style={{ marginBottom: 16 }}>
+        <Mono size={8} color={C.mutedLight}>Biological Sex</Mono>
+        <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
+          {["male", "female"].map((s) => (
+            <div
+              key={s}
+              onClick={() => set("sex", s)}
+              style={{
+                flex: 1,
+                padding: "12px",
+                textAlign: "center",
+                borderRadius: 10,
+                border: `1px solid ${form.sex === s ? C.accent : C.border}`,
+                background: form.sex === s ? C.accent + "20" : C.card,
+                cursor: "pointer",
+                fontFamily: F.body,
+                fontSize: 14,
+                fontWeight: 600,
+                color: C.text,
+                textTransform: "capitalize",
+              }}
+            >
+              {s}
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* weight / height / age — stack vertically on mobile */}
       <div
         style={{
@@ -94,11 +142,38 @@ export default function BodyStatsModal({ handleClose }) {
           marginBottom: 16,
         }}
       >
+        <div style={{ marginBottom: 6 }}>
+          <Mono size={8} color={C.mutedLight}>Weight Unit</Mono>
+          <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
+            {["kg", "lbs"].map((u) => (
+              <div
+                key={u}
+                onClick={() => set("weight_unit", u)}
+                style={{
+                  flex: 1,
+                  padding: "10px",
+                  textAlign: "center",
+                  borderRadius: 10,
+                  border: `1px solid ${form.weight_unit === u ? C.accent : C.border}`,
+                  background: form.weight_unit === u ? C.accent + "20" : C.card,
+                  cursor: "pointer",
+                  fontFamily: F.body,
+                  fontSize: 14,
+                  fontWeight: 600,
+                  color: C.text,
+                }}
+              >
+                {u}
+              </div>
+            ))}
+          </div>
+        </div>
+
         {[
           {
             key: "weight",
             label: "Weight",
-            unit: "kg",
+            unit: form.weight_unit,
             placeholder: "e.g. 70",
           },
           {

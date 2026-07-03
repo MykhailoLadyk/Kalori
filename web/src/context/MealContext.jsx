@@ -13,17 +13,15 @@ export function MealProvider({ children }) {
   const [selectedDate, setSelectedDate] = useState(new Date());
 
   const getLocalYMD = (d) => {
-    const yyyy = d.getFullYear();
-    const mm = String(d.getMonth() + 1).padStart(2, "0");
-    const dd = String(d.getDate()).padStart(2, "0");
-    return `${yyyy}-${mm}-${dd}`;
+    return d.toISOString().split("T")[0];
   };
 
   const handleFetchMeals = async (dateObj) => {
+    if (!user?.id) return;
     try {
       setLoading(true);
       const dateStr = dateObj ? getLocalYMD(dateObj) : undefined;
-      const fetchedMeals = await apiFetchMeals(dateStr);
+      const fetchedMeals = await apiFetchMeals(user.id, dateStr);
       setMeals(fetchedMeals);
     } catch (error) {
       setError(error.message || "Failed to fetch meals");
@@ -42,10 +40,11 @@ export function MealProvider({ children }) {
   }, [user?.userAuth, selectedDate]);
 
   const handleAddMeal = async (meal) => {
+    if (!user?.id) throw new Error("No authenticated user");
     try {
       setUpdating(true);
       const mealWithDate = { ...meal, date: meal.date || getLocalYMD(selectedDate) };
-      const newMeal = await addMeal(mealWithDate);
+      const newMeal = await addMeal(user.id, mealWithDate);
       setMeals((prev) => [...prev, newMeal]);
     } catch (error) {
       setError(error.message || "Failed to add meal");
@@ -56,9 +55,10 @@ export function MealProvider({ children }) {
   };
 
   const handleDeleteMeal = async (id) => {
+    if (!user?.id) throw new Error("No authenticated user");
     try {
       setUpdating(true);
-      await deleteMeal(id);
+      await deleteMeal(user.id, id);
       setMeals((prev) => prev.filter((meal) => meal.id !== id));
     } catch (error) {
       setError(error.message || "Failed to delete meal");
@@ -69,9 +69,10 @@ export function MealProvider({ children }) {
   };
 
   const handleUpdateMeal = async (id, updates) => {
+    if (!user?.id) throw new Error("No authenticated user");
     try {
       setUpdating(true);
-      const newMeal = await updateMeal(id, updates);
+      const newMeal = await updateMeal(user.id, id, updates);
       setMeals((prev) => prev.map((m) => (m.id === id ? newMeal : m)));
     } catch (error) {
       setError(error.message || "Failed to edit meal");

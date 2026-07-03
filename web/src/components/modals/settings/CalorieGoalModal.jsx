@@ -56,8 +56,9 @@ export default function CalorieGoalModal({ handleClose }) {
     setForm(newForm);
     
     if (user?.settings && user.age) {
+       const weightKg = user.settings.weight_unit === "lbs" ? user.settings.weight * 0.453592 : user.settings.weight;
        const { calories, water } = calculateTargets({
-         weight: user.settings.weight,
+         weight: weightKg,
          height: user.settings.height,
          age: user.age,
          activity_level: newForm.activity_level,
@@ -65,7 +66,7 @@ export default function CalorieGoalModal({ handleClose }) {
        });
        setCalorieGoal(calories);
        setWaterGoal(water);
-       setMacroGoals(calcMacros({ weight: user.settings.weight, calories, goal: newForm.goal }));
+       setMacroGoals(calcMacros({ weight: weightKg, calories, goal: newForm.goal }));
     }
   };
 
@@ -266,7 +267,8 @@ export default function CalorieGoalModal({ handleClose }) {
               onChange={(e) => {
                 const val = Number(e.target.value);
                 setCalorieGoal(val);
-                setMacroGoals(calcMacros({ weight: user?.settings?.weight, calories: val, goal: form.goal }));
+                const weightKg = user?.settings?.weight_unit === "lbs" ? user.settings.weight * 0.453592 : user?.settings?.weight;
+                setMacroGoals(calcMacros({ weight: weightKg, calories: val, goal: form.goal }));
               }}
               placeholder="Enter calorie goal"
               style={{

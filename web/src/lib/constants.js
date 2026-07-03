@@ -269,6 +269,7 @@ export const quests = [
   {
     id: 1,
     name: "Log 3 meals today",
+    description: "Log at least 3 meals with calories today.",
     icon: "meal",
     type: "Daily",
     reward: 50,
@@ -279,6 +280,7 @@ export const quests = [
   {
     id: 2,
     name: "Drink 2.5L water",
+    description: "Track at least 2.5 liters of water today.",
     icon: "water",
     type: "Daily",
     reward: 30,
@@ -292,6 +294,7 @@ export const quests = [
   {
     id: 3,
     name: "Hit protein goal",
+    description: "Reach your daily protein target.",
     icon: "protein",
     type: "Daily",
     reward: 40,
@@ -305,6 +308,7 @@ export const quests = [
   {
     id: 4,
     name: "Track breakfast",
+    description: "Log your breakfast for the day.",
     icon: "meal",
     type: "Daily",
     reward: 20,
@@ -317,6 +321,7 @@ export const quests = [
   {
     id: 5,
     name: "Stay under calorie goal",
+    description: "Keep your total calories under your daily target.",
     icon: "fire",
     type: "Daily",
     reward: 60,
@@ -333,6 +338,7 @@ export const quests = [
   {
     id: 6,
     name: "Walk after lunch",
+    description: "Log an activity.",
     icon: "fire",
     type: "Daily",
     reward: 25,
@@ -343,6 +349,7 @@ export const quests = [
   {
     id: 7,
     name: "Log 5 meals this week",
+    description: "Log at least 5 meals over the course of the week.",
     icon: "meal",
     type: "Weekly",
     reward: 90,
@@ -353,6 +360,7 @@ export const quests = [
   {
     id: 8,
     name: "Drink water 7 days",
+    description: "Track your water intake every day for a week.",
     icon: "water",
     type: "Weekly",
     reward: 180,
@@ -367,6 +375,7 @@ export const quests = [
   {
     id: 9,
     name: "Protein streak 5 days",
+    description: "Hit your protein goal 5 days this week.",
     icon: "protein",
     type: "Weekly",
     reward: 110,
@@ -384,6 +393,7 @@ export const quests = [
   {
     id: 10,
     name: "Complete 4 workouts",
+    description: "Log an activity 4 times this week.",
     icon: "fire",
     type: "Weekly",
     reward: 120,
@@ -394,6 +404,7 @@ export const quests = [
   {
     id: 11,
     name: "Log 10 meals",
+    description: "Log at least 10 meals this week.",
     icon: "meal",
     type: "Weekly",
     reward: 140,
@@ -404,6 +415,7 @@ export const quests = [
   {
     id: 12,
     name: "Track water 10 times",
+    description: "Track your water intake 10 times this week.",
     icon: "water",
     type: "Weekly",
     reward: 150,
@@ -414,6 +426,7 @@ export const quests = [
   {
     id: 13,
     name: "Protein master 10 days",
+    description: "Hit your protein goal 10 times.",
     icon: "protein",
     type: "Weekly",
     reward: 170,
@@ -431,6 +444,7 @@ export const quests = [
   {
     id: 14,
     name: "Log lunch every weekday",
+    description: "Log lunch 5 days this week.",
     icon: "meal",
     type: "Weekly",
     reward: 200,
@@ -446,6 +460,7 @@ export const quests = [
   {
     id: 15,
     name: "Hydration habit 14 times",
+    description: "Track your water intake 14 times this week.",
     icon: "water",
     type: "Weekly",
     reward: 210,
@@ -456,6 +471,7 @@ export const quests = [
   {
     id: 16,
     name: "Burn 1,000 calories",
+    description: "Burn at least 1,000 calories from activities.",
     icon: "fire",
     type: "Weekly",
     reward: 250,
@@ -466,6 +482,7 @@ export const quests = [
   {
     id: 17,
     name: "Perfect week",
+    description: "Stay under your calorie goal for 7 days this week.",
     icon: "meal",
     type: "Weekly",
     reward: 230,
@@ -482,6 +499,7 @@ export const quests = [
   {
     id: 18,
     name: "Water champion",
+    description: "Track at least 3 liters of water 14 times.",
     icon: "water",
     type: "Weekly",
     reward: 260,
@@ -498,6 +516,7 @@ export const quests = [
   {
     id: 19,
     name: "Protein consistency",
+    description: "Hit your protein goal 20 times.",
     icon: "protein",
     type: "Weekly",
     reward: 280,
@@ -515,6 +534,7 @@ export const quests = [
   {
     id: 20,
     name: "Daily logger",
+    description: "Log any meal today.",
     icon: "meal",
     type: "Daily",
     reward: 45,
@@ -525,6 +545,7 @@ export const quests = [
   {
     id: 21,
     name: "Morning hydration",
+    description: "Track water before noon today.",
     icon: "water",
     type: "Daily",
     reward: 25,
@@ -535,6 +556,7 @@ export const quests = [
   {
     id: 22,
     name: "Active calories",
+    description: "Log an activity 5 times.",
     icon: "fire",
     type: "Weekly",
     reward: 160,
@@ -545,6 +567,7 @@ export const quests = [
   {
     id: 23,
     name: "Meal streak 7",
+    description: "Log a meal every day for a week.",
     icon: "meal",
     type: "Weekly",
     reward: 190,
@@ -559,6 +582,7 @@ export const quests = [
   {
     id: 24,
     name: "Water streak 7",
+    description: "Track your water intake every day for a week.",
     icon: "water",
     type: "Weekly",
     reward: 190,
@@ -573,6 +597,7 @@ export const quests = [
   {
     id: 25,
     name: "Protein streak 7",
+    description: "Hit your protein goal every day for a week.",
     icon: "protein",
     type: "Weekly",
     reward: 190,
@@ -590,6 +615,7 @@ export const quests = [
   {
     id: 26,
     name: "Fire starter",
+    description: "Log 3 activities today.",
     icon: "fire",
     type: "Daily",
     reward: 35,
@@ -600,6 +626,7 @@ export const quests = [
   {
     id: 27,
     name: "Meal planner",
+    description: "Log 10 meals this week.",
     icon: "meal",
     type: "Weekly",
     reward: 175,
@@ -610,6 +637,7 @@ export const quests = [
   {
     id: 28,
     name: "Hydration planner",
+    description: "Track water 10 times this week.",
     icon: "water",
     type: "Weekly",
     reward: 175,
@@ -620,6 +648,7 @@ export const quests = [
   {
     id: 29,
     name: "Protein planner",
+    description: "Log 10 protein-rich meals this week.",
     icon: "protein",
     type: "Weekly",
     reward: 175,
@@ -630,6 +659,7 @@ export const quests = [
   {
     id: 30,
     name: "Weekly boss",
+    description: "Log 7 activities this week.",
     icon: "fire",
     type: "Weekly",
     reward: 300,

@@ -42,13 +42,14 @@ export function calcMacros({ weight, calories, goal = "maintain" }) {
 /**
  * Calculate calorie and water targets based on body stats.
  */
-export function calculateTargets({ weight, height, age, activity_level, goal }) {
+export function calculateTargets({ weight, height, age, sex = "male", activity_level, goal }) {
   if (!weight || !height || !age) {
     return { calories: 2000, water: 2000 };
   }
 
-  // Estimate BMR (average between male and female Mifflin-St Jeor)
-  let bmr = (10 * Number(weight)) + (6.25 * Number(height)) - (5 * Number(age)) - 78;
+  // Estimate BMR (using exact Mifflin-St Jeor based on biological sex)
+  let bmr = (10 * Number(weight)) + (6.25 * Number(height)) - (5 * Number(age));
+  bmr += sex === "female" ? -161 : 5;
   
   let multiplier = 1.2;
   switch (activity_level) {

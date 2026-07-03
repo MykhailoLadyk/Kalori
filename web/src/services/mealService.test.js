@@ -90,19 +90,17 @@ beforeEach(() => {
 // ─────────────────────────────────────────
 describe("fetchMeals", () => {
   it("returns meals for a given date", async () => {
-    supabase.auth.getUser.mockResolvedValue(AUTH_OK);
     mockChain({ data: MOCK_MEALS, error: null });
 
-    const result = await fetchMeals("2025-02-27");
+    const result = await fetchMeals("user-123", "2025-02-27");
 
     expect(result).toEqual(MOCK_MEALS);
   });
 
   it("queries with correct user_id and date", async () => {
-    supabase.auth.getUser.mockResolvedValue(AUTH_OK);
     const chain = mockChain({ data: MOCK_MEALS, error: null });
 
-    await fetchMeals("2025-02-27");
+    await fetchMeals("user-123", "2025-02-27");
 
     expect(supabase.from).toHaveBeenCalledWith("meals");
     expect(chain.eq).toHaveBeenNthCalledWith(1, "user_id", "user-123");
@@ -110,35 +108,23 @@ describe("fetchMeals", () => {
   });
 
   it("returns empty array when no meals for that date", async () => {
-    supabase.auth.getUser.mockResolvedValue(AUTH_OK);
     mockChain({ data: [], error: null });
 
-    const result = await fetchMeals("2025-02-27");
+    const result = await fetchMeals("user-123", "2025-02-27");
 
     expect(result).toEqual([]);
   });
 
-  it("throws if not authenticated", async () => {
-    supabase.auth.getUser.mockResolvedValue(NO_USER);
-
-    await expect(fetchMeals("2025-02-27")).rejects.toThrow(
-      "No authenticated user",
-    );
-  });
-
-  it("throws if auth fails", async () => {
-    supabase.auth.getUser.mockResolvedValue(AUTH_FAIL);
-
-    await expect(fetchMeals("2025-02-27")).rejects.toThrow(
-      "Auth session expired",
+  it("throws if no user ID provided", async () => {
+    await expect(fetchMeals(null, "2025-02-27")).rejects.toThrow(
+      "No authenticated user ID provided",
     );
   });
 
   it("throws if query fails", async () => {
-    supabase.auth.getUser.mockResolvedValue(AUTH_OK);
     mockChain({ data: null, error: { message: "Query failed" } });
 
-    await expect(fetchMeals("2025-02-27")).rejects.toThrow("Query failed");
+    await expect(fetchMeals("user-123", "2025-02-27")).rejects.toThrow("Query failed");
   });
 });
 
@@ -158,23 +144,21 @@ describe("addMeal", () => {
 
   it("returns the created meal with id", async () => {
     const created = { ...NEW_MEAL, id: "meal-4", user_id: "user-123" };
-    supabase.auth.getUser.mockResolvedValue(AUTH_OK);
     mockChain({ data: created, error: null });
 
-    const result = await addMeal(NEW_MEAL);
+    const result = await addMeal("user-123", NEW_MEAL);
 
     expect(result).toEqual(created);
     expect(result.id).toBeDefined();
   });
 
   it("inserts with correct fields including user_id", async () => {
-    supabase.auth.getUser.mockResolvedValue(AUTH_OK);
     const chain = mockChain({
       data: { ...NEW_MEAL, id: "meal-4" },
       error: null,
     });
 
-    await addMeal(NEW_MEAL);
+    await addMeal("user-123", NEW_MEAL);
 
     expect(chain.insert).toHaveBeenCalledWith({
       user_id: "user-123",
@@ -188,17 +172,14 @@ describe("addMeal", () => {
     });
   });
 
-  it("throws if not authenticated", async () => {
-    supabase.auth.getUser.mockResolvedValue(NO_USER);
-
-    await expect(addMeal(NEW_MEAL)).rejects.toThrow("No authenticated user");
+  it("throws if no user ID provided", async () => {
+    await expect(addMeal(null, NEW_MEAL)).rejects.toThrow("No authenticated user ID provided");
   });
 
   it("throws if insert fails", async () => {
-    supabase.auth.getUser.mockResolvedValue(AUTH_OK);
     mockChain({ data: null, error: { message: "Insert failed" } });
 
-    await expect(addMeal(NEW_MEAL)).rejects.toThrow("Insert failed");
+    await expect(addMeal("user-123", NEW_MEAL)).rejects.toThrow("Insert failed");
   });
 });
 
@@ -210,37 +191,32 @@ describe("updateMeal", () => {
     const updates = { calories: 480, protein: 38 };
     const updated = { ...MOCK_MEAL, ...updates };
 
-    supabase.auth.getUser.mockResolvedValue(AUTH_OK);
     mockChain({ data: updated, error: null });
 
-    const result = await updateMeal("meal-1", updates);
+    const result = await updateMeal("user-123", "meal-1", updates);
 
     expect(result).toEqual(updated);
   });
 
   it("filters by both id and user_id for security", async () => {
-    supabase.auth.getUser.mockResolvedValue(AUTH_OK);
     const chain = mockChain({ data: MOCK_MEAL, error: null });
 
-    await updateMeal("meal-1", { calories: 480 });
+    await updateMeal("user-123", "meal-1", { calories: 480 });
 
     expect(chain.eq).toHaveBeenNthCalledWith(1, "id", "meal-1");
     expect(chain.eq).toHaveBeenNthCalledWith(2, "user_id", "user-123");
   });
 
-  it("throws if not authenticated", async () => {
-    supabase.auth.getUser.mockResolvedValue(NO_USER);
-
-    await expect(updateMeal("meal-1", {})).rejects.toThrow(
-      "No authenticated user",
+  it("throws if no user ID provided", async () => {
+    await expect(updateMeal(null, "meal-1", {})).rejects.toThrow(
+      "No authenticated user ID provided",
     );
   });
 
   it("throws if update fails", async () => {
-    supabase.auth.getUser.mockResolvedValue(AUTH_OK);
     mockChain({ data: null, error: { message: "Update failed" } });
 
-    await expect(updateMeal("meal-1", {})).rejects.toThrow("Update failed");
+    await expect(updateMeal("user-123", "meal-1", {})).rejects.toThrow("Update failed");
   });
 });
 
@@ -249,35 +225,30 @@ describe("updateMeal", () => {
 // ─────────────────────────────────────────
 describe("deleteMeal", () => {
   it("returns true on successful delete", async () => {
-    supabase.auth.getUser.mockResolvedValue(AUTH_OK);
     mockChain({ error: null });
 
-    const result = await deleteMeal("meal-1");
+    const result = await deleteMeal("user-123", "meal-1");
 
     expect(result).toBe(true);
   });
 
   it("filters by both id and user_id for security", async () => {
-    supabase.auth.getUser.mockResolvedValue(AUTH_OK);
     const chain = mockChain({ error: null });
 
-    await deleteMeal("meal-1");
+    await deleteMeal("user-123", "meal-1");
 
     expect(chain.eq).toHaveBeenCalledWith("id", "meal-1");
     expect(chain.eq).toHaveBeenCalledWith("user_id", "user-123");
   });
 
-  it("throws if not authenticated", async () => {
-    supabase.auth.getUser.mockResolvedValue(NO_USER);
-
-    await expect(deleteMeal("meal-1")).rejects.toThrow("No authenticated user");
+  it("throws if no user ID provided", async () => {
+    await expect(deleteMeal(null, "meal-1")).rejects.toThrow("No authenticated user ID provided");
   });
 
   it("throws if delete fails", async () => {
-    supabase.auth.getUser.mockResolvedValue(AUTH_OK);
     mockChain({ error: { message: "Delete failed" } });
 
-    await expect(deleteMeal("meal-1")).rejects.toThrow("Delete failed");
+    await expect(deleteMeal("user-123", "meal-1")).rejects.toThrow("Delete failed");
   });
 });
 
@@ -286,46 +257,40 @@ describe("deleteMeal", () => {
 // ─────────────────────────────────────────
 describe("fetchMealsByRange", () => {
   it("returns meals within date range", async () => {
-    supabase.auth.getUser.mockResolvedValue(AUTH_OK);
     mockChain({ data: MOCK_MEALS, error: null });
 
-    const result = await fetchMealsByRange("2025-02-21", "2025-02-27");
+    const result = await fetchMealsByRange("user-123", "2025-02-21", "2025-02-27");
 
     expect(result).toEqual(MOCK_MEALS);
   });
 
   it("queries with correct date range filters", async () => {
-    supabase.auth.getUser.mockResolvedValue(AUTH_OK);
     const chain = mockChain({ data: MOCK_MEALS, error: null });
 
-    await fetchMealsByRange("2025-02-21", "2025-02-27");
+    await fetchMealsByRange("user-123", "2025-02-21", "2025-02-27");
 
     expect(chain.gte).toHaveBeenCalledWith("date", "2025-02-21");
     expect(chain.lte).toHaveBeenCalledWith("date", "2025-02-27");
   });
 
   it("returns empty array when no meals in range", async () => {
-    supabase.auth.getUser.mockResolvedValue(AUTH_OK);
     mockChain({ data: [], error: null });
 
-    const result = await fetchMealsByRange("2025-01-01", "2025-01-07");
+    const result = await fetchMealsByRange("user-123", "2025-01-01", "2025-01-07");
 
     expect(result).toEqual([]);
   });
 
-  it("throws if not authenticated", async () => {
-    supabase.auth.getUser.mockResolvedValue(NO_USER);
-
-    await expect(fetchMealsByRange("2025-02-21", "2025-02-27")).rejects.toThrow(
-      "No authenticated user",
+  it("throws if no user ID provided", async () => {
+    await expect(fetchMealsByRange(null, "2025-02-21", "2025-02-27")).rejects.toThrow(
+      "No authenticated user ID provided",
     );
   });
 
   it("throws if query fails", async () => {
-    supabase.auth.getUser.mockResolvedValue(AUTH_OK);
     mockChain({ data: null, error: { message: "Range query failed" } });
 
-    await expect(fetchMealsByRange("2025-02-21", "2025-02-27")).rejects.toThrow(
+    await expect(fetchMealsByRange("user-123", "2025-02-21", "2025-02-27")).rejects.toThrow(
       "Range query failed",
     );
   });

@@ -43,7 +43,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { description } = await req.json();
+    const { description, localDate } = await req.json();
 
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
@@ -69,7 +69,8 @@ Deno.serve(async (req) => {
       });
     }
 
-    const today = new Date().toISOString().slice(0, 10);
+    // Use client localDate to prevent timezone mismatch blocking users prematurely
+    const today = localDate || new Date().toISOString().slice(0, 10);
     const { data: usage } = await supabase
       .from("ai_usage")
       .select("request_count")

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { C, F, alpha } from "../lib/constants";
 import { Mono } from "../components/shared/Primitives";
@@ -19,12 +19,44 @@ const ChevronLeft = () => (
   </svg>
 );
 
+const Spinner = ({ color = "#000", size = 16 }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke={color}
+    strokeWidth="3"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    style={{ animation: "spin 1s linear infinite" }}
+  >
+    <style>{`@keyframes spin { 100% { transform: rotate(360deg); } }`}</style>
+    <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+  </svg>
+);
+
 export default function DescribeAddMeal() {
   const navigate = useNavigate();
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
+
+  const loadingSteps = ["Reading description...", "Searching database...", "Estimating calories...", "Calculating macros..."];
+  const [loadingStepIndex, setLoadingStepIndex] = useState(0);
+  
+  useEffect(() => {
+    let interval;
+    if (loading && !result) {
+      interval = setInterval(() => {
+        setLoadingStepIndex((prev) => (prev + 1) % loadingSteps.length);
+      }, 1500);
+    } else {
+      setLoadingStepIndex(0);
+    }
+    return () => clearInterval(interval);
+  }, [loading, result]);
 
   const handleAnalyze = async () => {
     if (!text.trim()) return;
@@ -160,11 +192,15 @@ export default function DescribeAddMeal() {
                 background: loading || !text.trim() ? C.accentDim : C.accent,
                 borderRadius: 12,
                 padding: "14px",
-                textAlign: "center",
-                cursor: text.trim() ? "pointer" : "not-allowed",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 8,
+                cursor: loading ? "not-allowed" : (text.trim() ? "pointer" : "not-allowed"),
                 margin: "16px 0",
               }}
             >
+              {loading && <Spinner color={C.accent} size={14} />}
               <span
                 style={{
                   fontFamily: F.mono,
@@ -173,7 +209,7 @@ export default function DescribeAddMeal() {
                   color: loading ? C.accent : "#000",
                 }}
               >
-                {loading ? "ANALYZING..." : "ANALYZE"}
+                {loading ? loadingSteps[loadingStepIndex].toUpperCase() : "ANALYZE"}
               </span>
             </div>
           </>
@@ -302,10 +338,14 @@ export default function DescribeAddMeal() {
                   background: loading ? C.accentDim : C.accent,
                   borderRadius: 12,
                   padding: "14px",
-                  textAlign: "center",
-                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                  cursor: loading ? "not-allowed" : "pointer",
                 }}
               >
+                {loading && <Spinner color={C.accent} size={14} />}
                 <span
                   style={{
                     fontFamily: F.mono,

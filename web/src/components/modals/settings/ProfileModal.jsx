@@ -2,9 +2,11 @@ import { useState, useEffect } from "react";
 import { C, F } from "../../../lib/constants";
 import { Mono } from "../../../components/shared/Primitives";
 import { useUser } from "../../../hooks/useUser";
+import { useNotifications } from "../../../context/NotificationContext";
 
 export default function ProfileModal({ handleClose }) {
   const { user, updateUser } = useUser();
+  const { addNotification } = useNotifications();
 
   const [form, setForm] = useState({
     name: "",
@@ -25,9 +27,20 @@ export default function ProfileModal({ handleClose }) {
   const [loading, setLoading] = useState(false);
 
   const handleSave = async () => {
+    if (form.age) {
+      const age = Number(form.age);
+      if (age < 13 || age > 120) {
+        addNotification({ type: "error", name: "Age must be between 13 and 120" });
+        return;
+      }
+    }
+    
     try {
       setLoading(true);
-      await updateUser(form);
+      await updateUser({
+        ...form,
+        age: form.age ? Number(form.age) : undefined,
+      });
       handleClose();
     } finally {
       setLoading(false);

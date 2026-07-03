@@ -224,12 +224,12 @@ export default function OnboardingPage() {
   const [form, setForm] = useState({
     name: "",
     age: "",
+    sex: "",
     weight: "",
+    weight_unit: "kg",
     height: "",
     activity_level: "moderate",
     goal: "maintain",
-    calorie_goal: 2000,
-    water_goal: 2500,
   });
 
   const set = (key, val) => {
@@ -240,11 +240,14 @@ export default function OnboardingPage() {
   const currentStep = STEPS[step];
   const totalDots = STEPS.length - 2; // exclude welcome + done from dots
 
-  useEffect(() => {
-    if (!form.weight || !form.height || !form.age) return;
+  // ── Derived Goals ───────────────────────────────────────────
+  let derivedCalories = 2000;
+  let derivedWater = 2500;
 
-    // Estimate BMR (average between male and female Mifflin-St Jeor)
-    let bmr = (10 * Number(form.weight)) + (6.25 * Number(form.height)) - (5 * Number(form.age)) - 78;
+  if (form.weight && form.height && form.age && form.sex) {
+    const weightKg = form.weight_unit === "lbs" ? Number(form.weight) * 0.453592 : Number(form.weight);
+    let bmr = (10 * weightKg) + (6.25 * Number(form.height)) - (5 * Number(form.age));
+    bmr += form.sex === "female" ? -161 : 5;
     
     let multiplier = 1.2;
     switch (form.activity_level) {
@@ -261,19 +264,11 @@ export default function OnboardingPage() {
     if (form.goal === "lose") tdee -= 500;
     if (form.goal === "gain") tdee += 500;
     
-    let calories = Math.max(1200, Math.round(tdee));
+    derivedCalories = Math.max(1200, Math.round(tdee));
     
-    // Water goal in ml (~35ml per kg)
-    let water = Math.round(Number(form.weight) * 35);
-    water = Math.max(2000, Math.min(4000, water));
-
-    setForm(prev => {
-       if (prev.calorie_goal !== calories || prev.water_goal !== water) {
-          return { ...prev, calorie_goal: calories, water_goal: water };
-       }
-       return prev;
-    });
-  }, [form.weight, form.height, form.age, form.activity_level, form.goal]);
+    let water = Math.round(weightKg * 35);
+    derivedWater = Math.max(2000, Math.min(4000, water));
+  }
 
   // ── Validate per step ───────────────────────────────────────
   const validate = () => {
@@ -282,9 +277,15 @@ export default function OnboardingPage() {
       if (!form.name.trim()) e.name = "Required";
     }
     if (currentStep === "body") {
-      if (!form.age || form.age <= 0) e.age = "Required";
-      if (!form.weight || form.weight <= 0) e.weight = "Required";
-      if (!form.height || form.height <= 0) e.height = "Required";
+      const age = Number(form.age);
+      const weight = Number(form.weight);
+      const weightKg = form.weight_unit === "lbs" ? weight * 0.453592 : weight;
+      const height = Number(form.height);
+
+      if (!form.sex) e.sex = "Please select biological sex";
+      if (!form.age || age < 13 || age > 120) e.age = "Must be 13-120";
+      if (!form.weight || weightKg < 20 || weightKg > 300) e.weight = form.weight_unit === "lbs" ? "Must be 44-660 lbs" : "Must be 20-300kg";
+      if (!form.height || height < 100 || height > 250) e.height = "Must be 100-250cm";
     }
     return e;
   };
@@ -314,12 +315,18 @@ export default function OnboardingPage() {
           activity_level: form.activity_level,
           weight_goal: form.goal,
           weight: Number(form.weight),
+          weight_unit: form.weight_unit,
           height: Number(form.height),
+          sex: form.sex,
         },
         targets: {
-          calories: form.calorie_goal,
-          water: form.water_goal,
-          ...calcMacros({ weight: form.weight, calories: form.calorie_goal, goal: form.goal }),
+          calories: derivedCalories,
+          water: derivedWater,
+          ...calcMacros({ 
+            weight: form.weight_unit === "lbs" ? Number(form.weight) * 0.453592 : Number(form.weight), 
+            calories: derivedCalories, 
+            goal: form.goal 
+          }),
         },
       });
 
@@ -580,6 +587,35 @@ export default function OnboardingPage() {
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                  <Mono size={8} color={C.mutedLight}>Biological Sex</Mono>
+                  {errors.sex && <Mono size={8} color={C.red}>{errors.sex}</Mono>}
+                </div>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <div style={{ flex: 1 }}>
+                    <Chip label="Male" selected={form.sex === "male"} onSelect={() => set("sex", "male")} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <Chip label="Female" selected={form.sex === "female"} onSelect={() => set("sex", "female")} />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                  <Mono size={8} color={C.mutedLight}>Weight Unit</Mono>
+                </div>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <div style={{ flex: 1 }}>
+                    <Chip label="kg" selected={form.weight_unit === "kg"} onSelect={() => set("weight_unit", "kg")} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <Chip label="lbs" selected={form.weight_unit === "lbs"} onSelect={() => set("weight_unit", "lbs")} />
+                  </div>
+                </div>
+              </div>
+
               <Field
                 label="Age"
                 type="number"
@@ -595,7 +631,7 @@ export default function OnboardingPage() {
                 value={form.weight}
                 onChange={(v) => set("weight", v)}
                 placeholder="e.g. 70"
-                unit="kg"
+                unit={form.weight_unit}
                 error={errors.weight}
               />
               <Field
@@ -869,13 +905,13 @@ export default function OnboardingPage() {
               {[
                 {
                   label: "Calorie Goal",
-                  value: `${form.calorie_goal}`,
+                  value: `${derivedCalories}`,
                   unit: "kcal",
                   color: C.accent,
                 },
                 {
                   label: "Water Goal",
-                  value: `${form.water_goal}`,
+                  value: `${derivedWater}`,
                   unit: "L",
                   color: C.blue,
                 },

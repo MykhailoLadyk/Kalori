@@ -25,6 +25,23 @@ const CaptureIcon = () => (
   </svg>
 );
 
+const Spinner = ({ color = "#000", size = 16 }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke={color}
+    strokeWidth="3"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    style={{ animation: "spin 1s linear infinite" }}
+  >
+    <style>{`@keyframes spin { 100% { transform: rotate(360deg); } }`}</style>
+    <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+  </svg>
+);
+
 export default function PhotoAddMeal() {
   const navigate = useNavigate();
 
@@ -36,6 +53,21 @@ export default function PhotoAddMeal() {
   const [analyzing, setAnalyzing] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
+
+  const loadingSteps = ["Analyzing image...", "Identifying food...", "Estimating calories...", "Calculating macros..."];
+  const [loadingStepIndex, setLoadingStepIndex] = useState(0);
+
+  useEffect(() => {
+    let interval;
+    if (analyzing) {
+      interval = setInterval(() => {
+        setLoadingStepIndex((prev) => (prev + 1) % loadingSteps.length);
+      }, 1500);
+    } else {
+      setLoadingStepIndex(0);
+    }
+    return () => clearInterval(interval);
+  }, [analyzing]);
 
   useEffect(() => {
     document.body.classList.add("photo-div");
@@ -91,6 +123,17 @@ export default function PhotoAddMeal() {
     } catch {
       setError("Camera access denied or unavailable.");
     }
+  };
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setPhoto(event.target.result);
+      setError(null);
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleAnalyze = async () => {
@@ -166,10 +209,38 @@ export default function PhotoAddMeal() {
         }}
       >
         {error ? (
-          <div style={{ padding: "0 40px", textAlign: "center" }}>
+          <div style={{ padding: "0 40px", textAlign: "center", display: "flex", flexDirection: "column", gap: "24px", alignItems: "center" }}>
             <Mono size={9} color={C.red}>
               {error}
             </Mono>
+            <label
+              className="hover-btn press"
+              style={{
+                background: C.card,
+                border: `1px solid ${C.border}`,
+                borderRadius: 14,
+                padding: "16px 24px",
+                cursor: "pointer",
+                display: "inline-block",
+              }}
+            >
+              <input
+                type="file"
+                accept="image/*"
+                style={{ display: "none" }}
+                onChange={handleFileUpload}
+              />
+              <span
+                style={{
+                  fontFamily: F.mono,
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: C.soft,
+                }}
+              >
+                UPLOAD FROM GALLERY
+              </span>
+            </label>
           </div>
         ) : photo ? (
           <img
@@ -235,10 +306,14 @@ export default function PhotoAddMeal() {
                   background: analyzing ? C.accentDim : C.accent,
                   borderRadius: 14,
                   padding: "16px",
-                  textAlign: "center",
-                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                  cursor: analyzing ? "not-allowed" : "pointer",
                 }}
               >
+                {analyzing && <Spinner color={C.accent} size={14} />}
                 <span
                   style={{
                     fontFamily: F.mono,
@@ -247,7 +322,7 @@ export default function PhotoAddMeal() {
                     color: analyzing ? C.accent : "#000",
                   }}
                 >
-                  {analyzing ? "ANALYZING..." : "USE PHOTO"}
+                  {analyzing ? loadingSteps[loadingStepIndex].toUpperCase() : "USE PHOTO"}
                 </span>
               </div>
             </div>

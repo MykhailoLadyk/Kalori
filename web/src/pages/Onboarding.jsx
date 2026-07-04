@@ -7,6 +7,14 @@ import { useUser } from "../hooks/useUser";
 import { supabase } from "../services/supabase";
 import { useNavigate } from "react-router-dom";
 import { calcMacros } from "../lib/macroCalc";
+import { 
+  IconMealPlate, 
+  IconLightning, 
+  IconFire, 
+  IconTarget, 
+  IconCoin, 
+  IconParty 
+} from "../components/shared/DuoIcon";
 
 // ── Step indicator ────────────────────────────────────────────
 function StepDots({ current, total }) {
@@ -434,9 +442,9 @@ export default function OnboardingPage() {
               }}
             >
               {[
-                { icon: "🍽️", label: "Log meals" },
-                { icon: "⚡", label: "Earn XP" },
-                { icon: "🔥", label: "Build streaks" },
+                { icon: <IconMealPlate size={24} color={C.accent} />, label: "Log meals" },
+                { icon: <IconLightning size={24} color={C.accent} />, label: "Earn XP" },
+                { icon: <IconFire size={24} color={C.orange} />, label: "Build streaks" },
               ].map(({ icon, label }) => (
                 <div
                   key={label}
@@ -447,7 +455,7 @@ export default function OnboardingPage() {
                     gap: 4,
                   }}
                 >
-                  <span style={{ fontSize: 22 }}>{icon}</span>
+                  <span className="flex">{icon}</span>
                   <Mono size={7} color={C.muted}>
                     {label.toUpperCase()}
                   </Mono>
@@ -727,25 +735,25 @@ export default function OnboardingPage() {
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {[
                 {
-                  icon: "⚡",
+                  icon: <IconLightning size={24} color={C.accent} />,
                   color: C.accent,
                   title: "Earn XP",
                   body: "Log meals, hit your calorie goal, and drink enough water to earn XP and level up.",
                 },
                 {
-                  icon: "🔥",
+                  icon: <IconFire size={24} color={C.orange} />,
                   color: C.orange,
                   title: "Build your streak",
                   body: "Log at least one meal every day to grow your streak. Longer streaks multiply your XP and coins.",
                 },
                 {
-                  icon: "🎯",
+                  icon: <IconTarget size={24} color={C.blue} />,
                   color: C.blue,
                   title: "Complete quests",
                   body: "Daily and weekly quests give bonus XP and coins. New quests unlock as you level up.",
                 },
                 {
-                  icon: "🪙",
+                  icon: <IconCoin size={24} color={C.gold} />,
                   color: C.gold,
                   title: "Spend coins",
                   body: "Buy streak shields, XP boosters, themes, and permanent upgrades in the shop.",
@@ -766,16 +774,14 @@ export default function OnboardingPage() {
                 >
                   <div
                     style={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: 12,
-                      flexShrink: 0,
-                      background: alpha(color, 9),
-                      border: `1px solid ${alpha(color, 19)}`,
+                      width: 48,
+                      height: 48,
+                      borderRadius: 16,
+                      background: alpha(color, 15),
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      fontSize: 18,
+                      flexShrink: 0,
                     }}
                   >
                     {icon}
@@ -824,13 +830,13 @@ export default function OnboardingPage() {
             }}
           >
             <div
+              className="flex items-center justify-center text-accent"
               style={{
-                fontSize: 56,
                 marginBottom: 20,
                 animation: "bounceIn 0.6s ease both",
               }}
             >
-              🎉
+              <IconParty size={64} />
             </div>
             <div
               style={{

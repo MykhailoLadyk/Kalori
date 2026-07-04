@@ -140,9 +140,7 @@ export default function PhotoAddMeal() {
     try {
       setAnalyzing(true);
       setError(null);
-      const res = await analyzeFood(photo);
-
-      const parsed = JSON.parse(res);
+      const parsed = await analyzeFood(photo);
       setResult(true);
 
       navigate("/add-meal/confirm", {
@@ -153,7 +151,11 @@ export default function PhotoAddMeal() {
         },
       });
     } catch (err) {
-      setError("Couldn't analyze the photo. Try retaking it.");
+      if (err.code === "RATE_LIMITED") {
+        setError("Daily AI limit reached. Try again tomorrow or add meals manually.");
+      } else {
+        setError("Couldn't analyze the photo. Try retaking it.");
+      }
     } finally {
       setAnalyzing(false);
     }
@@ -350,13 +352,3 @@ export default function PhotoAddMeal() {
   );
 }
 
-async function analyzeMealPhoto(photoDataUrl) {
-  await new Promise((r) => setTimeout(r, 1500));
-  return {
-    name: "Grilled Chicken Bowl",
-    calories: 540,
-    protein: 38,
-    carbs: 52,
-    fat: 16,
-  };
-}

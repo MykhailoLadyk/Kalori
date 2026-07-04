@@ -117,6 +117,7 @@ export function MealAddOptionSelectModal() {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
   const [albumLoading, setAlbumLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleOptionClick = (key) => {
     if (key === "album") {
@@ -131,21 +132,30 @@ export function MealAddOptionSelectModal() {
     if (!file) return;
 
     setAlbumLoading(true);
+    setError(null);
 
     const reader = new FileReader();
     reader.onload = async () => {
-      const photoDataUrl = reader.result;
-      const res = await analyzeFood(photoDataUrl);
-      const parsed = JSON.parse(res);
+      try {
+        const photoDataUrl = reader.result;
+        const parsed = await analyzeFood(photoDataUrl);
 
-      setAlbumLoading(false);
-      navigate("/add-meal/confirm", {
-        state: {
-          meal: parsed,
-          photoData: photoDataUrl,
-          isAlbum: true,
-        },
-      });
+        navigate("/add-meal/confirm", {
+          state: {
+            meal: parsed,
+            photoData: photoDataUrl,
+            isAlbum: true,
+          },
+        });
+      } catch (err) {
+        if (err.code === "RATE_LIMITED") {
+          setError("Daily AI limit reached. Try again tomorrow.");
+        } else {
+          setError("Couldn't analyze the photo. Try again.");
+        }
+      } finally {
+        setAlbumLoading(false);
+      }
     };
     reader.readAsDataURL(file);
     e.target.value = "";
@@ -271,17 +281,24 @@ export function MealAddOptionSelectModal() {
           );
         })}
       </div>
+
+      {error && (
+        <div
+          style={{
+            marginTop: 12,
+            padding: "10px 14px",
+            background: alpha(C.red, 9),
+            border: `1px solid ${alpha(C.red, 19)}`,
+            borderRadius: 10,
+          }}
+        >
+          <Mono size={8} color={C.red}>
+            {error}
+          </Mono>
+        </div>
+      )}
     </div>
   );
 }
 
-async function analyzeMealPhoto(photoDataUrl) {
-  await new Promise((r) => setTimeout(r, 1500));
-  return {
-    name: "Grilled Chicken Bowl",
-    calories: 540,
-    protein: 38,
-    carbs: 52,
-    fat: 16,
-  };
-}
+

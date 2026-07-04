@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { C, F } from "../../../lib/constants";
 import { Mono } from "../../../components/shared/Primitives";
+import { IconCheck } from "../../../components/shared/DuoIcon";
 
 const EXPORT_OPTIONS = [
   { key: "meals", label: "Meal Logs", sub: "All logged meals with macros" },
@@ -93,10 +94,8 @@ export default function ExportModal({ handleClose }) {
                 }}
               >
                 {on && (
-                  <span
-                    style={{ color: "#000", fontSize: 12, fontWeight: 900 }}
-                  >
-                    ✓
+                  <span className="flex" style={{ color: "#000" }}>
+                    <IconCheck size={14} />
                   </span>
                 )}
               </div>
@@ -131,6 +130,7 @@ export default function ExportModal({ handleClose }) {
           }}
         >
           <span
+            className="flex items-center gap-2 justify-center"
             style={{
               fontFamily: F.mono,
               fontSize: 11,
@@ -138,7 +138,7 @@ export default function ExportModal({ handleClose }) {
               color: C.accent,
             }}
           >
-            ✓ EXPORT READY
+            <IconCheck size={14} /> EXPORT READY
           </span>
         </div>
       ) : (

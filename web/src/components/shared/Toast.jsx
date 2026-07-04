@@ -1,15 +1,24 @@
 import { useEffect, useState } from "react";
 import { C, F, alpha } from "../../lib/constants";
 import { Mono } from "./Primitives";
+import {
+  IconLightning,
+  IconCoin,
+  IconTarget,
+  IconTrophy,
+  IconArrowUp,
+  IconFire,
+  IconCheck,
+} from "./DuoIcon";
 
 const CONFIGS = {
-  xp: { color: C.accent, icon: "⚡", duration: 2000 },
-  coins: { color: C.gold, icon: "🪙", duration: 2000 },
-  quest: { color: C.accent, icon: "🎯", duration: 3500 },
-  achievement: { color: C.gold, icon: "🏆", duration: 5000 },
-  levelup: { color: C.accent, icon: "⬆️", duration: 5000 },
-  streak: { color: C.orange, icon: "🔥", duration: 4000 },
-  success: { color: "#10B981", icon: "✅", duration: 3000 },
+  xp: { color: C.accent, icon: IconLightning, duration: 2000 },
+  coins: { color: C.gold, icon: IconCoin, duration: 2000 },
+  quest: { color: C.accent, icon: IconTarget, duration: 3500 },
+  achievement: { color: C.gold, icon: IconTrophy, duration: 5000 },
+  levelup: { color: C.accent, icon: IconArrowUp, duration: 5000 },
+  streak: { color: C.orange, icon: IconFire, duration: 4000 },
+  success: { color: "#10B981", icon: IconCheck, duration: 3000 },
 };
 
 function ToastContent({ notification }) {
@@ -30,7 +39,7 @@ function ToastContent({ notification }) {
           boxShadow: `0 4px 20px ${alpha("#000", 38)}, 0 0 0 1px ${alpha(color, 13)}`,
         }}
       >
-        <span style={{ fontSize: 14 }}>{cfg.icon}</span>
+        <span className="flex" style={{ color }}><cfg.icon size={16} /></span>
         <span className="font-mono font-bold" style={{ fontSize: 12, color }}>
           +{amount} {type === "xp" ? "XP" : "coins"}
         </span>
@@ -51,7 +60,7 @@ function ToastContent({ notification }) {
           boxShadow: `0 4px 20px ${alpha("#000", 38)}`,
         }}
       >
-        <span style={{ fontSize: 16 }}>{cfg.icon}</span>
+        <span className="flex" style={{ color }}><cfg.icon size={18} /></span>
         <span className="font-body font-semibold text-primary" style={{ fontSize: 13 }}>
           {name || "Success"}
         </span>
@@ -73,7 +82,7 @@ function ToastContent({ notification }) {
         }}
       >
         <div className="flex items-center mb-2" style={{ gap: 8, marginBottom: 6 }}>
-          <span style={{ fontSize: 14 }}>🎯</span>
+          <span className="flex" style={{ color }}><IconTarget size={16} /></span>
           <Mono size={8} color={color}>
             Quest Complete
           </Mono>
@@ -109,7 +118,9 @@ function ToastContent({ notification }) {
         }}
       >
         <div className="flex items-center mb-2" style={{ gap: 8, marginBottom: 6 }}>
-          <span style={{ fontSize: 16, animation: "bounceIn 0.5s ease both" }}>🏆</span>
+          <span className="flex" style={{ color, animation: "bounceIn 0.5s ease both" }}>
+            <IconTrophy size={20} />
+          </span>
           <Mono size={8} color={C.gold}>
             Achievement Unlocked
           </Mono>
@@ -164,7 +175,9 @@ function ToastContent({ notification }) {
         }}
       >
         <div className="flex items-center" style={{ gap: 8 }}>
-          <span style={{ fontSize: 20, animation: "streakBounce 0.6s ease both" }}>🔥</span>
+          <span className="flex" style={{ color, animation: "streakBounce 0.6s ease both" }}>
+            <IconFire size={24} />
+          </span>
           <div>
             <Mono size={8} color={C.orange}>
               Streak Milestone

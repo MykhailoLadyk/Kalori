@@ -41,12 +41,21 @@ export default function ConfirmMeal() {
   const result = location.state?.meal;
   const photo = location.state?.photoData;
   const isAlbum = location.state?.isAlbum;
+  // Get macro value from meal_total or sum from foods array
+  const getMacro = (data, field) => {
+    if (data?.meal_total?.[field] != null) return data.meal_total[field];
+    if (data?.foods?.length > 0) {
+      return data.foods.reduce((sum, f) => sum + (f[field] || 0), 0);
+    }
+    return "";
+  };
+
   const [form, setForm] = useState({
-    name: result?.name ?? result?.foods?.[0]?.name ?? "",
-    calories: result?.meal_total?.calories ?? "",
-    protein: result?.meal_total?.protein_g ?? "",
-    carbs: result?.meal_total?.carbs_g ?? "",
-    fat: result?.meal_total?.fat_g ?? "",
+    name: result?.name || result?.foods?.[0]?.name || "",
+    calories: getMacro(result, "calories"),
+    protein: getMacro(result, "protein_g"),
+    carbs: getMacro(result, "carbs_g"),
+    fat: getMacro(result, "fat_g"),
     type: result?.type ?? "breakfast",
   });
 

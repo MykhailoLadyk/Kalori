@@ -155,8 +155,8 @@ export const achievements = [
   },
   {
     id: 10,
-    name: "Hydration Habit",
-    description: "Track your water intake 10 times.",
+    name: "Hydration Days",
+    description: "Track your water intake on 10 different days.",
     max: 10,
     triggers: [TRIGGERS.ADD_WATER],
     evaluate: (payload, ctx) => {
@@ -179,15 +179,29 @@ export const achievements = [
   {
     id: 12,
     name: "Goal Getter",
-    description: "Stay within your calorie goal for a full week.",
+    description: "Stay within your calorie goal for 7 consecutive days.",
     max: 7,
     triggers: [TRIGGERS.ADD_MEAL],
     evaluate: (payload, ctx) => {
-      const todayStr = new Date().toISOString().split("T")[0];
+      const today = new Date();
+      const todayStr = today.toISOString().split("T")[0];
+      const yesterday = new Date(today);
+      yesterday.setDate(today.getDate() - 1);
+      const yesterdayStr = yesterday.toISOString().split("T")[0];
+
       const totalCals = ctx.meals.reduce((sum, m) => sum + (m.calories || 0), 0);
-      if (totalCals > ctx.user.targets.calories) return { progress: 0, lastCountedDate: null };
-      if (ctx.item.lastCountedDate === todayStr) return { progress: ctx.item.progress };
-      return { progress: ctx.item.progress + 1, lastCountedDate: todayStr };
+      const counted = ctx.item.lastCountedDate === todayStr;
+
+      if (totalCals <= ctx.user.targets.calories) {
+        if (counted) return { progress: ctx.item.progress };
+
+        if (ctx.item.lastCountedDate !== yesterdayStr && ctx.item.lastCountedDate != null) {
+          return { progress: 1, lastCountedDate: todayStr };
+        }
+        return { progress: ctx.item.progress + 1, lastCountedDate: todayStr };
+      } else {
+        return { progress: 0, lastCountedDate: null };
+      }
     },
   },
   {
@@ -260,11 +274,7 @@ export const achievements = [
     description: "Keep a 90-day tracking habit alive.",
     max: 90,
     triggers: [TRIGGERS.ADD_MEAL, TRIGGERS.ADD_WATER],
-    evaluate: (payload, ctx) => {
-      const todayStr = new Date().toISOString().split("T")[0];
-      if (ctx.item.lastCountedDate === todayStr) return { progress: ctx.item.progress };
-      return { progress: ctx.item.progress + 1, lastCountedDate: todayStr };
-    },
+    evaluate: (payload, ctx) => ({ progress: ctx.gameData.streak }),
   },
 ];
 export const quests = [
@@ -325,28 +335,25 @@ export const quests = [
     name: "Stay under calorie goal",
     description: "Keep your total calories under your daily target.",
     icon: "fire",
-    type: "Daily",
+    type: "Weekly",
     reward: 60,
     max: 7,
     triggers: [TRIGGERS.ADD_MEAL],
     evaluate: (p, ctx) => {
       const todayStr = new Date().toISOString().split("T")[0];
       const totalCals = ctx.meals.reduce((sum, m) => sum + (m.calories || 0), 0);
-      if (totalCals > ctx.user.targets.calories) return { progress: 0, lastCountedDate: null };
-      if (ctx.item.lastCountedDate === todayStr) return { progress: ctx.item.progress };
-      return { progress: ctx.item.progress + 1, lastCountedDate: todayStr };
+
+      let newProgress = ctx.item.progress;
+      let counted = ctx.item.lastCountedDate === todayStr;
+
+      if (totalCals <= ctx.user.targets.calories) {
+        if (!counted) return { progress: newProgress + 1, lastCountedDate: todayStr };
+        return { progress: newProgress };
+      } else {
+        if (counted) return { progress: Math.max(0, newProgress - 1), lastCountedDate: null };
+        return { progress: newProgress };
+      }
     },
-  },
-  {
-    id: 6,
-    name: "Walk after lunch",
-    description: "Log an activity.",
-    icon: "fire",
-    type: "Daily",
-    reward: 25,
-    max: 5,
-    triggers: ["ADD_ACTIVITY"],
-    evaluate: (p, ctx) => ({ progress: ctx.item.progress + 1 }),
   },
   {
     id: 7,
@@ -392,17 +399,7 @@ export const quests = [
       return { progress: ctx.item.progress };
     },
   },
-  {
-    id: 10,
-    name: "Complete 4 workouts",
-    description: "Log an activity 4 times this week.",
-    icon: "fire",
-    type: "Weekly",
-    reward: 120,
-    max: 4,
-    triggers: ["ADD_ACTIVITY"],
-    evaluate: (p, ctx) => ({ progress: ctx.item.progress + 1 }),
-  },
+
   {
     id: 11,
     name: "Log 10 meals",
@@ -461,51 +458,49 @@ export const quests = [
   },
   {
     id: 15,
-    name: "Hydration habit 14 times",
-    description: "Track your water intake 14 times this week.",
+    name: "Hydration habit 7 times",
+    description: "Track your water intake 7 times this week.",
     icon: "water",
     type: "Weekly",
     reward: 210,
-    max: 14,
+    max: 7,
     triggers: [TRIGGERS.ADD_WATER],
     evaluate: (p, ctx) => ({ progress: ctx.item.progress + 1 }),
   },
-  {
-    id: 16,
-    name: "Burn 1,000 calories",
-    description: "Burn at least 1,000 calories from activities.",
-    icon: "fire",
-    type: "Weekly",
-    reward: 250,
-    max: 1000,
-    triggers: ["ADD_ACTIVITY"],
-    evaluate: (p, ctx) => ({ progress: ctx.item.progress + (p.caloriesBurned || 0) }),
-  },
+
   {
     id: 17,
-    name: "Perfect week",
-    description: "Stay under your calorie goal for 7 days this week.",
+    name: "Balanced week",
+    description: "Stay under your calorie goal for 5 days this week.",
     icon: "meal",
     type: "Weekly",
     reward: 230,
-    max: 7,
+    max: 5,
     triggers: [TRIGGERS.ADD_MEAL],
     evaluate: (p, ctx) => {
       const todayStr = new Date().toISOString().split("T")[0];
       const totalCals = ctx.meals.reduce((sum, m) => sum + (m.calories || 0), 0);
-      if (totalCals > ctx.user.targets.calories) return { progress: 0, lastCountedDate: null };
-      if (ctx.item.lastCountedDate === todayStr) return { progress: ctx.item.progress };
-      return { progress: ctx.item.progress + 1, lastCountedDate: todayStr };
+
+      let newProgress = ctx.item.progress;
+      let counted = ctx.item.lastCountedDate === todayStr;
+
+      if (totalCals <= ctx.user.targets.calories) {
+        if (!counted) return { progress: newProgress + 1, lastCountedDate: todayStr };
+        return { progress: newProgress };
+      } else {
+        if (counted) return { progress: Math.max(0, newProgress - 1), lastCountedDate: null };
+        return { progress: newProgress };
+      }
     },
   },
   {
     id: 18,
     name: "Water champion",
-    description: "Track at least 3 liters of water 14 times.",
+    description: "Track at least 3 liters of water 7 times.",
     icon: "water",
     type: "Weekly",
     reward: 260,
-    max: 14,
+    max: 7,
     triggers: [TRIGGERS.ADD_WATER],
     evaluate: (p, ctx) => {
       const todayStr = new Date().toISOString().split("T")[0];
@@ -518,11 +513,11 @@ export const quests = [
   {
     id: 19,
     name: "Protein consistency",
-    description: "Hit your protein goal 20 times.",
+    description: "Hit your protein goal 5 times.",
     icon: "protein",
     type: "Weekly",
     reward: 280,
-    max: 20,
+    max: 5,
     triggers: [TRIGGERS.ADD_MEAL],
     evaluate: (p, ctx) => {
       const todayStr = new Date().toISOString().split("T")[0];
@@ -555,17 +550,7 @@ export const quests = [
     triggers: [TRIGGERS.ADD_WATER],
     evaluate: (p, ctx) => ({ progress: new Date().getHours() < 12 ? 1 : ctx.item.progress }),
   },
-  {
-    id: 22,
-    name: "Active calories",
-    description: "Log an activity 5 times.",
-    icon: "fire",
-    type: "Weekly",
-    reward: 160,
-    max: 5,
-    triggers: ["ADD_ACTIVITY"],
-    evaluate: (p, ctx) => ({ progress: ctx.item.progress + 1 }),
-  },
+
   {
     id: 23,
     name: "Meal streak 7",
@@ -614,17 +599,7 @@ export const quests = [
       return { progress: ctx.item.progress };
     },
   },
-  {
-    id: 26,
-    name: "Fire starter",
-    description: "Log 3 activities today.",
-    icon: "fire",
-    type: "Daily",
-    reward: 35,
-    max: 3,
-    triggers: ["ADD_ACTIVITY"],
-    evaluate: (p, ctx) => ({ progress: ctx.item.progress + 1 }),
-  },
+
   {
     id: 27,
     name: "Meal planner",
@@ -656,17 +631,6 @@ export const quests = [
     reward: 175,
     max: 10,
     triggers: [TRIGGERS.ADD_MEAL],
-    evaluate: (p, ctx) => ({ progress: ctx.item.progress + 1 }),
-  },
-  {
-    id: 30,
-    name: "Weekly boss",
-    description: "Log 7 activities this week.",
-    icon: "fire",
-    type: "Weekly",
-    reward: 300,
-    max: 7,
-    triggers: ["ADD_ACTIVITY"],
     evaluate: (p, ctx) => ({ progress: ctx.item.progress + 1 }),
   },
 ];

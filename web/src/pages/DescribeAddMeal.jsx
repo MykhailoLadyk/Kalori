@@ -63,12 +63,14 @@ export default function DescribeAddMeal() {
     try {
       setLoading(true);
       setError(null);
-      const res = await analyzeFoodDesc(text);
-
-      const parsed = JSON.parse(res);
+      const parsed = await analyzeFoodDesc(text);
       navigate("/add-meal/confirm", { state: { meal: parsed } });
     } catch (err) {
-      setError("Couldn't analyze that. Try being more specific.");
+      if (err.code === "RATE_LIMITED") {
+        setError("Daily AI limit reached. Try again tomorrow or add meals manually.");
+      } else {
+        setError("Couldn't analyze that. Try being more specific.");
+      }
     } finally {
       setLoading(false);
     }
@@ -257,13 +259,3 @@ export default function DescribeAddMeal() {
   );
 }
 
-async function analyzeMealDescription(text) {
-  await new Promise((r) => setTimeout(r, 1200));
-  return {
-    name: text.length > 30 ? text.slice(0, 30) + "..." : text,
-    calories: 450,
-    protein: 28,
-    carbs: 45,
-    fat: 14,
-  };
-}

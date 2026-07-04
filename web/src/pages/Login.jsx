@@ -5,6 +5,7 @@ import { Mono } from "../components/shared/Primitives";
 import { supabase } from "../services/supabase";
 import { Modal } from "../components/modals/Modal";
 import LegalModal from "../components/modals/settings/LegalModal";
+import { IconCheck, IconX } from "../components/shared/DuoIcon";
 
 // ── Kalori wordmark ───────────────────────────────────────────
 const KaloriMark = () => (
@@ -315,7 +316,7 @@ export default function Login() {
                 animation: "fadeIn 0.2s ease both",
               }}
             >
-              <span style={{ color: C.accent, fontSize: 14 }}>✓</span>
+              <span className="flex" style={{ color: C.accent }}><IconCheck size={14} /></span>
               <span style={{ fontFamily: F.body, fontSize: 12, color: C.accent }}>{message}</span>
             </div>
           )}
@@ -335,7 +336,7 @@ export default function Login() {
                 animation: "fadeIn 0.2s ease both",
               }}
             >
-              <span style={{ color: C.red, fontSize: 14 }}>✕</span>
+              <span className="flex" style={{ color: C.red }}><IconX size={14} /></span>
               <span style={{ fontFamily: F.body, fontSize: 12, color: C.red }}>{authError}</span>
             </div>
           )}

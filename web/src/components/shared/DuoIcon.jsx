@@ -702,3 +702,43 @@ export const QuestFireIcon = ({ color }) => (
     <circle cx="18" cy="21" r="3" fill={color} opacity="0.4" />
   </svg>
 );
+
+// Lightning/XP
+export const IconLightning = ({ size = 20, color = "currentColor" }) => (
+  <DuoIcon size={size} color={color}>
+    <polygon points="160 24 64 128 104 128 96 232 192 128 152 128 160 24" />
+    <path d="M96,240a8,8,0,0,1-7.86-9.52L99.76,136H64a8,8,0,0,1-5.69-13.63l96-104a8,8,0,0,1,13.55,7.15L156.24,120H192a8,8,0,0,1,5.69,13.63l-96,104A8,8,0,0,1,96,240Zm-10.82-120H104a8,8,0,0,1,7.86,9.52L105,191.07l65.8-71.28H152a8,8,0,0,1-7.86-9.52L155,48.93Z" />
+  </DuoIcon>
+);
+
+// Check / Success
+export const IconCheck = ({ size = 20, color = "currentColor" }) => (
+  <DuoIcon size={size} color={color}>
+    <circle cx="128" cy="128" r="96" />
+    <path d="M176.49,95.51l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,1,1,11.32-11.32L115,134.69l50.15-50.5a8,8,0,0,1,11.34,11.32Z" />
+  </DuoIcon>
+);
+
+// X / Close
+export const IconX = ({ size = 20, color = "currentColor" }) => (
+  <DuoIcon size={size} color={color}>
+    <circle cx="128" cy="128" r="96" />
+    <path d="M165.66,101.66,139.31,128l26.35,26.34a8,8,0,0,1-11.32,11.32L128,139.31l-26.34,26.35a8,8,0,0,1-11.32-11.32L116.69,128,90.34,101.66a8,8,0,0,1,11.32-11.32L128,116.69l26.34-26.35a8,8,0,0,1,11.32,11.32Z" />
+  </DuoIcon>
+);
+
+// Arrow Up / Level Up
+export const IconArrowUp = ({ size = 20, color = "currentColor" }) => (
+  <DuoIcon size={size} color={color}>
+    <polygon points="128 32 56 104 200 104 128 32" />
+    <path d="M205.66,109.66a8,8,0,0,1-11.32,0L136,51.31V216a8,8,0,0,1-16,0V51.31L61.66,109.66a8,8,0,0,1-11.32-11.32l72-72a8,8,0,0,1,11.32,0l72,72A8,8,0,0,1,205.66,109.66Z" />
+  </DuoIcon>
+);
+
+// Party / Confetti
+export const IconParty = ({ size = 20, color = "currentColor" }) => (
+  <DuoIcon size={size} color={color}>
+    <path d="M160,112,88,240,40,192l88-72Z" />
+    <path d="M165.66,106.34l-48-48A8,8,0,0,0,104,64L8.34,183.65a16,16,0,0,0,2.4,21.61l40,32A16,16,0,0,0,72,232l119.65-95.65a8,8,0,0,0,2-11.72ZM61.85,216.5l-40-32,71.21-89,40,32Zm88.89-63L111.47,84.47l27.18-27.18L177.3,96ZM216,24a8,8,0,0,0-8,8V56H176a8,8,0,0,0,0,16h32V104a8,8,0,0,0,16,0V72h32a8,8,0,0,0,0-16H224V32A8,8,0,0,0,216,24Zm-16,168a8,8,0,0,0-8,8v16a8,8,0,0,0,16,0V200A8,8,0,0,0,200,192Zm32-56a8,8,0,0,0-8,8v16a8,8,0,0,0,16,0V144A8,8,0,0,0,232,136ZM136,32a8,8,0,0,0-8,8V56a8,8,0,0,0,16,0V40A8,8,0,0,0,136,32Z" />
+  </DuoIcon>
+);

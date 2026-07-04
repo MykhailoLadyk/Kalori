@@ -69,7 +69,7 @@ export function MealEditModal({ meal, handleClose }) {
       fat: Number(form.fat),
     };
 
-    updateMeal(meal.name, payload);
+    updateMeal(meal.id, payload);
     handleClose();
   };
 

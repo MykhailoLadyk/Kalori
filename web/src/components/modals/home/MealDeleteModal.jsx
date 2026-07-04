@@ -7,7 +7,7 @@ export function MealDeleteModal({ meal, handleClose }) {
   const { deleteMeal } = useMeals();
 
   const handleDelete = async () => {
-    await deleteMeal(meal.name);
+    await deleteMeal(meal.id);
     handleClose();
   };
   return (

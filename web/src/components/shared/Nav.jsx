@@ -157,21 +157,21 @@ export default function Nav() {
           );
         })}
 
-        {/* Selection Modal Context Integration */}
-        <Modal id={modal} close={() => setModal(null)}>
-          {/* 3. Intercept the legacy state call and route to the specific sub-wizard path */}
-          <MealAddOptionSelectModal
-            setCurrentPage={(targetPage) => {
-              setModal(null); // Dismiss modal frame layout
-              if (targetPage === "home") {
-                navigate("/");
-              } else {
-                navigate(`/add-meal/${targetPage}`); // Routes to /add-meal/photo, etc.
-              }
-            }}
-          />
-        </Modal>
       </div>
+      {/* Selection Modal Context Integration */}
+      <Modal id={modal} close={() => setModal(null)}>
+        {/* 3. Intercept the legacy state call and route to the specific sub-wizard path */}
+        <MealAddOptionSelectModal
+          setCurrentPage={(targetPage) => {
+            setModal(null); // Dismiss modal frame layout
+            if (targetPage === "home") {
+              navigate("/");
+            } else {
+              navigate(`/add-meal/${targetPage}`); // Routes to /add-meal/photo, etc.
+            }
+          }}
+        />
+      </Modal>
     </>
   );
 }

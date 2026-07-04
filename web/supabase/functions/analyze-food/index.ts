@@ -73,12 +73,11 @@ Deno.serve(async (req) => {
 
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+      { global: { headers: { Authorization: authHeader } } }
     );
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser(
-      authHeader.replace("Bearer ", "")
-    );
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -103,18 +102,13 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Increment usage
-    const { error: upsertError } = await supabase.from("ai_usage").upsert(
-      { user_id: user.id, date: today, request_count: (usage?.request_count || 0) + 1 },
-      { onConflict: "ai_usage_user_id_date_key" }
-    );
+    // Increment usage securely via RPC
+    const { error: rpcError } = await supabase.rpc("increment_ai_usage");
 
-    if (upsertError) {
-      console.error("Upsert Error:", upsertError);
-      // We don't necessarily want to block the user if analytics fail, but for debugging we can return it
-      // or we can just log it. Let's return it so we can see the exact error.
+    if (rpcError) {
+      console.error("RPC Error:", rpcError);
       return new Response(
-        JSON.stringify({ error: "Failed to track AI usage", details: upsertError }),
+        JSON.stringify({ error: "Failed to track AI usage", details: rpcError }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -122,210 +116,48 @@ Deno.serve(async (req) => {
     const projectId = Deno.env.get("GOOGLE_CLOUD_PROJECT_ID")!;
     const accessToken = await getAccessToken();
 
-    const prompt = `
-    You are a food recognition and nutrition estimation engine.
-
-
-
-TASK:
-
-Analyze the provided image and identify ONLY foods that are visibly present.
-
-
-
-OUTPUT REQUIREMENT:
-
-Return ONLY a single valid JSON object.
-
-Do not return markdown.
-
-Do not return explanations.
-
-Do not return code fences.
-
-Do not return any text before or after the JSON.
-
-
-
-JSON SCHEMA (must match exactly):
-
-
-
-{
-
-"foods": [
-
-{
-
-"name": "string",
-
-"portion": "string",
-
-"calories": 0,
-
-"protein_g": 0,
-
-"carbs_g": 0,
-
-"fat_g": 0,
-
-"fiber_g": 0
-
-}
-
-],
-
-"meal_total": {
-
-"calories": 0,
-
-"protein_g": 0,
-
-"carbs_g": 0,
-
-"fat_g": 0,
-
-"fiber_g": 0
-
-},
-
-"confidence": "high",
-
-"notes": "string"
-
-}
-
-
-
-MANDATORY RULES:
-
-
-
-JSON ONLY
-
-Output must begin with "{"
-
-Output must end with "}"
-
-No markdown
-
-No code fences
-
-No comments
-
-No extra keys
-
-No omitted keys
-
-FOOD DETECTION
-
-Identify only foods that are clearly visible.
-
-Never infer hidden ingredients.
-
-Never infer cooking oils, butter, sauces, seasonings, dressings, toppings, fillings, or side dishes unless visibly present.
-
-Never add foods that are not visible.
-
-PORTION ESTIMATION
-
-Estimate portion from visible size only.
-
-Use units such as:
-
-"100g"
-
-"250g"
-
-"1 cup"
-
-"2 slices"
-
-"1 piece"
-
-If uncertain, provide best estimate and mention uncertainty in notes.
-
-NUTRITION VALUES
-
-All nutrition values must be integers.
-
-Round to nearest whole number.
-
-No decimals.
-
-No strings for numeric fields.
-
-MULTIPLE FOODS
-
-Each visible food must appear as exactly one item in the foods array.
-
-Do not split a single visible food into ingredients unless visually distinguishable.
-
-TOTALS
-
-meal_total values must equal the sum of all food items after rounding.
-
-CONFIDENCE
-
-high = food clearly visible and recognizable
-
-medium = food recognizable but portion uncertain
-
-low = food partially visible, blurry, distant, obstructed, or ambiguous
-
-NO FOOD DETECTED
-
-If no identifiable food is visible, return EXACTLY:
-
-
-
-{"error":"No food detected"}
-
-
-
-INVALID IMAGE
-
-If the image is missing, unreadable, corrupted, contains only text, contains only people, contains only objects, or contains no food, return EXACTLY:
-
-
-
-{"error":"No food detected"}
-
-
-
-HALLUCINATION PREVENTION
-
-Never guess ingredients.
-
-Never guess recipes.
-
-Never guess preparation methods.
-
-Never guess oils.
-
-Never guess condiments.
-
-Never guess beverages unless visible.
-
-Never guess side dishes outside the image.
-
-STRICT VALIDATION
-
-Before responding, verify:
-
-JSON is valid.
-
-All required fields exist.
-
-All numbers are integers.
-
-meal_total equals sum of foods.
-
-confidence is one of: high, medium, low.
-
-Output contains nothing except the JSON object.
-`
-;
+    const systemInstruction = `You are a nutrition estimator. Analyze the image and identify ONLY visibly present foods.
+
+Rules:
+1. Identify ONLY foods clearly visible. Do not infer hidden ingredients (oils, sauces, seasonings) unless visible.
+2. Estimate portions from visible size (e.g. "100g", "1 cup").
+3. Do not guess recipes, preparation methods, or unseen side dishes.
+4. If no food is clearly visible, or if the image is blurry, unreadable, or not primarily focused on food, return {"error": "No food detected"}.`;
+
+    const responseSchema = {
+      type: "OBJECT",
+      properties: {
+        error: { type: "STRING" },
+        name: { type: "STRING" },
+        confidence: { type: "STRING" },
+        notes: { type: "STRING" },
+        foods: {
+          type: "ARRAY",
+          items: {
+            type: "OBJECT",
+            properties: {
+              name: { type: "STRING" },
+              portion: { type: "STRING" },
+              calories: { type: "INTEGER" },
+              protein_g: { type: "INTEGER" },
+              carbs_g: { type: "INTEGER" },
+              fat_g: { type: "INTEGER" },
+              fiber_g: { type: "INTEGER" }
+            }
+          }
+        },
+        meal_total: {
+          type: "OBJECT",
+          properties: {
+            calories: { type: "INTEGER" },
+            protein_g: { type: "INTEGER" },
+            carbs_g: { type: "INTEGER" },
+            fat_g: { type: "INTEGER" },
+            fiber_g: { type: "INTEGER" }
+          }
+        }
+      }
+    };
 
     const response = await fetch(
       `https://us-central1-aiplatform.googleapis.com/v1/projects/${projectId}/locations/us-central1/publishers/google/models/gemini-2.5-flash-lite:generateContent`,
@@ -336,13 +168,20 @@ Output contains nothing except the JSON object.
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          systemInstruction: {
+            parts: [{ text: systemInstruction }]
+          },
           contents: [{
             role: "user",
             parts: [
-              { inlineData: { mimeType, data: imageBase64 } },
-              { text: prompt },
+              { inlineData: { mimeType, data: imageBase64 } }
             ],
           }],
+          generationConfig: {
+            temperature: 0.1,
+            responseMimeType: "application/json",
+            responseSchema: responseSchema,
+          },
         }),
       },
     );
@@ -353,7 +192,25 @@ Output contains nothing except the JSON object.
       throw new Error(`Vertex API error: ${JSON.stringify(result)}`);
     }
 
-    const text = result.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+    let text = result.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+
+    try {
+      if (text) {
+        const parsed = JSON.parse(text);
+        if (parsed.foods && Array.isArray(parsed.foods)) {
+          parsed.meal_total = {
+            calories: parsed.foods.reduce((acc: number, f: any) => acc + (f.calories || 0), 0),
+            protein_g: parsed.foods.reduce((acc: number, f: any) => acc + (f.protein_g || 0), 0),
+            carbs_g: parsed.foods.reduce((acc: number, f: any) => acc + (f.carbs_g || 0), 0),
+            fat_g: parsed.foods.reduce((acc: number, f: any) => acc + (f.fat_g || 0), 0),
+            fiber_g: parsed.foods.reduce((acc: number, f: any) => acc + (f.fiber_g || 0), 0),
+          };
+          text = JSON.stringify(parsed);
+        }
+      }
+    } catch (e) {
+      console.error("Failed to parse and calculate totals programmatically:", e);
+    }
 
     return new Response(JSON.stringify(text), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

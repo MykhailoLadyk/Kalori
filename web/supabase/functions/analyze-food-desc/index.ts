@@ -55,12 +55,11 @@ Deno.serve(async (req) => {
 
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+      { global: { headers: { Authorization: authHeader } } }
     );
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser(
-      authHeader.replace("Bearer ", ""),
-    );
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -90,22 +89,54 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Increment usage
-    const { error: upsertError } = await supabase.from("ai_usage").upsert(
-      { user_id: user.id, date: today, request_count: (usage?.request_count || 0) + 1 },
-      { onConflict: "ai_usage_user_id_date_key" }
-    );
+    // Increment usage securely via RPC
+    const { error: rpcError } = await supabase.rpc("increment_ai_usage");
 
-    if (upsertError) {
-      console.error("Upsert Error:", upsertError);
+    if (rpcError) {
+      console.error("RPC Error:", rpcError);
       return new Response(
-        JSON.stringify({ error: "Failed to track AI usage", details: upsertError }),
+        JSON.stringify({ error: "Failed to track AI usage", details: rpcError }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
     const projectId = Deno.env.get("GOOGLE_CLOUD_PROJECT_ID")!;
     const accessToken = await getAccessToken();
+
+    const responseSchema = {
+      type: "OBJECT",
+      properties: {
+        error: { type: "STRING" },
+        name: { type: "STRING" },
+        confidence: { type: "STRING" },
+        notes: { type: "STRING" },
+        foods: {
+          type: "ARRAY",
+          items: {
+            type: "OBJECT",
+            properties: {
+              name: { type: "STRING" },
+              portion: { type: "STRING" },
+              calories: { type: "INTEGER" },
+              protein_g: { type: "INTEGER" },
+              carbs_g: { type: "INTEGER" },
+              fat_g: { type: "INTEGER" },
+              fiber_g: { type: "INTEGER" }
+            }
+          }
+        },
+        meal_total: {
+          type: "OBJECT",
+          properties: {
+            calories: { type: "INTEGER" },
+            protein_g: { type: "INTEGER" },
+            carbs_g: { type: "INTEGER" },
+            fat_g: { type: "INTEGER" },
+            fiber_g: { type: "INTEGER" }
+          }
+        }
+      }
+    };
 
     const response = await fetch(
       `https://us-central1-aiplatform.googleapis.com/v1/projects/${projectId}/locations/us-central1/publishers/google/models/gemini-2.5-flash-lite:generateContent`,
@@ -116,46 +147,26 @@ Deno.serve(async (req) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          systemInstruction: {
+            parts: [{
+              text: `You are a nutrition estimator. Analyze the provided meal description.
+
+Rules:
+1. Extract ONLY the specific food items explicitly mentioned.
+2. Do NOT invent, assume, or append any extra ingredients, sides, condiments, or cooking oils if not explicitly written.
+3. If the input contains only one food item, output exactly one object.
+4. If the text is too short (1-2 letters), meaningless gibberish, or does not contain recognizable food, return {"error": "No food detected"}.`
+            }]
+          },
           contents: [{
             role: "user",
-            parts: [{
-              text: `
-You are a nutrition expert. Analyze the provided text description of a meal(${description})
-Respond ONLY with a valid, raw JSON object. Do not include any conversational text, no markdown formatting, and absolutely no code fences or backticks 
-
-Use exactly this structure:
-{
-  "foods": [
-    {
-      "name": "food item name",
-      "portion": "estimated portion e.g. 150g or 1 cup",
-      "calories": 000,
-      "protein_g": 00,
-      "carbs_g": 00,
-      "fat_g": 00,
-      "fiber_g": 00
-    }
-  ],
-  "meal_total": {
-    "calories": 000,
-    "protein_g": 00,
-    "carbs_g": 00,
-    "fat_g": 00,
-    "fiber_g": 00
-  },
-  "confidence": "high | medium | low",
-  "notes": "any caveats about the estimate or missing portion details"
-}
-
-Strict Extraction Rules:
-1. EXCLUSIVITY: Extract ONLY the specific food items explicitly mentioned in the user's text description. Do NOT invent, assume, or append any extra ingredients, sides, condiments, or cooking oils (such as chicken, broccoli, or olive oil) if they are not explicitly written.
-2. MINIMAL INPUT HANDLING: If the user input contains only one food item (e.g., "rice"), the "foods" array must contain exactly one object for that specific item. 
-3. MACRONUTRIENT ACCURACY: Calculate nutritional values based strictly on the items provided. All numbers must be integers (round to the nearest whole number).
-4. NO FOOD RULE: If the text description does not contain legible food items, or if no food can be identified, return exactly this object: { "error": "No food detected" }
-5. VALIDATION: Output must begin with '{' and end with '}'. Never return any content outside the single JSON object. Do not use training examples as fallback data.
- `,
-            }],
+            parts: [{ text: description }],
           }],
+          generationConfig: {
+            temperature: 0.1,
+            responseMimeType: "application/json",
+            responseSchema: responseSchema,
+          },
         }),
       },
     );
@@ -166,7 +177,25 @@ Strict Extraction Rules:
       throw new Error(`Vertex API error: ${JSON.stringify(result)}`);
     }
 
-    const text = result.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+    let text = result.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+
+    try {
+      if (text) {
+        const parsed = JSON.parse(text);
+        if (parsed.foods && Array.isArray(parsed.foods)) {
+          parsed.meal_total = {
+            calories: parsed.foods.reduce((acc: number, f: any) => acc + (f.calories || 0), 0),
+            protein_g: parsed.foods.reduce((acc: number, f: any) => acc + (f.protein_g || 0), 0),
+            carbs_g: parsed.foods.reduce((acc: number, f: any) => acc + (f.carbs_g || 0), 0),
+            fat_g: parsed.foods.reduce((acc: number, f: any) => acc + (f.fat_g || 0), 0),
+            fiber_g: parsed.foods.reduce((acc: number, f: any) => acc + (f.fiber_g || 0), 0),
+          };
+          text = JSON.stringify(parsed);
+        }
+      }
+    } catch (e) {
+      console.error("Failed to parse and calculate totals programmatically:", e);
+    }
 
     return new Response(JSON.stringify(text), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

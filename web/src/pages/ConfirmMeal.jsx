@@ -42,7 +42,7 @@ export default function ConfirmMeal() {
   const photo = location.state?.photoData;
   const isAlbum = location.state?.isAlbum;
   const [form, setForm] = useState({
-    name: result?.foods[0]?.name ?? "",
+    name: result?.name ?? result?.foods?.[0]?.name ?? "",
     calories: result?.meal_total?.calories ?? "",
     protein: result?.meal_total?.protein_g ?? "",
     carbs: result?.meal_total?.carbs_g ?? "",

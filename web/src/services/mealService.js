@@ -18,9 +18,16 @@ export const fetchMeals = async (userId, date = todayYmd()) => {
 };
 export const updateMeal = async (userId, id, updates) => {
   if (!userId) throw new Error("No authenticated user ID provided");
+  const sanitizedUpdates = { ...updates };
+  if (sanitizedUpdates.calories != null) sanitizedUpdates.calories = Math.round(Number(sanitizedUpdates.calories));
+  if (sanitizedUpdates.protein != null) sanitizedUpdates.protein = Math.round(Number(sanitizedUpdates.protein));
+  if (sanitizedUpdates.carbs != null) sanitizedUpdates.carbs = Math.round(Number(sanitizedUpdates.carbs));
+  if (sanitizedUpdates.fat != null) sanitizedUpdates.fat = Math.round(Number(sanitizedUpdates.fat));
+  if (sanitizedUpdates.amount != null) sanitizedUpdates.amount = Math.round(Number(sanitizedUpdates.amount));
+
   const { data, error } = await supabase
     .from("meals")
-    .update(updates)
+    .update(sanitizedUpdates)
     .eq("id", id)
     .eq("user_id", userId)
     .select()
@@ -48,13 +55,13 @@ export async function addMeal(userId, meal) {
     .insert({
       user_id: userId,
       name: meal.name,
-      calories: meal.calories,
-      protein: meal.protein,
-      carbs: meal.carbs,
-      fat: meal.fat,
+      calories: meal.calories != null ? Math.round(Number(meal.calories)) : null,
+      protein: meal.protein != null ? Math.round(Number(meal.protein)) : null,
+      carbs: meal.carbs != null ? Math.round(Number(meal.carbs)) : null,
+      fat: meal.fat != null ? Math.round(Number(meal.fat)) : null,
       type: meal.type, // "breakfast" | "lunch" | "dinner" | "snacks"
       date: meal.date || todayYmd(),
-      amount: meal.amount,
+      amount: meal.amount != null ? Math.round(Number(meal.amount)) : null,
     })
     .select()
     .single();

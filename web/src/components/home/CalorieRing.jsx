@@ -19,7 +19,10 @@ export function CalorieRing() {
     return () => clearTimeout(t);
   }, []);
   const left = goal - consumed;
-  const pct = goal > 0 ? consumed / goal : 0;
+  const isOver = left < 0;
+  const isSeverelyOver = goal > 0 && consumed >= goal * 1.2;
+  const displayValue = Math.abs(left);
+  const pct = goal > 0 ? Math.min(consumed / goal, 1) : 0;
   const totalArc = 427;
   return (
     <div
@@ -48,7 +51,7 @@ export function CalorieRing() {
         <path
           d="M 24 154 A 136 136 0 0 1 296 154"
           fill="none"
-          stroke={C.accent}
+          stroke={isSeverelyOver ? C.redSoft : C.accent}
           strokeWidth="16"
           strokeLinecap="round"
           strokeDasharray={
@@ -56,8 +59,8 @@ export function CalorieRing() {
           }
           style={{
             transition:
-              "stroke-dasharray 1.4s cubic-bezier(0.22,1,0.36,1) 0.3s",
-            filter: `drop-shadow(0 0 12px ${C.accentGlow})`,
+              "stroke-dasharray 1.4s cubic-bezier(0.22,1,0.36,1) 0.3s, stroke 0.5s ease",
+            filter: `drop-shadow(0 0 12px ${isSeverelyOver ? C.redDim : C.accentGlow})`,
           }}
         />
         {[0.25, 0.5, 0.75].map((t, i) => {
@@ -82,10 +85,10 @@ export function CalorieRing() {
                 cx={160 + 136 * Math.cos(a)}
                 cy={154 - 136 * Math.sin(a)}
                 r="8"
-                fill={C.accent}
+                fill={isSeverelyOver ? C.redSoft : C.accent}
                 style={{
                   animation: "glowPulse 2s ease infinite",
-                  filter: `drop-shadow(0 0 6px ${C.accent})`,
+                  filter: `drop-shadow(0 0 6px ${isSeverelyOver ? C.redSoft : C.accent})`,
                 }}
               />
             );
@@ -129,15 +132,15 @@ export function CalorieRing() {
           style={{
             fontFamily: F.head,
             fontWeight: 900,
-            color: C.text,
+            color: isSeverelyOver ? C.redSoft : C.text,
             lineHeight: 1,
             fontSize: 50,
           }}
         >
-          <CountUp to={Number(left)} duration={1200} delay={400} />
+          <CountUp to={Number(displayValue)} duration={1200} delay={400} />
         </div>
-        <Mono size={9} color={C.mutedLight}>
-          KCAL REMAINING
+        <Mono size={9} color={isSeverelyOver ? C.redSoft : C.mutedLight}>
+          {isOver ? "KCAL OVER" : "KCAL REMAINING"}
         </Mono>
         <div
           style={{

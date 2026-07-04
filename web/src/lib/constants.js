@@ -21,6 +21,8 @@ export const C = {
   pinkDim: "var(--c-pink-dim)",
   orange: "var(--c-orange)",
   red: "var(--c-red)",
+  redSoft: "var(--c-red-soft)",
+  redDim: "var(--c-red-dim)",
   text: "var(--c-text)",
   soft: "var(--c-soft)",
   muted: "var(--c-muted)",

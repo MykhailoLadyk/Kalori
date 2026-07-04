@@ -18,6 +18,8 @@
   --c-pink-dim: color-mix(in srgb, var(--c-pink) 8%, transparent);
   --c-orange: #FB923C;
   --c-red: #F87171;
+  --c-red-soft: color-mix(in srgb, var(--c-red) 75%, transparent);
+  --c-red-dim: color-mix(in srgb, var(--c-red) 15%, transparent);
   --c-text: #F0F0F8;
   --c-soft: #8888A8;
   --c-muted: #404058;

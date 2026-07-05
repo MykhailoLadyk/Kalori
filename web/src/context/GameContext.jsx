@@ -1,10 +1,11 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useRef } from "react";
 import { useNotifications } from "./NotificationContext";
 import { fetchGameData, updateGameData } from "../services/gameService";
-import { achievements as achievementDefinitions, quests as questDefinitions } from "../lib/constants";
+import { achievements as achievementDefinitions, quests as questDefinitions, levels } from "../lib/constants";
 import { useUser } from "../hooks/useUser";
 import { supabase } from "../services/supabase";
 import { getTodayDateString, getDaysBetweenDates } from "../lib/dateUtils";
+import { processProgress } from "../lib/progressEngine";
 
 export const GameContext = createContext(null);
 
@@ -12,7 +13,7 @@ const defaultAchievements = [
   { id: 1, progress: 0 }, { id: 2, progress: 0 }, { id: 3, progress: 0 },
   { id: 4, progress: 0 }, { id: 5, progress: 0 }, { id: 6, progress: 0 },
   { id: 7, progress: 0 }, { id: 8, progress: 0 }, { id: 9, progress: 0 },
-  { id: 10, progress: 0 }, { id: 11, progress: 0 }, { id: 12, progress: 0 },
+  { id: 10, progress: 0 }, { id: 12, progress: 0 },
   { id: 13, progress: 0 }, { id: 14, progress: 0 }, { id: 15, progress: 0 },
   { id: 16, progress: 0 }, { id: 17, progress: 0 }, { id: 18, progress: 0 },
   { id: 19, progress: 0 }, { id: 20, progress: 0 },
@@ -27,8 +28,11 @@ const defaultQuests = [
 export function GameProvider({ children }) {
   const { user } = useUser();
   const [gameData, setGameData] = useState({ xp_total: 0, streak: 0, coins: 0, level: 1, last_log_date: null });
+  const gameDataRef = useRef({ xp_total: 0, streak: 0, coins: 0, level: 1, last_log_date: null });
   const [achievements, setAchievements] = useState(defaultAchievements);
+  const achievementsRef = useRef(defaultAchievements);
   const [quests, setQuests] = useState(defaultQuests);
+  const questsRef = useRef(defaultQuests);
   const [shopItems, setShopItems] = useState({ streak_shields: 0, themesOwned: [1] });
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -43,7 +47,10 @@ export function GameProvider({ children }) {
         setLoading(true);
         const data = await fetchGameData();
         
-        if (data.achievements) setAchievements(data.achievements);
+        if (data.achievements) {
+          setAchievements(data.achievements);
+          achievementsRef.current = data.achievements;
+        }
         if (data.themesOwned) setShopItems(prev => ({ ...prev, themesOwned: data.themesOwned }));
         if (data.streak_shields !== undefined) setShopItems(prev => ({ ...prev, streak_shields: data.streak_shields }));
 
@@ -77,6 +84,7 @@ export function GameProvider({ children }) {
             
             currentQuests = [...newDailyQuests, ...newWeeklyQuests];
             setQuests(currentQuests);
+            questsRef.current = currentQuests;
             
             // Fire RPC to securely update db
             await supabase.rpc('refresh_quests', {
@@ -86,6 +94,7 @@ export function GameProvider({ children }) {
             });
         } else {
             setQuests(currentQuests);
+            questsRef.current = currentQuests;
         }
 
         // Remove array fields from base gameData state so it's clean
@@ -98,6 +107,7 @@ export function GameProvider({ children }) {
         delete baseData.last_weekly_refresh;
 
         setGameData(baseData);
+        gameDataRef.current = baseData;
       } catch (error) {
         setError("Failed to fetch game data");
       } finally {
@@ -111,8 +121,9 @@ export function GameProvider({ children }) {
     try {
       setUpdating(true);
       
-      const prev = gameData;
-      const newGameData = { ...gameData, ...updates };
+      const prev = gameDataRef.current;
+      const newGameData = { ...prev, ...updates };
+      gameDataRef.current = newGameData;
       setGameData(newGameData);
 
       // We still update the database
@@ -123,7 +134,30 @@ export function GameProvider({ children }) {
         const prevXP = prev.xp_total ?? 0;
         const newXP = newGameData.xp_total ?? prevXP;
         const xpDelta = newXP - prevXP;
-        if (xpDelta > 0) addNotification({ type: "xp", amount: xpDelta });
+        if (xpDelta > 0) {
+          addNotification({ type: "xp", amount: xpDelta });
+          
+          let prevLevel = 1;
+          let newLevel = 1;
+          for (let [lvl, xp] of Object.entries(levels)) {
+            if (prevXP >= xp) prevLevel = parseInt(lvl);
+            if (newXP >= xp) newLevel = parseInt(lvl);
+          }
+
+          if (newLevel > prevLevel) {
+            addNotification({ type: "levelup", level: newLevel });
+          }
+          
+          const { updatedAchievements } = processProgress("EARN_XP", { xp: xpDelta }, {
+            gameData: newGameData,
+            level: newLevel,
+            userQuests: questsRef.current,
+            userAchievements: achievementsRef.current
+          });
+          if (updatedAchievements && updatedAchievements.length > 0) {
+            handleUpdateAchievements(updatedAchievements);
+          }
+        }
 
         const prevCoins = prev.coins ?? 0;
         const newCoins = newGameData.coins ?? prevCoins;
@@ -146,14 +180,18 @@ export function GameProvider({ children }) {
     if (!updates || !updates.length) return;
 
     const achDefMap = new Map(achievementDefinitions.map((a) => [a.id, a]));
+    const currentAchievements = achievementsRef.current;
+
+    let xpEarned = 0;
 
     updates.forEach((update) => {
-      const a = achievements.find((ach) => ach.id === update.id);
+      const a = currentAchievements.find((ach) => ach.id === update.id);
       const def = achDefMap.get(update.id);
       if (a) {
         const wasCompleted = a.completedAt != null;
         const isNowCompleted = update.progress >= (def?.max ?? 1);
         if (isNowCompleted && !wasCompleted) {
+          xpEarned += def?.xp || 0;
           try {
             addNotification({ ...def, ...a, ...update, type: "achievement" });
           } catch (e) {
@@ -161,6 +199,7 @@ export function GameProvider({ children }) {
         }
       } else {
         if (update.progress >= (def?.max ?? 1)) {
+          xpEarned += def?.xp || 0;
           try {
             addNotification({ ...def, ...update, type: "achievement" });
           } catch (e) {
@@ -170,7 +209,7 @@ export function GameProvider({ children }) {
     });
 
     // Compute merged array
-    const merged = achievements.map((a) => {
+    const merged = currentAchievements.map((a) => {
       const update = updates.find((u) => u.id === a.id);
       if (!update) return a;
 
@@ -182,7 +221,7 @@ export function GameProvider({ children }) {
       return result;
     });
 
-    const newOnes = updates.filter((u) => !achievements.some((p) => p.id === u.id));
+    const newOnes = updates.filter((u) => !currentAchievements.some((p) => p.id === u.id));
     newOnes.forEach((update) => {
       const def = achDefMap.get(update.id);
       if (update.progress >= (def?.max ?? 1)) {
@@ -191,12 +230,38 @@ export function GameProvider({ children }) {
       merged.unshift(update);
     });
 
+    achievementsRef.current = merged;
     setAchievements(merged);
     
+    let dbUpdates = { achievements: merged };
+
+    if (xpEarned > 0) {
+      const prev = gameDataRef.current;
+      const prevXP = prev.xp_total || 0;
+      const newXpTotal = prevXP + xpEarned;
+      dbUpdates.xp_total = newXpTotal;
+      const nextData = { ...prev, xp_total: newXpTotal };
+      gameDataRef.current = nextData;
+      setGameData(nextData);
+
+      try {
+        let prevLevel = 1;
+        let newLevel = 1;
+        for (let [lvl, xp] of Object.entries(levels)) {
+          if (prevXP >= xp) prevLevel = parseInt(lvl);
+          if (newXpTotal >= xp) newLevel = parseInt(lvl);
+        }
+
+        if (newLevel > prevLevel) {
+          addNotification({ type: "levelup", level: newLevel });
+        }
+      } catch (e) {}
+    }
+
     // Persist to Supabase
     try {
       setUpdating(true);
-      await updateGameData({ achievements: merged });
+      await updateGameData(dbUpdates);
     } catch (e) {
     } finally {
       setUpdating(false);
@@ -207,17 +272,20 @@ export function GameProvider({ children }) {
     if (!updates || !updates.length) return;
 
     const questDefMap = new Map(questDefinitions.map((q) => [q.id, q]));
+    const currentQuests = questsRef.current;
 
     let coinsEarned = 0;
+    let questsCompleted = 0;
 
     updates.forEach((update) => {
-      const q = quests.find((quest) => quest.id === update.id);
+      const q = currentQuests.find((quest) => quest.id === update.id);
       const def = questDefMap.get(update.id);
       if (q) {
         const wasCompleted = q.completedAt != null;
         const isNowCompleted = update.progress >= (def?.max ?? 1);
         if (isNowCompleted && !wasCompleted) {
           coinsEarned += def?.reward || 0;
+          questsCompleted++;
           try {
             addNotification({
               ...def,
@@ -233,7 +301,7 @@ export function GameProvider({ children }) {
     });
 
     // Compute merged quests
-    const mergedQuests = quests.map((q) => {
+    const mergedQuests = currentQuests.map((q) => {
       const update = updates.find((u) => u.id === q.id);
       if (!update) return q;
 
@@ -245,16 +313,30 @@ export function GameProvider({ children }) {
       return result;
     });
 
+    questsRef.current = mergedQuests;
     setQuests(mergedQuests);
 
     let dbUpdates = { quests: mergedQuests };
 
     if (coinsEarned > 0) {
-      setGameData((prev) => {
-        const newCoins = (prev.coins || 0) + coinsEarned;
-        dbUpdates.coins = newCoins;
-        return { ...prev, coins: newCoins };
+      const prev = gameDataRef.current;
+      const newCoins = (prev.coins || 0) + coinsEarned;
+      dbUpdates.coins = newCoins;
+      const nextData = { ...prev, coins: newCoins };
+      gameDataRef.current = nextData;
+      setGameData(nextData);
+    }
+
+    if (questsCompleted > 0) {
+      const { updatedAchievements } = processProgress("COMPLETE_QUEST", { count: questsCompleted }, {
+        gameData: gameDataRef.current,
+        level: gameDataRef.current.level || 1,
+        userQuests: mergedQuests,
+        userAchievements: achievementsRef.current
       });
+      if (updatedAchievements && updatedAchievements.length > 0) {
+        handleUpdateAchievements(updatedAchievements);
+      }
     }
 
     // Persist to Supabase

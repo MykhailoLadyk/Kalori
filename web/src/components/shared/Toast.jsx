@@ -12,13 +12,13 @@ import {
 } from "./DuoIcon";
 
 const CONFIGS = {
-  xp: { color: C.accent, icon: IconLightning, duration: 2000 },
-  coins: { color: C.gold, icon: IconCoin, duration: 2000 },
-  quest: { color: C.accent, icon: IconTarget, duration: 3500 },
-  achievement: { color: C.gold, icon: IconTrophy, duration: 5000 },
-  levelup: { color: C.accent, icon: IconArrowUp, duration: 5000 },
-  streak: { color: C.orange, icon: IconFire, duration: 4000 },
-  success: { color: "#10B981", icon: IconCheck, duration: 3000 },
+  xp: { color: C.accent, icon: IconLightning, duration: 3000 },
+  coins: { color: C.gold, icon: IconCoin, duration: 3000 },
+  quest: { color: C.accent, icon: IconTarget, duration: 5000 },
+  achievement: { color: C.gold, icon: IconTrophy, duration: 6500 },
+  levelup: { color: C.accent, icon: IconArrowUp, duration: 6500 },
+  streak: { color: C.orange, icon: IconFire, duration: 5500 },
+  success: { color: "#10B981", icon: IconCheck, duration: 4000 },
 };
 
 function ToastContent({ notification }) {
@@ -140,7 +140,8 @@ function ToastContent({ notification }) {
     return (
       <div
         style={{
-          background: `linear-gradient(135deg, ${C.accentDim}, ${C.pinkDim})`,
+          background: `linear-gradient(135deg, ${alpha(C.accent, 25)}, ${alpha(C.pink, 25)})`,
+          backdropFilter: "blur(12px)",
           border: `1px solid ${C.accentMid}`,
           borderRadius: 14,
           padding: "14px 16px",

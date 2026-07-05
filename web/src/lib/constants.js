@@ -82,6 +82,7 @@ export const achievements = [
     name: "First Log",
     description: "Log your first meal and start the journey.",
     max: 1,
+    xp: 50,
     triggers: [TRIGGERS.ADD_MEAL],
     evaluate: (payload, ctx) => ({ progress: 1 }),
   },
@@ -90,6 +91,7 @@ export const achievements = [
     name: "Three in a Row",
     description: "Log meals for 3 consecutive days.",
     max: 3,
+    xp: 100,
     triggers: [TRIGGERS.ADD_MEAL],
     evaluate: (payload, ctx) => ({ progress: ctx.gameData.streak }),
   },
@@ -98,6 +100,7 @@ export const achievements = [
     name: "Five Day Streak",
     description: "Keep your logging streak alive for 5 days.",
     max: 5,
+    xp: 150,
     triggers: [TRIGGERS.ADD_MEAL],
     evaluate: (payload, ctx) => ({ progress: ctx.gameData.streak }),
   },
@@ -106,6 +109,7 @@ export const achievements = [
     name: "Week Warrior",
     description: "Hit a 7-day logging streak.",
     max: 7,
+    xp: 200,
     triggers: [TRIGGERS.ADD_MEAL],
     evaluate: (payload, ctx) => ({ progress: ctx.gameData.streak }),
   },
@@ -114,6 +118,7 @@ export const achievements = [
     name: "Two Week Grind",
     description: "Stay consistent for 14 straight days.",
     max: 14,
+    xp: 300,
     triggers: [TRIGGERS.ADD_MEAL],
     evaluate: (payload, ctx) => ({ progress: ctx.gameData.streak }),
   },
@@ -122,6 +127,7 @@ export const achievements = [
     name: "Monthly Momentum",
     description: "Log something every day for 30 days.",
     max: 30,
+    xp: 500,
     triggers: [TRIGGERS.ADD_MEAL],
     evaluate: (payload, ctx) => ({ progress: ctx.gameData.streak }),
   },
@@ -130,6 +136,7 @@ export const achievements = [
     name: "Calorie Tracker",
     description: "Log 25 meals in total.",
     max: 25,
+    xp: 250,
     triggers: [TRIGGERS.ADD_MEAL],
     evaluate: (payload, ctx) => ({ progress: ctx.item.progress + 1 }),
   },
@@ -138,6 +145,7 @@ export const achievements = [
     name: "Meal Planner",
     description: "Reach 50 total meal logs.",
     max: 50,
+    xp: 500,
     triggers: [TRIGGERS.ADD_MEAL],
     evaluate: (payload, ctx) => ({ progress: ctx.item.progress + 1 }),
   },
@@ -146,6 +154,7 @@ export const achievements = [
     name: "Macro Minded",
     description: "Check your macros on 10 different days.",
     max: 10,
+    xp: 200,
     triggers: [TRIGGERS.ADD_MEAL],
     evaluate: (payload, ctx) => {
       const todayStr = new Date().toISOString().split("T")[0];
@@ -158,6 +167,7 @@ export const achievements = [
     name: "Hydration Days",
     description: "Track your water intake on 10 different days.",
     max: 10,
+    xp: 150,
     triggers: [TRIGGERS.ADD_WATER],
     evaluate: (payload, ctx) => {
       const todayStr = new Date().toISOString().split("T")[0];
@@ -165,22 +175,13 @@ export const achievements = [
       return { progress: ctx.item.progress + 1, lastCountedDate: todayStr };
     },
   },
-  {
-    id: 11,
-    name: "Balanced Plate",
-    description: "Log a meal with all three macros in focus.",
-    max: 1,
-    triggers: [TRIGGERS.ADD_MEAL],
-    evaluate: (payload, ctx) => {
-      if (payload.protein > 0 && payload.carbs > 0 && payload.fat > 0) return { progress: 1 };
-      return { progress: ctx.item.progress };
-    },
-  },
+
   {
     id: 12,
     name: "Goal Getter",
     description: "Stay within your calorie goal for 7 consecutive days.",
     max: 7,
+    xp: 350,
     triggers: [TRIGGERS.ADD_MEAL],
     evaluate: (payload, ctx) => {
       const today = new Date();
@@ -207,32 +208,36 @@ export const achievements = [
   {
     id: 13,
     name: "Quest Starter",
-    description: "Complete your first quest.",
-    max: 1,
+    description: "Complete 3 quests.",
+    max: 3,
+    xp: 50,
     triggers: [TRIGGERS.COMPLETE_QUEST],
-    evaluate: (payload, ctx) => ({ progress: 1 }),
+    evaluate: (payload, ctx) => ({ progress: ctx.item.progress + (payload?.count || 1) }),
   },
   {
     id: 14,
     name: "Quest Hunter",
     description: "Complete 5 quests.",
     max: 5,
+    xp: 250,
     triggers: [TRIGGERS.COMPLETE_QUEST],
-    evaluate: (payload, ctx) => ({ progress: ctx.item.progress + 1 }),
+    evaluate: (payload, ctx) => ({ progress: ctx.item.progress + (payload?.count || 1) }),
   },
   {
     id: 15,
     name: "Quest Master",
     description: "Complete 10 quests.",
     max: 10,
+    xp: 500,
     triggers: [TRIGGERS.COMPLETE_QUEST],
-    evaluate: (payload, ctx) => ({ progress: ctx.item.progress + 1 }),
+    evaluate: (payload, ctx) => ({ progress: ctx.item.progress + (payload?.count || 1) }),
   },
   {
     id: 16,
     name: "XP Collector",
     description: "Earn 1,000 XP total.",
     max: 1000,
+    xp: 200,
     triggers: [TRIGGERS.EARN_XP],
     evaluate: (payload, ctx) => ({ progress: ctx.gameData.xp_total }),
   },
@@ -241,6 +246,7 @@ export const achievements = [
     name: "Level Up",
     description: "Reach level 5.",
     max: 5,
+    xp: 300,
     triggers: [TRIGGERS.EARN_XP],
     evaluate: (payload, ctx) => ({ progress: ctx.level || 1 }),
   },
@@ -249,6 +255,7 @@ export const achievements = [
     name: "Routine Builder",
     description: "Use the app for 20 separate days.",
     max: 20,
+    xp: 400,
     triggers: [TRIGGERS.ADD_MEAL, TRIGGERS.ADD_WATER],
     evaluate: (payload, ctx) => {
       const todayStr = new Date().toISOString().split("T")[0];
@@ -261,6 +268,7 @@ export const achievements = [
     name: "Consistency King",
     description: "Log meals on 60 total days.",
     max: 60,
+    xp: 1000,
     triggers: [TRIGGERS.ADD_MEAL, TRIGGERS.ADD_WATER],
     evaluate: (payload, ctx) => {
       const todayStr = new Date().toISOString().split("T")[0];
@@ -273,6 +281,7 @@ export const achievements = [
     name: "Legendary Discipline",
     description: "Keep a 90-day tracking habit alive.",
     max: 90,
+    xp: 2000,
     triggers: [TRIGGERS.ADD_MEAL, TRIGGERS.ADD_WATER],
     evaluate: (payload, ctx) => ({ progress: ctx.gameData.streak }),
   },

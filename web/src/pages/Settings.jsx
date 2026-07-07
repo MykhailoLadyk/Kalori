@@ -101,9 +101,6 @@ export default function Settings() {
         </div>
         <div>
           <div style={{ fontFamily: F.head, fontSize: 18, fontWeight: 900, color: C.text }}>{user?.name || "User"}</div>
-          <Mono size={8} color={C.muted}>
-            Level {Math.floor(gameData?.xp_total / 100) + 1} · {gameData?.xp_total || 0} XP
-          </Mono>
         </div>
       </div>
 

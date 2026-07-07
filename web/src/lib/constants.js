@@ -1,6 +1,7 @@
 // ══════════════════════════════════════════════════
 // COLORS AND FONTS
 // ══════════════════════════════════════════════════
+import { getTodayDateString, getLocalYMD } from "./dateUtils";
 
 // C values are CSS variable references — they resolve at render time
 // via the custom properties set on :root by ThemeContext.
@@ -157,7 +158,7 @@ export const achievements = [
     xp: 200,
     triggers: [TRIGGERS.ADD_MEAL],
     evaluate: (payload, ctx) => {
-      const todayStr = new Date().toISOString().split("T")[0];
+      const todayStr = getTodayDateString();
       if (ctx.item.lastCountedDate === todayStr) return { progress: ctx.item.progress };
       return { progress: ctx.item.progress + 1, lastCountedDate: todayStr };
     },
@@ -185,10 +186,10 @@ export const achievements = [
     triggers: [TRIGGERS.ADD_MEAL],
     evaluate: (payload, ctx) => {
       const today = new Date();
-      const todayStr = today.toISOString().split("T")[0];
+      const todayStr = getLocalYMD(today);
       const yesterday = new Date(today);
       yesterday.setDate(today.getDate() - 1);
-      const yesterdayStr = yesterday.toISOString().split("T")[0];
+      const yesterdayStr = getLocalYMD(yesterday);
 
       const totalCals = ctx.meals.reduce((sum, m) => sum + (m.calories || 0), 0);
       const counted = ctx.item.lastCountedDate === todayStr;

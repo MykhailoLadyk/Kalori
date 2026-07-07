@@ -1,6 +1,7 @@
 import { createContext, useEffect, useState } from "react";
 import { fetchMeals as apiFetchMeals, addMeal, deleteMeal, updateMeal } from "../services/mealService";
 import { useUser } from "../hooks/useUser";
+import { getLocalYMD } from "../lib/dateUtils";
 
 export const MealContext = createContext(null);
 
@@ -11,10 +12,6 @@ export function MealProvider({ children }) {
   const [updating, setUpdating] = useState(false);
   const [meals, setMeals] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
-
-  const getLocalYMD = (d) => {
-    return d.toISOString().split("T")[0];
-  };
 
   const handleFetchMeals = async (dateObj) => {
     if (!user?.id) return;

@@ -1,10 +1,7 @@
 import { supabase } from "./supabase";
+import { getTodayDateString } from "../lib/dateUtils";
 
-const todayYmd = () => {
-  return new Date().toISOString().split("T")[0];
-};
-
-export const fetchMeals = async (userId, date = todayYmd()) => {
+export const fetchMeals = async (userId, date = getTodayDateString()) => {
   if (!userId) throw new Error("No authenticated user ID provided");
   const { data, error } = await supabase
     .from("meals")
@@ -60,7 +57,7 @@ export async function addMeal(userId, meal) {
       carbs: meal.carbs != null ? Math.round(Number(meal.carbs)) : null,
       fat: meal.fat != null ? Math.round(Number(meal.fat)) : null,
       type: meal.type, // "breakfast" | "lunch" | "dinner" | "snacks"
-      date: meal.date || todayYmd(),
+      date: meal.date || getTodayDateString(),
       amount: meal.amount != null ? Math.round(Number(meal.amount)) : null,
     })
     .select()

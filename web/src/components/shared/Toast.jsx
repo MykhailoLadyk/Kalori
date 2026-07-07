@@ -140,8 +140,7 @@ function ToastContent({ notification }) {
     return (
       <div
         style={{
-          background: `linear-gradient(135deg, ${alpha(C.accent, 25)}, ${alpha(C.pink, 25)})`,
-          backdropFilter: "blur(12px)",
+          background: `linear-gradient(135deg, ${alpha(C.accent, 25)}, ${alpha(C.pink, 25)}), ${C.panel}`,
           border: `1px solid ${C.accentMid}`,
           borderRadius: 14,
           padding: "14px 16px",

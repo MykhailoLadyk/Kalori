@@ -1,26 +1,48 @@
 import { supabase } from "./supabase";
 
-function fileToBase64(file) {
+function resizeImage(dataUrl) {
   return new Promise((resolve, reject) => {
-    const reader = new FileReader();
+    const img = new Image();
+    img.onload = () => {
+      const MAX_SIZE = 800;
+      let width = img.width;
+      let height = img.height;
 
-    reader.onload = () => {
-      const dataUrl = reader.result;
-      const parts = String(dataUrl).split(",");
-      const base64 = parts[1];
-      resolve({ base64, mimeType: file.type || "image/jpeg" });
+      if (width > height) {
+        if (width > MAX_SIZE) {
+          height = Math.round((height * MAX_SIZE) / width);
+          width = MAX_SIZE;
+        }
+      } else {
+        if (height > MAX_SIZE) {
+          width = Math.round((width * MAX_SIZE) / height);
+          height = MAX_SIZE;
+        }
+      }
+
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, width, height);
+
+      const resizedDataUrl = canvas.toDataURL("image/jpeg", 0.8);
+      const parts = String(resizedDataUrl).split(",");
+      resolve({ base64: parts[1], mimeType: "image/jpeg" });
     };
-
-    reader.onerror = () => reject(new Error("Failed to read image file"));
-
-    reader.readAsDataURL(file);
+    img.onerror = () => reject(new Error("Failed to load image for resizing"));
+    img.src = dataUrl;
   });
 }
 
-function dataUrlToBase64(dataUrl) {
-  const match = String(dataUrl).match(/^data:(.+);base64,(.*)$/);
-  if (!match) throw new Error("Invalid data URL");
-  return { base64: match[2], mimeType: match[1] };
+function fileToDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(new Error("Failed to read image file"));
+    reader.readAsDataURL(file);
+  });
 }
 
 /**
@@ -31,20 +53,18 @@ function dataUrlToBase64(dataUrl) {
  * Throws an error with a `code` property for structured error handling.
  */
 export default async function analyzeFood(imageInput) {
-  let imageBase64;
-  let mimeType;
+  let dataUrl;
 
   if (typeof imageInput === "string" && imageInput.startsWith("data:")) {
-    const res = dataUrlToBase64(imageInput);
-    imageBase64 = res.base64;
-    mimeType = res.mimeType;
+    dataUrl = imageInput;
   } else if (imageInput instanceof File) {
-    const res = await fileToBase64(imageInput);
-    imageBase64 = res.base64;
-    mimeType = res.mimeType;
+    dataUrl = await fileToDataUrl(imageInput);
   } else {
     throw new Error("analyzeFood expects a File or a data URL string");
   }
+
+  // Resize and compress the image before uploading to reduce latency
+  const { base64: imageBase64, mimeType } = await resizeImage(dataUrl);
 
   const { data, error } = await supabase.functions.invoke("analyze-food", {
     body: { imageBase64, mimeType },

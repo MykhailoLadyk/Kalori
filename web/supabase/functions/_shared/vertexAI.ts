@@ -35,7 +35,8 @@ export async function getAccessToken(): Promise<string> {
   const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: `grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${jwt}`,
+    body:
+      `grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${jwt}`,
   });
 
   const tokenData = await tokenRes.json();
@@ -64,7 +65,14 @@ export const nutritionResponseSchema = {
       type: "ARRAY",
       items: {
         type: "OBJECT",
-        required: ["name", "portion", "calories", "protein_g", "carbs_g", "fat_g"],
+        required: [
+          "name",
+          "portion",
+          "calories",
+          "protein_g",
+          "carbs_g",
+          "fat_g",
+        ],
         properties: {
           name: { type: "STRING" },
           portion: { type: "STRING" },
@@ -104,35 +112,61 @@ export async function callVertexAI(
   const projectId = Deno.env.get("GOOGLE_CLOUD_PROJECT_ID")!;
   const accessToken = await getAccessToken();
 
-  const response = await fetch(
-    `https://us-central1-aiplatform.googleapis.com/v1/projects/${projectId}/locations/us-central1/publishers/google/models/gemini-2.5-flash-lite:generateContent`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        systemInstruction: {
-          parts: [{ text: systemInstruction }],
-        },
-        contents,
-        generationConfig: {
-          temperature: 0.1,
-          responseMimeType: "application/json",
-          responseSchema: nutritionResponseSchema,
-        },
-      }),
-    },
-  );
+  const maxRetries = 3;
+  let attempt = 0;
 
-  const result = await response.json();
+  while (attempt <= maxRetries) {
+    try {
+      // Use the global endpoint to dynamically route traffic and reduce 429s
+      const response = await fetch(
+        `https://aiplatform.googleapis.com/v1/projects/${projectId}/locations/global/publishers/google/models/gemini-2.5-flash-lite:generateContent`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            systemInstruction: {
+              parts: [{ text: systemInstruction }],
+            },
+            contents,
+            generationConfig: {
+              temperature: 0.1,
+              responseMimeType: "application/json",
+              responseSchema: nutritionResponseSchema,
+            },
+          }),
+        },
+      );
 
-  if (!response.ok) {
-    throw new Error(`Vertex API error (${response.status}): ${JSON.stringify(result)}`);
+      const result = await response.json();
+
+      if (!response.ok) {
+        // If we hit a 429 and haven't exceeded max retries, throw a specific error to trigger backoff
+        if (response.status === 429 && attempt < maxRetries) {
+          throw new Error("429");
+        }
+        throw new Error(
+          `Vertex API error (${response.status}): ${JSON.stringify(result)}`,
+        );
+      }
+
+      return result;
+    } catch (error) {
+      if (error instanceof Error && error.message === "429") {
+        attempt++;
+        // Exponential backoff with jitter: 2s, 4s, 8s + random ms
+        const backoffTime = Math.pow(2, attempt) * 1000 + Math.random() * 1000;
+        console.warn(`[Vertex AI] 429 Resource Exhausted. Retrying in ${Math.round(backoffTime)}ms... (Attempt ${attempt}/${maxRetries})`);
+        await new Promise(resolve => setTimeout(resolve, backoffTime));
+      } else {
+        throw error;
+      }
+    }
   }
 
-  return result;
+  throw new Error("Vertex AI: Max retries exceeded");
 }
 
 // --- Response parsing & normalization ---
@@ -160,15 +194,21 @@ interface NutritionData {
   };
 }
 
+
+
 /**
  * Extracts the text response from Vertex AI, parses it as JSON,
  * and recalculates meal_total from the individual foods array
  * to ensure accuracy.
  */
-export function parseVertexResponse(result: Record<string, unknown>): NutritionData {
-  const candidates = result.candidates as Array<{
-    content?: { parts?: Array<{ text?: string }> };
-  }> | undefined;
+export function parseVertexResponse(
+  result: Record<string, unknown>,
+): NutritionData {
+  const candidates = result.candidates as
+    | Array<{
+      content?: { parts?: Array<{ text?: string }> };
+    }>
+    | undefined;
 
   const text = candidates?.[0]?.content?.parts?.[0]?.text ?? "";
 
@@ -179,11 +219,13 @@ export function parseVertexResponse(result: Record<string, unknown>): NutritionD
   const parsed: NutritionData = JSON.parse(text);
 
   // If the AI didn't provide meal_total or it's empty/zero, recalculate it from foods
-  const hasValidTotal =
-    parsed.meal_total &&
+  const hasValidTotal = parsed.meal_total &&
     (parsed.meal_total.calories > 0 || parsed.meal_total.protein_g > 0);
 
-  if (!hasValidTotal && parsed.foods && Array.isArray(parsed.foods) && parsed.foods.length > 0) {
+  if (
+    !hasValidTotal && parsed.foods && Array.isArray(parsed.foods) &&
+    parsed.foods.length > 0
+  ) {
     parsed.meal_total = {
       calories: parsed.foods.reduce((acc, f) => acc + (f.calories || 0), 0),
       protein_g: parsed.foods.reduce((acc, f) => acc + (f.protein_g || 0), 0),

@@ -14,7 +14,7 @@ Rules:
 2. Do NOT invent, assume, or append any extra ingredients, sides, condiments, or cooking oils if not explicitly written.
 3. If the input contains only one food item, output exactly one object.
 4. If the text is too short (1-2 letters), meaningless gibberish, or does not contain recognizable food, return {"error": "No food detected"}.
-5. Set the top-level "name" field to a descriptive title for the ENTIRE meal (e.g., "Chicken, Rice & Vegetables").`;
+5. Set the top-level "name" field to a highly descriptive title listing the main components (e.g., "Eggs, Bacon & Toast", "Grilled Chicken with Broccoli"). DO NOT use generic categorical names like "Breakfast", "Hearty Breakfast", "Lunch", or "Breakfast Plate".`;
 
 Deno.serve(async (req) => {
   // Handle CORS preflight

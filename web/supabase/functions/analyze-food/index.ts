@@ -15,7 +15,49 @@ Rules:
 2. Estimate portions from visible size (e.g. "100g", "1 cup").
 3. Do not guess recipes, preparation methods, or unseen side dishes.
 4. If no food is clearly visible, or if the image is blurry, unreadable, or not primarily focused on food, return {"error": "No food detected"}.
-5. Set the top-level "name" field to a descriptive title for the ENTIRE meal (e.g., "Chicken, Rice & Vegetables").`;
+5. Set the top-level "name" field to a highly descriptive title listing the main components (e.g., "Eggs, Bacon & Toast", "Grilled Chicken with Broccoli"). DO NOT use generic categorical names like "Breakfast", "Hearty Breakfast", "Lunch", or "Breakfast Plate".
+
+EXAMPLES OF CORRECT BEHAVIOR:
+
+Example 1: A photo of a grilled chicken breast and a side of broccoli.
+{
+  "name": "Grilled Chicken & Broccoli",
+  "confidence": "high",
+  "notes": "Estimated 6oz chicken breast and 1 cup of steamed broccoli.",
+  "foods": [
+    {
+      "name": "Grilled Chicken Breast",
+      "portion": "6 oz",
+      "calories": 280,
+      "protein_g": 52,
+      "carbs_g": 0,
+      "fat_g": 6,
+      "fiber_g": 0
+    },
+    {
+      "name": "Broccoli",
+      "portion": "1 cup",
+      "calories": 30,
+      "protein_g": 2,
+      "carbs_g": 6,
+      "fat_g": 0,
+      "fiber_g": 2
+    }
+  ],
+  "meal_total": {
+    "calories": 310,
+    "protein_g": 54,
+    "carbs_g": 6,
+    "fat_g": 6,
+    "fiber_g": 2
+  }
+}
+
+Example 2: A photo of a steering wheel (no food).
+{
+  "error": "No food detected"
+}
+`;
 
 Deno.serve(async (req) => {
   // Handle CORS preflight

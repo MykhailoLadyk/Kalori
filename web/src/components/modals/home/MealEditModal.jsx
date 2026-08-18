@@ -150,6 +150,7 @@ export function MealEditModal({ meal, handleClose }) {
               value={form[key]}
               onChange={(e) => handleChange(key, e.target.value)}
               placeholder={placeholder}
+              maxLength={key === "name" ? 50 : undefined}
               style={{
                 width: "100%",
                 background: C.card,

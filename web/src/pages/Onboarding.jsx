@@ -46,6 +46,7 @@ function Field({
   placeholder,
   unit,
   error,
+  maxLength,
 }) {
   const [focused, setFocused] = useState(false);
   return (
@@ -73,6 +74,7 @@ function Field({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
+          maxLength={maxLength}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           className="flex-1 input-field"
@@ -498,6 +500,7 @@ export default function OnboardingPage() {
               onChange={(v) => set("name", v)}
               placeholder="e.g. Maria"
               error={errors.name}
+              maxLength={50}
             />
 
             {/* avatar preview */}

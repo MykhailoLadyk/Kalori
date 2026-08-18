@@ -6,6 +6,7 @@ import { useMeals } from "../hooks/useMeals";
 import { useGameStats } from "../hooks/useGameStats";
 import { useUser } from "../hooks/useUser";
 import { getStreakMultiplier } from "../lib/utils";
+import { getLocalYMD } from "../lib/dateUtils";
 import { processProgress } from "../lib/progressEngine";
 const ChevronLeft = () => (
   <svg
@@ -80,36 +81,37 @@ export default function ManualMealPage() {
 
     try {
       setLoading(true);
-      const multiplier = getStreakMultiplier(gameData.streak);
-      const baseXp = 10;
-      const xpAwarded = baseXp * multiplier;
-      const baseCoins = 5;
-      const coinsAwarded = baseCoins * multiplier;
-      const getLocalYMD = (d) => {
-        const yyyy = d.getFullYear();
-        const mm = String(d.getMonth() + 1).padStart(2, "0");
-        const dd = String(d.getDate()).padStart(2, "0");
-        return `${yyyy}-${mm}-${dd}`;
-      };
-      
       const mealDateStr = getLocalYMD(selectedDate);
       const todayStr = getLocalYMD(new Date());
-      const yesterdayD = new Date();
-      yesterdayD.setDate(yesterdayD.getDate() - 1);
-      const yesterdayStr = getLocalYMD(yesterdayD);
+      const isToday = mealDateStr === todayStr;
 
       let streakUpdates = {};
-      if (mealDateStr === todayStr && gameData.last_log_date !== todayStr) {
-        const isConsecutive = gameData.last_log_date === yesterdayStr;
-        const newStreak = isConsecutive ? (gameData.streak || 0) + 1 : 1;
-        streakUpdates = { streak: newStreak, last_log_date: todayStr };
-      }
+      let xpAwarded = 0;
+      let coinsAwarded = 0;
 
-      await updateGameData({ 
-        xp_total: (gameData.xp_total || 0) + xpAwarded, 
-        coins: (gameData.coins || 0) + coinsAwarded,
-        ...streakUpdates
-      });
+      if (isToday) {
+        const multiplier = getStreakMultiplier(gameData.streak);
+        const baseXp = 10;
+        xpAwarded = Math.round(baseXp * multiplier);
+        const baseCoins = 5;
+        coinsAwarded = Math.round(baseCoins * multiplier);
+
+        const yesterdayD = new Date();
+        yesterdayD.setDate(yesterdayD.getDate() - 1);
+        const yesterdayStr = getLocalYMD(yesterdayD);
+
+        if (gameData.last_log_date !== todayStr) {
+          const isConsecutive = gameData.last_log_date === yesterdayStr;
+          const newStreak = isConsecutive ? (gameData.streak || 0) + 1 : 1;
+          streakUpdates = { streak: newStreak, last_log_date: todayStr };
+        }
+
+        await updateGameData({ 
+          xp_total: (gameData.xp_total || 0) + xpAwarded, 
+          coins: (gameData.coins || 0) + coinsAwarded,
+          ...streakUpdates
+        });
+      }
 
       const mealObj = {
         ...form,
@@ -122,16 +124,18 @@ export default function ManualMealPage() {
 
       await addMeal(mealObj);
 
-      const contextBag = {
-        meals: [...meals, mealObj],
-        user,
-        userQuests: quests || [],
-        userAchievements: achievements || [],
-        gameData: { ...gameData, xp_total: (gameData.xp_total || 0) + xpAwarded, coins: (gameData.coins || 0) + coinsAwarded, ...streakUpdates },
-      };
-      const { updatedQuests, updatedAchievements } = processProgress("ADD_MEAL", mealObj, contextBag);
-      if (updatedQuests.length) updateQuests(updatedQuests);
-      if (updatedAchievements.length) updateAchievements(updatedAchievements);
+      if (isToday) {
+        const contextBag = {
+          meals: [...meals, mealObj],
+          user,
+          userQuests: quests || [],
+          userAchievements: achievements || [],
+          gameData: { ...gameData, xp_total: (gameData.xp_total || 0) + xpAwarded, coins: (gameData.coins || 0) + coinsAwarded, ...streakUpdates },
+        };
+        const { updatedQuests, updatedAchievements } = processProgress("ADD_MEAL", mealObj, contextBag);
+        if (updatedQuests.length) updateQuests(updatedQuests);
+        if (updatedAchievements.length) updateAchievements(updatedAchievements);
+      }
 
       navigate("/");
     } catch (err) {
@@ -222,6 +226,7 @@ export default function ManualMealPage() {
                 value={form[key]}
                 onChange={(e) => handleChange(key, e.target.value)}
                 placeholder={placeholder}
+                maxLength={key === "name" ? 50 : undefined}
                 style={{
                   width: "100%",
                   background: C.card,

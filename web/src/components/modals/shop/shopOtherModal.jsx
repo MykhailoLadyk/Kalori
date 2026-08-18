@@ -4,27 +4,45 @@ import { Mono } from "../../shared/Primitives";
 import { IconShield, IconCoin } from "../../shared/DuoIcon";
 import { shieldPacks } from "../../../lib/constants";
 import { useGameStats } from "../../../hooks/useGameStats";
+import { supabase } from "../../../services/supabase";
 
 export default function ShopOtherModal() {
   const { shopItems, updateShopItems, gameData, updateGameData } = useGameStats();
   const [error, setError] = useState(null);
   const [message, setMessage] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   async function onPurchase(price, qty) {
+    if (loading) return;
+    setLoading(true);
     setError(null);
     setMessage(null);
     
     const newCoiins = gameData.coins - price;
     if (newCoiins < 0) {
       setError("Not enough coins.");
+      setLoading(false);
       return;
     }
-    const newStreakShields = shopItems.streak_shields + parseInt(qty);
-    await updateShopItems({ streak_shields: newStreakShields });
-    await updateGameData({ coins: newCoiins });
-    setMessage(`Purchased ${qty} Streak Shield(s) for ${price} coins!`);
     
-    setTimeout(() => setMessage(null), 3000);
+    try {
+      const { data, error: rpcError } = await supabase.rpc("purchase_shield", {
+        p_qty: parseInt(qty),
+        p_price: price,
+      });
+
+      if (rpcError) throw rpcError;
+
+      const newStreakShields = shopItems.streak_shields + parseInt(qty);
+      await updateShopItems({ streak_shields: newStreakShields });
+      await updateGameData({ coins: newCoiins });
+      setMessage(`Purchased ${qty} Streak Shield(s) for ${price} coins!`);
+      setTimeout(() => setMessage(null), 3000);
+    } catch (err) {
+      setError(err.message || "Purchase failed.");
+    } finally {
+      setLoading(false);
+    }
   }
   return (
     <div>

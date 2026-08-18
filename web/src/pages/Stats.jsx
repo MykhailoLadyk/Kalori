@@ -2,19 +2,15 @@ import { useState, useMemo } from "react";
 
 import { C, F } from "../lib/constants";
 
-import { IconFire } from "../components/shared/DuoIcon";
 import { Mono } from "../components/shared/Primitives";
-import CountUp from "../components/shared/CountUp";
 import StatsBarChart from "../components/stats/StatsBarChart";
 import StatsLineChart from "../components/stats/StatsLineChart";
 import StatsItemQuick from "../components/stats/StatsItemQuick";
 import StatsMacroSplit from "../components/stats/StatsMacroSplit";
-import { useGameStats } from "../hooks/useGameStats";
 import { useStats } from "../hooks/useStats";
 import { useUser } from "../hooks/useUser";
 
 export default function Stats() {
-  const { gameData } = useGameStats();
   const { getWeekData, getMonthData, get3MonthData, get3MonthWeeklyAverages } = useStats();
   const { user } = useUser();
   const [period, setPeriod] = useState("W");
@@ -100,18 +96,8 @@ export default function Stats() {
             animation: "fadeUp 0.4s ease both",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <div style={{ animation: "float 2.5s ease infinite" }}>
-              <IconFire size={24} color={C.orange} />
-            </div>
-            <div>
-              <Mono size={8} color={C.orange}>
-                Current Streak
-              </Mono>
-              <div style={{ fontFamily: F.head, fontSize: 22, fontWeight: 900, color: C.text, lineHeight: 1 }}>
-                <CountUp to={gameData.streak} duration={800} delay={100} /> days
-              </div>
-            </div>
+          <div style={{ fontFamily: F.head, fontSize: 22, fontWeight: 900, color: C.text }}>
+            Stats
           </div>
           <div style={{ display: "flex", gap: 5 }}>
             {["W", "M", "3M"].map((p) => (

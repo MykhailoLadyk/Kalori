@@ -10,6 +10,7 @@ import GameCard from "../components/game/GameCard";
 import Achievements from "../components/game/Achievements";
 import { Modal } from "../components/modals/Modal";
 import AchievementsModal from "../components/modals/game/AchievementsModal";
+import { StreakBanner } from "../components/game/StreakBanner";
 import { useGameStats } from "../hooks/useGameStats";
 
 export default function Game() {
@@ -75,6 +76,8 @@ export default function Game() {
         <div style={{ animation: "fadeUp 0.4s ease 0.1s both" }}>
           <GameCard {...cardGameStats} />
         </div>
+
+        <StreakBanner />
 
         <div style={{ animation: "fadeUp 0.4s ease 0.2s both" }}>
           <Achievements

@@ -4,19 +4,31 @@ import { fetchGameData, updateGameData } from "../services/gameService";
 import { achievements as achievementDefinitions, quests as questDefinitions, levels } from "../lib/constants";
 import { useUser } from "../hooks/useUser";
 import { supabase } from "../services/supabase";
-import { getTodayDateString, getDaysBetweenDates } from "../lib/dateUtils";
+import { getTodayDateString, getDaysBetweenDates, getLocalYMD } from "../lib/dateUtils";
 import { processProgress } from "../lib/progressEngine";
 
 export const GameContext = createContext(null);
 
 const defaultAchievements = [
-  { id: 1, progress: 0 }, { id: 2, progress: 0 }, { id: 3, progress: 0 },
-  { id: 4, progress: 0 }, { id: 5, progress: 0 }, { id: 6, progress: 0 },
-  { id: 7, progress: 0 }, { id: 8, progress: 0 }, { id: 9, progress: 0 },
-  { id: 10, progress: 0 }, { id: 12, progress: 0 },
-  { id: 13, progress: 0 }, { id: 14, progress: 0 }, { id: 15, progress: 0 },
-  { id: 16, progress: 0 }, { id: 17, progress: 0 }, { id: 18, progress: 0 },
-  { id: 19, progress: 0 }, { id: 20, progress: 0 },
+  { id: 1, progress: 0 },
+  { id: 2, progress: 0 },
+  { id: 3, progress: 0 },
+  { id: 4, progress: 0 },
+  { id: 5, progress: 0 },
+  { id: 6, progress: 0 },
+  { id: 7, progress: 0 },
+  { id: 8, progress: 0 },
+  { id: 9, progress: 0 },
+  { id: 10, progress: 0 },
+  { id: 12, progress: 0 },
+  { id: 13, progress: 0 },
+  { id: 14, progress: 0 },
+  { id: 15, progress: 0 },
+  { id: 16, progress: 0 },
+  { id: 17, progress: 0 },
+  { id: 18, progress: 0 },
+  { id: 19, progress: 0 },
+  { id: 20, progress: 0 },
 ];
 
 const defaultQuests = [
@@ -46,55 +58,89 @@ export function GameProvider({ children }) {
       try {
         setLoading(true);
         const data = await fetchGameData();
-        
+
         if (data.achievements) {
           setAchievements(data.achievements);
           achievementsRef.current = data.achievements;
         }
-        if (data.themesOwned) setShopItems(prev => ({ ...prev, themesOwned: data.themesOwned }));
-        if (data.streak_shields !== undefined) setShopItems(prev => ({ ...prev, streak_shields: data.streak_shields }));
+        if (data.themesOwned) setShopItems((prev) => ({ ...prev, themesOwned: data.themesOwned }));
+        if (data.streak_shields !== undefined)
+          setShopItems((prev) => ({ ...prev, streak_shields: data.streak_shields }));
+
+        // --- Streak & Shield Inactivity Decay Logic ---
+        const today = getTodayDateString();
+        let currentStreak = data.streak || 0;
+        let currentShields = data.streak_shields || 0;
+        let currentLastLog = data.last_log_date;
+
+        if (currentLastLog && currentStreak > 0) {
+          const daysSinceLog = getDaysBetweenDates(currentLastLog, today);
+          if (daysSinceLog > 1) {
+            const missedDays = daysSinceLog - 1;
+            if (currentShields >= missedDays) {
+              currentShields -= missedDays;
+              const yesterday = new Date();
+              yesterday.setDate(yesterday.getDate() - 1);
+              currentLastLog = getLocalYMD(yesterday);
+              data.streak_shields = currentShields;
+              data.last_log_date = currentLastLog;
+              setShopItems((prev) => ({ ...prev, streak_shields: currentShields }));
+              await updateGameData({ streak_shields: currentShields, last_log_date: currentLastLog });
+            } else {
+              currentStreak = 0;
+              currentShields = 0;
+              data.streak = 0;
+              data.streak_shields = 0;
+              setShopItems((prev) => ({ ...prev, streak_shields: 0 }));
+              await updateGameData({ streak: 0, streak_shields: 0 });
+            }
+          }
+        }
 
         // --- Quest Lazy Loading Logic ---
         let currentQuests = data.quests || defaultQuests;
-        const today = getTodayDateString();
-        
+
         let needsDaily = false;
         let needsWeekly = false;
-        
+
         if (data.last_daily_refresh !== today) needsDaily = true;
-        
+
         const daysSinceWeekly = getDaysBetweenDates(data.last_weekly_refresh, today);
         if (!data.last_weekly_refresh || daysSinceWeekly >= 7) needsWeekly = true;
-        
+
         if (needsDaily || needsWeekly) {
-            const dailyPool = questDefinitions.filter(q => q.type === "Daily");
-            const weeklyPool = questDefinitions.filter(q => q.type === "Weekly");
-            
-            let newDailyQuests = currentQuests.filter(q => questDefinitions.find(d => d.id === q.id)?.type === "Daily");
-            let newWeeklyQuests = currentQuests.filter(q => questDefinitions.find(d => d.id === q.id)?.type === "Weekly");
-            
-            if (needsDaily) {
-                const shuffled = [...dailyPool].sort(() => 0.5 - Math.random());
-                newDailyQuests = shuffled.slice(0, 2).map(q => ({ id: q.id, progress: 0 }));
-            }
-            if (needsWeekly) {
-                const shuffled = [...weeklyPool].sort(() => 0.5 - Math.random());
-                newWeeklyQuests = shuffled.slice(0, 1).map(q => ({ id: q.id, progress: 0 }));
-            }
-            
-            currentQuests = [...newDailyQuests, ...newWeeklyQuests];
-            setQuests(currentQuests);
-            questsRef.current = currentQuests;
-            
-            // Fire RPC to securely update db
-            await supabase.rpc('refresh_quests', {
-                new_quests: currentQuests,
-                is_daily_refresh: needsDaily,
-                is_weekly_refresh: needsWeekly
-            });
+          const dailyPool = questDefinitions.filter((q) => q.type === "Daily");
+          const weeklyPool = questDefinitions.filter((q) => q.type === "Weekly");
+
+          let newDailyQuests = currentQuests.filter(
+            (q) => questDefinitions.find((d) => d.id === q.id)?.type === "Daily",
+          );
+          let newWeeklyQuests = currentQuests.filter(
+            (q) => questDefinitions.find((d) => d.id === q.id)?.type === "Weekly",
+          );
+
+          if (needsDaily) {
+            const shuffled = [...dailyPool].sort(() => 0.5 - Math.random());
+            newDailyQuests = shuffled.slice(0, 2).map((q) => ({ id: q.id, progress: 0 }));
+          }
+          if (needsWeekly) {
+            const shuffled = [...weeklyPool].sort(() => 0.5 - Math.random());
+            newWeeklyQuests = shuffled.slice(0, 1).map((q) => ({ id: q.id, progress: 0 }));
+          }
+
+          currentQuests = [...newDailyQuests, ...newWeeklyQuests];
+          setQuests(currentQuests);
+          questsRef.current = currentQuests;
+
+          // Fire RPC to securely update db
+          await supabase.rpc("refresh_quests", {
+            new_quests: currentQuests,
+            is_daily_refresh: needsDaily,
+            is_weekly_refresh: needsWeekly,
+          });
         } else {
-            setQuests(currentQuests);
-            questsRef.current = currentQuests;
+          setQuests(currentQuests);
+          questsRef.current = currentQuests;
         }
 
         // Remove array fields from base gameData state so it's clean
@@ -118,10 +164,10 @@ export function GameProvider({ children }) {
   }, [user?.userAuth]);
 
   const handleUpdateGameData = async (updates) => {
+    const prev = gameDataRef.current;
     try {
       setUpdating(true);
-      
-      const prev = gameDataRef.current;
+
       const newGameData = { ...prev, ...updates };
       gameDataRef.current = newGameData;
       setGameData(newGameData);
@@ -136,7 +182,7 @@ export function GameProvider({ children }) {
         const xpDelta = newXP - prevXP;
         if (xpDelta > 0) {
           addNotification({ type: "xp", amount: xpDelta });
-          
+
           let prevLevel = 1;
           let newLevel = 1;
           for (let [lvl, xp] of Object.entries(levels)) {
@@ -147,13 +193,17 @@ export function GameProvider({ children }) {
           if (newLevel > prevLevel) {
             addNotification({ type: "levelup", level: newLevel });
           }
-          
-          const { updatedAchievements } = processProgress("EARN_XP", { xp: xpDelta }, {
-            gameData: newGameData,
-            level: newLevel,
-            userQuests: questsRef.current,
-            userAchievements: achievementsRef.current
-          });
+
+          const { updatedAchievements } = processProgress(
+            "EARN_XP",
+            { xp: xpDelta },
+            {
+              gameData: newGameData,
+              level: newLevel,
+              userQuests: questsRef.current,
+              userAchievements: achievementsRef.current,
+            },
+          );
           if (updatedAchievements && updatedAchievements.length > 0) {
             handleUpdateAchievements(updatedAchievements);
           }
@@ -163,14 +213,12 @@ export function GameProvider({ children }) {
         const newCoins = newGameData.coins ?? prevCoins;
         const coinsDelta = newCoins - prevCoins;
         if (coinsDelta > 0) addNotification({ type: "coins", amount: coinsDelta });
-
-        if (updates.level !== undefined && updates.level !== prev.level) {
-          addNotification({ type: "levelup", level: updates.level });
-        }
-      } catch (e) {
-      }
+      } catch (e) {}
     } catch (error) {
+      gameDataRef.current = prev;
+      setGameData(prev);
       setError(error.message || "Failed to update game data");
+      throw error;
     } finally {
       setUpdating(false);
     }
@@ -181,6 +229,7 @@ export function GameProvider({ children }) {
 
     const achDefMap = new Map(achievementDefinitions.map((a) => [a.id, a]));
     const currentAchievements = achievementsRef.current;
+    const prevGameData = gameDataRef.current;
 
     let xpEarned = 0;
 
@@ -194,16 +243,14 @@ export function GameProvider({ children }) {
           xpEarned += def?.xp || 0;
           try {
             addNotification({ ...def, ...a, ...update, type: "achievement" });
-          } catch (e) {
-          }
+          } catch (e) {}
         }
       } else {
         if (update.progress >= (def?.max ?? 1)) {
           xpEarned += def?.xp || 0;
           try {
             addNotification({ ...def, ...update, type: "achievement" });
-          } catch (e) {
-          }
+          } catch (e) {}
         }
       }
     });
@@ -232,7 +279,7 @@ export function GameProvider({ children }) {
 
     achievementsRef.current = merged;
     setAchievements(merged);
-    
+
     let dbUpdates = { achievements: merged };
 
     if (xpEarned > 0) {
@@ -263,6 +310,14 @@ export function GameProvider({ children }) {
       setUpdating(true);
       await updateGameData(dbUpdates);
     } catch (e) {
+      achievementsRef.current = currentAchievements;
+      setAchievements(currentAchievements);
+      if (xpEarned > 0) {
+        gameDataRef.current = prevGameData;
+        setGameData(prevGameData);
+      }
+      setError(e.message || "Failed to update achievements");
+      throw e;
     } finally {
       setUpdating(false);
     }
@@ -273,6 +328,7 @@ export function GameProvider({ children }) {
 
     const questDefMap = new Map(questDefinitions.map((q) => [q.id, q]));
     const currentQuests = questsRef.current;
+    const prevGameData = gameDataRef.current;
 
     let coinsEarned = 0;
     let questsCompleted = 0;
@@ -287,15 +343,16 @@ export function GameProvider({ children }) {
           coinsEarned += def?.reward || 0;
           questsCompleted++;
           try {
-            addNotification({
-              ...def,
-              ...q,
-              ...update,
-              type: "quest",
-              coins: def.reward,
-            });
-          } catch (e) {
-          }
+            addNotification({ ...def, ...q, ...update, type: "quest", coins: def.reward });
+          } catch (e) {}
+        }
+      } else {
+        if (update.progress >= (def?.max ?? 1)) {
+          coinsEarned += def?.reward || 0;
+          questsCompleted++;
+          try {
+            addNotification({ ...def, ...update, type: "quest", coins: def.reward });
+          } catch (e) {}
         }
       }
     });
@@ -328,12 +385,16 @@ export function GameProvider({ children }) {
     }
 
     if (questsCompleted > 0) {
-      const { updatedAchievements } = processProgress("COMPLETE_QUEST", { count: questsCompleted }, {
-        gameData: gameDataRef.current,
-        level: gameDataRef.current.level || 1,
-        userQuests: mergedQuests,
-        userAchievements: achievementsRef.current
-      });
+      const { updatedAchievements } = processProgress(
+        "COMPLETE_QUEST",
+        { count: questsCompleted },
+        {
+          gameData: gameDataRef.current,
+          level: gameDataRef.current.level || 1,
+          userQuests: mergedQuests,
+          userAchievements: achievementsRef.current,
+        },
+      );
       if (updatedAchievements && updatedAchievements.length > 0) {
         handleUpdateAchievements(updatedAchievements);
       }
@@ -344,21 +405,26 @@ export function GameProvider({ children }) {
       setUpdating(true);
       await updateGameData(dbUpdates);
     } catch (e) {
+      questsRef.current = currentQuests;
+      setQuests(currentQuests);
+      if (coinsEarned > 0) {
+        gameDataRef.current = prevGameData;
+        setGameData(prevGameData);
+      }
+      setError(e.message || "Failed to update quests");
+      throw e;
     } finally {
       setUpdating(false);
     }
   };
 
   const handleUpdateShopItems = async (updates) => {
-    const newThemesOwned = updates.themesOwned 
-      ? [...shopItems.themesOwned, ...updates.themesOwned] 
+    const prevShop = shopItems;
+    const newThemesOwned = updates.themesOwned
+      ? [...shopItems.themesOwned, ...updates.themesOwned]
       : shopItems.themesOwned;
-      
-    const newItems = {
-      ...shopItems,
-      ...updates,
-      themesOwned: newThemesOwned
-    };
+
+    const newItems = { ...shopItems, ...updates, themesOwned: newThemesOwned };
 
     setShopItems(newItems);
 
@@ -366,7 +432,9 @@ export function GameProvider({ children }) {
       setUpdating(true);
       await updateGameData(newItems);
     } catch (error) {
+      setShopItems(prevShop);
       setError(error.message || "Failed to update shop items");
+      throw error;
     } finally {
       setUpdating(false);
     }

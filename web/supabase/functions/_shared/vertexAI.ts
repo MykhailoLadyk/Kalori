@@ -119,7 +119,7 @@ export async function callVertexAI(
     try {
       // Use the global endpoint to dynamically route traffic and reduce 429s
       const response = await fetch(
-        `https://aiplatform.googleapis.com/v1/projects/${projectId}/locations/global/publishers/google/models/gemini-2.5-flash-lite:generateContent`,
+        `https://aiplatform.googleapis.com/v1/projects/${projectId}/locations/global/publishers/google/models/gemini-3.1-flash-lite:generateContent`,
         {
           method: "POST",
           headers: {
@@ -158,8 +158,12 @@ export async function callVertexAI(
         attempt++;
         // Exponential backoff with jitter: 2s, 4s, 8s + random ms
         const backoffTime = Math.pow(2, attempt) * 1000 + Math.random() * 1000;
-        console.warn(`[Vertex AI] 429 Resource Exhausted. Retrying in ${Math.round(backoffTime)}ms... (Attempt ${attempt}/${maxRetries})`);
-        await new Promise(resolve => setTimeout(resolve, backoffTime));
+        console.warn(
+          `[Vertex AI] 429 Resource Exhausted. Retrying in ${
+            Math.round(backoffTime)
+          }ms... (Attempt ${attempt}/${maxRetries})`,
+        );
+        await new Promise((resolve) => setTimeout(resolve, backoffTime));
       } else {
         throw error;
       }
@@ -193,8 +197,6 @@ interface NutritionData {
     fiber_g: number;
   };
 }
-
-
 
 /**
  * Extracts the text response from Vertex AI, parses it as JSON,

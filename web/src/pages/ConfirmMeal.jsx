@@ -2,10 +2,13 @@ import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { C, F, alpha } from "../lib/constants";
 import { Mono } from "../components/shared/Primitives";
+import { IconStar, IconStarOutline } from "../components/shared/DuoIcon";
+import { useFavorites } from "../hooks/useFavorites";
 import { useMeals } from "../hooks/useMeals";
 import { useGameStats } from "../hooks/useGameStats";
 import { useUser } from "../hooks/useUser";
 import { getStreakMultiplier } from "../lib/utils";
+import { getLocalYMD } from "../lib/dateUtils";
 import { processProgress } from "../lib/progressEngine";
 const ChevronLeft = () => (
   <svg
@@ -47,6 +50,7 @@ export default function ConfirmMeal() {
     if (data?.foods?.length > 0) {
       return data.foods.reduce((sum, f) => sum + (f[field] || 0), 0);
     }
+    if (data?.[field] != null) return data[field];
     return "";
   };
 
@@ -61,6 +65,9 @@ export default function ConfirmMeal() {
 
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+
+  const { isFavorite, addFavorite, removeFavorite, getFavoriteByName } = useFavorites();
+  const formIsFav = isFavorite(form.name);
 
   const handleChange = (key, value) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -90,37 +97,38 @@ export default function ConfirmMeal() {
 
     try {
       setLoading(true);
-      const multiplier = getStreakMultiplier(gameData.streak);
-      const baseXp = 10;
-      const xpAwarded = baseXp * multiplier;
-      const baseCoins = 5;
-      const coinsAwarded = baseCoins * multiplier;
-      const getLocalYMD = (d) => {
-        const yyyy = d.getFullYear();
-        const mm = String(d.getMonth() + 1).padStart(2, "0");
-        const dd = String(d.getDate()).padStart(2, "0");
-        return `${yyyy}-${mm}-${dd}`;
-      };
-      
       const mealDateStr = getLocalYMD(selectedDate);
       const todayStr = getLocalYMD(new Date());
-      const yesterdayD = new Date();
-      yesterdayD.setDate(yesterdayD.getDate() - 1);
-      const yesterdayStr = getLocalYMD(yesterdayD);
+      const isToday = mealDateStr === todayStr;
 
       let streakUpdates = {};
-      if (mealDateStr === todayStr && gameData.last_log_date !== todayStr) {
-        const isConsecutive = gameData.last_log_date === yesterdayStr;
-        const newStreak = isConsecutive ? (gameData.streak || 0) + 1 : 1;
-        streakUpdates = { streak: newStreak, last_log_date: todayStr };
+      let xpAwarded = 0;
+      let coinsAwarded = 0;
+
+      if (isToday) {
+        const multiplier = getStreakMultiplier(gameData.streak);
+        const baseXp = 10;
+        xpAwarded = Math.round(baseXp * multiplier);
+        const baseCoins = 5;
+        coinsAwarded = Math.round(baseCoins * multiplier);
+
+        const yesterdayD = new Date();
+        yesterdayD.setDate(yesterdayD.getDate() - 1);
+        const yesterdayStr = getLocalYMD(yesterdayD);
+
+        if (gameData.last_log_date !== todayStr) {
+          const isConsecutive = gameData.last_log_date === yesterdayStr;
+          const newStreak = isConsecutive ? (gameData.streak || 0) + 1 : 1;
+          streakUpdates = { streak: newStreak, last_log_date: todayStr };
+        }
+
+        await updateGameData({
+          xp_total: (gameData.xp_total || 0) + xpAwarded,
+          coins: (gameData.coins || 0) + coinsAwarded,
+          ...streakUpdates,
+        });
       }
 
-      await updateGameData({ 
-        xp_total: (gameData.xp_total || 0) + xpAwarded, 
-        coins: (gameData.coins || 0) + coinsAwarded,
-        ...streakUpdates
-      });
-      
       const mealObj = {
         ...form,
         calories: Number(form.calories),
@@ -131,16 +139,23 @@ export default function ConfirmMeal() {
       };
       await addMeal(mealObj);
 
-      const contextBag = {
-        meals: [...meals, mealObj],
-        user,
-        userQuests: quests || [],
-        userAchievements: achievements || [],
-        gameData: { ...gameData, xp_total: (gameData.xp_total || 0) + xpAwarded, coins: (gameData.coins || 0) + coinsAwarded, ...streakUpdates },
-      };
-      const { updatedQuests, updatedAchievements } = processProgress("ADD_MEAL", mealObj, contextBag);
-      if (updatedQuests.length) updateQuests(updatedQuests);
-      if (updatedAchievements.length) updateAchievements(updatedAchievements);
+      if (isToday) {
+        const contextBag = {
+          meals: [...meals, mealObj],
+          user,
+          userQuests: quests || [],
+          userAchievements: achievements || [],
+          gameData: {
+            ...gameData,
+            xp_total: (gameData.xp_total || 0) + xpAwarded,
+            coins: (gameData.coins || 0) + coinsAwarded,
+            ...streakUpdates,
+          },
+        };
+        const { updatedQuests, updatedAchievements } = processProgress("ADD_MEAL", mealObj, contextBag);
+        if (updatedQuests.length) updateQuests(updatedQuests);
+        if (updatedAchievements.length) updateAchievements(updatedAchievements);
+      }
       navigate("/");
     } catch (err) {
     } finally {
@@ -149,10 +164,7 @@ export default function ConfirmMeal() {
   };
 
   return (
-    <div
-      className="sy flex flex-col flex-1"
-      style={{ animation: "fadeIn 0.22s ease both" }}
-    >
+    <div className="sy flex flex-col flex-1" style={{ animation: "fadeIn 0.22s ease both" }}>
       <div className="flex items-center" style={{ gap: 12, padding: "8px 22px 16px" }}>
         <div
           onClick={() => navigate("/")}
@@ -168,19 +180,16 @@ export default function ConfirmMeal() {
         >
           <ChevronLeft />
         </div>
-        <div className="font-head font-black text-primary" style={{ fontSize: 18 }}>Confirm Meal</div>
+        <div className="font-head font-black text-primary" style={{ fontSize: 18 }}>
+          Confirm Meal
+        </div>
       </div>
 
       <div className="flex-1 flex flex-col" style={{ padding: "0 22px 22px" }}>
         {photo && (
           <div
             className="w-full relative overflow-hidden"
-            style={{
-              height: 180,
-              borderRadius: 16,
-              marginBottom: 16,
-              border: `1px solid ${C.border}`,
-            }}
+            style={{ height: 180, borderRadius: 16, marginBottom: 16, border: `1px solid ${C.border}` }}
           >
             <img src={photo} alt="meal" className="w-full h-full" style={{ objectFit: "cover" }} />
             {!isAlbum && (
@@ -198,7 +207,9 @@ export default function ConfirmMeal() {
                   cursor: "pointer",
                 }}
               >
-                <span className="font-mono font-bold" style={{ fontSize: 9, color: "#fff" }}>RETAKE</span>
+                <span className="font-mono font-bold" style={{ fontSize: 9, color: "#fff" }}>
+                  RETAKE
+                </span>
               </div>
             )}
           </div>
@@ -228,10 +239,7 @@ export default function ConfirmMeal() {
               >
                 <span
                   className="font-mono font-bold"
-                  style={{
-                    fontSize: 8,
-                    color: form.type === type ? "#000" : C.muted,
-                  }}
+                  style={{ fontSize: 8, color: form.type === type ? "#000" : C.muted }}
                 >
                   {type.toUpperCase()}
                 </span>
@@ -251,32 +259,61 @@ export default function ConfirmMeal() {
               </Mono>
             )}
           </div>
-          <input
-            type="text"
-            value={form.name}
-            onChange={(e) => handleChange("name", e.target.value)}
-            placeholder="e.g. Chicken & Rice"
-            className="w-full bg-card input-field"
-            style={{
-              border: `1px solid ${errors.name ? alpha(C.red, 50) : C.border}`,
-              borderRadius: 10,
-              padding: "12px 14px",
-              transition: "border-color 0.2s",
-              minHeight: 46,
-            }}
-            onFocus={(e) => (e.target.style.borderColor = errors.name ? alpha(C.red, 50) : C.accent)}
-            onBlur={(e) => (e.target.style.borderColor = errors.name ? alpha(C.red, 50) : C.border)}
-          />
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            <input
+              type="text"
+              value={form.name}
+              onChange={(e) => handleChange("name", e.target.value)}
+              placeholder="e.g. Chicken & Rice"
+              maxLength={50}
+              className="w-full bg-card input-field"
+              style={{
+                flex: 1,
+                border: `1px solid ${errors.name ? alpha(C.red, 50) : C.border}`,
+                borderRadius: 10,
+                padding: "12px 14px",
+                transition: "border-color 0.2s",
+                minHeight: 46,
+              }}
+              onFocus={(e) => (e.target.style.borderColor = errors.name ? alpha(C.red, 50) : C.accent)}
+              onBlur={(e) => (e.target.style.borderColor = errors.name ? alpha(C.red, 50) : C.border)}
+            />
+            <div
+              onClick={() => {
+                if (formIsFav) {
+                  const fav = getFavoriteByName(form.name);
+                  if (fav) removeFavorite(fav.id);
+                } else {
+                  addFavorite({
+                    name: form.name,
+                    calories: Number(form.calories) || 0,
+                    protein: Number(form.protein) || 0,
+                    carbs: Number(form.carbs) || 0,
+                    fat: Number(form.fat) || 0,
+                    type: form.type,
+                  });
+                }
+              }}
+              className="press flex items-center justify-center"
+              style={{
+                width: 46,
+                height: 46,
+                borderRadius: 10,
+                background: formIsFav ? alpha(C.gold, 9) : C.card,
+                border: `1px solid ${formIsFav ? alpha(C.gold, 25) : C.border}`,
+                flexShrink: 0,
+                cursor: "pointer",
+                transition: "all 0.2s",
+              }}
+            >
+              {formIsFav ? <IconStar size={20} color={C.gold} /> : <IconStarOutline size={20} color={C.muted} />}
+            </div>
+          </div>
         </div>
 
         <div
           className="bg-card text-center"
-          style={{
-            border: `1px solid ${C.border}`,
-            borderRadius: 16,
-            padding: "16px",
-            marginBottom: 14,
-          }}
+          style={{ border: `1px solid ${C.border}`, borderRadius: 16, padding: "16px", marginBottom: 14 }}
         >
           <Mono size={8} color={C.mutedLight}>
             Calories
@@ -287,13 +324,7 @@ export default function ConfirmMeal() {
               value={form.calories}
               onChange={(e) => handleChange("calories", e.target.value)}
               className="font-head font-black text-accent text-right"
-              style={{
-                width: 110,
-                background: "transparent",
-                border: "none",
-                fontSize: 36,
-                outline: "none",
-              }}
+              style={{ width: 110, background: "transparent", border: "none", fontSize: 36, outline: "none" }}
             />
             <Mono size={11} color={C.muted}>
               kcal
@@ -359,14 +390,11 @@ export default function ConfirmMeal() {
           <div
             onClick={() => navigate("/")}
             className="hover-btn press flex-1 bg-card text-center cursor-pointer"
-            style={{
-              border: `1px solid ${C.border}`,
-              borderRadius: 12,
-              padding: "15px",
-              minHeight: 50,
-            }}
+            style={{ border: `1px solid ${C.border}`, borderRadius: 12, padding: "15px", minHeight: 50 }}
           >
-            <span className="font-mono font-bold" style={{ fontSize: 10, color: C.soft }}>CANCEL</span>
+            <span className="font-mono font-bold" style={{ fontSize: 10, color: C.soft }}>
+              CANCEL
+            </span>
           </div>
           <div
             onClick={!loading ? handleConfirm : undefined}

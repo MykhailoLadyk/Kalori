@@ -60,12 +60,13 @@ export function UserProvider({ children }) {
   }, []);
 
   const handleUpdateUser = async (updates) => {
+    const previousUser = user;
     try {
       setUpdating(true);
       setError(null);
       
-      const newSettings = updates.settings ? { ...user.settings, ...updates.settings } : user.settings;
-      const newTargets = updates.targets ? { ...user.targets, ...updates.targets } : user.targets;
+      const newSettings = updates.settings ? { ...user?.settings, ...updates.settings } : user?.settings;
+      const newTargets = updates.targets ? { ...user?.targets, ...updates.targets } : user?.targets;
 
       const fullUpdates = {
         ...updates,
@@ -86,7 +87,9 @@ export function UserProvider({ children }) {
       
       await updateUser(dbUpdates);
     } catch (error) {
+      setUser(previousUser);
       setError(error.message || "Failed to update user");
+      throw error;
     } finally {
       setUpdating(false);
     }

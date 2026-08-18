@@ -5,33 +5,54 @@ import { Tag } from "../../shared/Primitives";
 import { IconCoin } from "../../shared/DuoIcon";
 import { useUser } from "../../../hooks/useUser";
 import { useGameStats } from "../../../hooks/useGameStats";
+import { supabase } from "../../../services/supabase";
 export default function ShopThemesModal({ themes = [], currentTheme, coins }) {
   const { updateUser } = useUser();
   const { updateShopItems, shopItems, updateGameData, gameData } = useGameStats();
   const [error, setError] = useState(null);
   const [message, setMessage] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const onPurchase = async (themeId) => {
+    if (loading) return;
+    setLoading(true);
     setError(null);
     setMessage(null);
 
     const theme = themes.find((t) => t.id === themeId);
-    if (!theme) return;
+    if (!theme) {
+      setLoading(false);
+      return;
+    }
     if (coins < theme.price) {
       setError("Not enough coins to purchase this theme.");
+      setLoading(false);
       return;
     }
 
-    await updateUser({ settings: { theme: theme.id } });
-    await updateShopItems({ themesOwned: [...(shopItems?.themesOwned || []), theme.id] });
-    await updateGameData({ coins: gameData.coins - theme.price });
+    try {
+      const { data, error: rpcError } = await supabase.rpc("purchase_theme", {
+        p_theme_id: theme.id,
+        p_price: theme.price,
+      });
 
-    setMessage(`Unlocked ${theme.name} theme!`);
-    setTimeout(() => setMessage(null), 3000);
+      if (rpcError) throw rpcError;
+
+      await updateUser({ settings: { theme: theme.id } });
+      await updateShopItems({ themesOwned: [...(shopItems?.themesOwned || []), theme.id] });
+      await updateGameData({ coins: gameData.coins - theme.price });
+
+      setMessage(`Unlocked ${theme.name} theme!`);
+      setTimeout(() => setMessage(null), 3000);
+    } catch (err) {
+      setError(err.message || "Purchase failed.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleThemeClick = async (theme, isLocked, isCurrent, isOwned) => {
-    if (isLocked) return;
+    if (isLocked || loading) return;
 
     if (isOwned) {
       if (isCurrent) return;

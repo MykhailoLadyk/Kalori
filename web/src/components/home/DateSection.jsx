@@ -1,9 +1,15 @@
 import { C, F } from "../../lib/constants";
-import { IconCalendar } from "../../components/shared/DuoIcon";
+import { IconCalendar, IconFire } from "../../components/shared/DuoIcon";
 import { getDayName, getMonthName } from "../../lib/utils";
+import { useGameStats } from "../../hooks/useGameStats";
+
 export function DateSection({ setModal, date }) {
   const day = getDayName(date);
   const month = getMonthName(date);
+  const { gameData } = useGameStats();
+  const streak = gameData?.streak || 0;
+  const isActive = streak > 0;
+
   return (
     <div
       style={{
@@ -58,6 +64,34 @@ export function DateSection({ setModal, date }) {
           {"  "}
           {date.getDate()}
         </div>
+      </div>
+
+      <div
+        style={{
+          position: "absolute",
+          right: 22,
+          height: 36,
+          background: C.card,
+          border: `1px solid ${isActive ? C.orange + "40" : C.border}`,
+          borderRadius: 11,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "0 10px",
+          gap: 6,
+        }}
+      >
+        <IconFire size={18} color={isActive ? C.orange : C.mutedLight} />
+        <span
+          style={{
+            fontFamily: F.head,
+            fontSize: 16,
+            fontWeight: 900,
+            color: isActive ? C.text : C.muted,
+          }}
+        >
+          {streak}
+        </span>
       </div>
     </div>
   );

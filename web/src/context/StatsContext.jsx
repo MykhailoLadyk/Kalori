@@ -2,15 +2,9 @@ import { createContext, useMemo, useCallback, useState, useEffect } from "react"
 import { useMeals } from "../hooks/useMeals";
 import { useUser } from "../hooks/useUser";
 import { fetchMealsByRange } from "../services/mealService";
+import { getLocalYMD } from "../lib/dateUtils";
 
 export const StatsContext = createContext(null);
-
-const getLocalYMD = (d) => {
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  const dd = String(d.getDate()).padStart(2, "0");
-  return `${yyyy}-${mm}-${dd}`;
-};
 
 export function StatsProvider({ children }) {
   const { meals } = useMeals(); // Today's meals

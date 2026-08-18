@@ -21,8 +21,8 @@ export function StreakBanner() {
   return (
     <div
       style={{
-        padding: "10px 22px 0",
-        animation: "fadeUp 0.5s ease 0.58s both",
+        marginBottom: 14,
+        animation: "fadeUp 0.4s ease 0.15s both",
       }}
     >
       <div

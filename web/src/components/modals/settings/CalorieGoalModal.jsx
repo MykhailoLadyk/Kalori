@@ -22,8 +22,8 @@ export default function CalorieGoalModal({ handleClose }) {
     { key: "very_active", label: "Very Active", sub: "Twice a day" },
   ];
 
-  const [calorieGoal, setCalorieGoal] = useState(user.targets.calories || 2000);
-  const [waterGoal, setWaterGoal] = useState(user.targets.water || 2000);
+  const [calorieGoal, setCalorieGoal] = useState(user?.targets?.calories || 2000);
+  const [waterGoal, setWaterGoal] = useState(user?.targets?.water || 2500);
   const [macroGoals, setMacroGoals] = useState({
     protein: user?.targets?.protein || 0,
     carbs: user?.targets?.carbs || 0,
@@ -37,12 +37,12 @@ export default function CalorieGoalModal({ handleClose }) {
 
   useEffect(() => {
     if (user?.settings) {
-      setCalorieGoal(user.targets.calories);
-      setWaterGoal(user.targets.water);
+      setCalorieGoal(user?.targets?.calories || 2000);
+      setWaterGoal(user?.targets?.water || 2500);
       setMacroGoals({
-        protein: user.targets.protein || 0,
-        carbs: user.targets.carbs || 0,
-        fat: user.targets.fat || 0,
+        protein: user?.targets?.protein || 0,
+        carbs: user?.targets?.carbs || 0,
+        fat: user?.targets?.fat || 0,
       });
       setForm({
         goal: user.settings.weight_goal || "maintain",
@@ -71,6 +71,28 @@ export default function CalorieGoalModal({ handleClose }) {
   };
 
   const handleSave = async () => {
+    const cal = Number(calorieGoal);
+    const wat = Number(waterGoal);
+
+    if (!cal || cal < 500 || cal > 15000) {
+      addNotification({ type: "error", name: "Calorie target must be between 500 and 15,000 kcal" });
+      return;
+    }
+    
+    if (!wat || wat < 500 || wat > 15000) {
+      addNotification({ type: "error", name: "Water target must be between 500 and 15,000 ml" });
+      return;
+    }
+
+    const p = Number(macroGoals.protein);
+    const c = Number(macroGoals.carbs);
+    const f = Number(macroGoals.fat);
+
+    if (p < 0 || p > 5000 || c < 0 || c > 5000 || f < 0 || f > 5000 || isNaN(p) || isNaN(c) || isNaN(f)) {
+      addNotification({ type: "error", name: "Macro targets must be between 0 and 5000g" });
+      return;
+    }
+
     try {
       setLoading(true);
       await updateUser({

@@ -20,6 +20,7 @@ import { GameProvider } from "./context/GameContext";
 import { StatsProvider } from "./context/StatsContext";
 import { NotificationProvider } from "./context/NotificationContext";
 import { ThemeProvider } from "./context/ThemeContext";
+import { FavoriteProvider } from "./context/FavoriteContext";
 import { C, alpha } from "./lib/constants";
 
 // Global loading screen component
@@ -69,6 +70,18 @@ function PublicRoute({ children }) {
   return children;
 }
 
+// Onboarding Route wrapper (redirects to login if unauth, or home if already onboarded)
+function OnboardingRoute({ children }) {
+  const { user } = useUser();
+  if (!user?.userAuth) {
+    return <Navigate to="/login" replace />;
+  }
+  if (user?.completedOnboarding) {
+    return <Navigate to="/" replace />;
+  }
+  return children;
+}
+
 function App() {
   return (
     <>
@@ -76,13 +89,14 @@ function App() {
       <UserProvider>
         <ThemeProvider>
         <MealProvider>
+          <FavoriteProvider>
           <StatsProvider>
           <GameProvider>
             <BrowserRouter>
               <AuthLoader>
                 <Routes>
                   <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
-                  <Route path="/onboarding" element={<Onboarding />} />
+                  <Route path="/onboarding" element={<OnboardingRoute><Onboarding /></OnboardingRoute>} />
                   <Route element={<ProtectedRoute />}>
                     <Route element={<Nav />}>
                       <Route path="/" element={<Home />} />
@@ -104,6 +118,7 @@ function App() {
             </BrowserRouter>
           </GameProvider>
           </StatsProvider>
+          </FavoriteProvider>
          </MealProvider>
         </ThemeProvider>
       </UserProvider>

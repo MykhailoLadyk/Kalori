@@ -1,12 +1,16 @@
 import { useState } from "react";
 import { C, F, alpha } from "../../lib/constants";
-import { IconPencil, IconTrash } from "../shared/DuoIcon";
+import { IconPencil, IconTrash, IconStar, IconStarOutline } from "../shared/DuoIcon";
+import { useFavorites } from "../../hooks/useFavorites";
 import { MealDeleteModal } from "../modals/home/MealDeleteModal";
 import { MealEditModal } from "../modals/home/MealEditModal";
 import { Modal } from "../modals/Modal";
 export function MealCard({ meal, color, type }) {
   const [deleteModal, setDeleteModal] = useState(null);
   const [editModal, setEditModal] = useState(null);
+
+  const { isFavorite, addFavorite, removeFavorite, getFavoriteByName } = useFavorites();
+  const mealIsFav = isFavorite(meal.name);
 
   const [expandedMeal, setExpandedMeal] = useState(null);
   const expanded = expandedMeal === meal.id;
@@ -214,6 +218,36 @@ export function MealCard({ meal, color, type }) {
               animation: "fadeIn 0.2s ease both",
             }}
           >
+            <div
+              className="hover-btn press flex-1 flex items-center justify-center bg-card"
+              style={{
+                border: `1px solid ${mealIsFav ? alpha(C.gold, 25) : C.border}`,
+                borderRadius: 9,
+                padding: "7px 0",
+                gap: 6,
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (mealIsFav) {
+                  const fav = getFavoriteByName(meal.name);
+                  if (fav) removeFavorite(fav.id);
+                } else {
+                  addFavorite({
+                    name: meal.name,
+                    calories: meal.calories,
+                    protein: meal.protein,
+                    carbs: meal.carbs,
+                    fat: meal.fat,
+                    type: type,
+                  });
+                }
+              }}
+            >
+              {mealIsFav ? <IconStar size={14} color={C.gold} /> : <IconStarOutline size={14} color={C.soft} />}
+              <span className="font-mono font-bold" style={{ fontSize: 8, color: mealIsFav ? C.gold : C.soft }}>
+                {mealIsFav ? "UNFAVE" : "FAVE"}
+              </span>
+            </div>
             <div
               className="hover-btn press flex-1 flex items-center justify-center bg-card"
               style={{

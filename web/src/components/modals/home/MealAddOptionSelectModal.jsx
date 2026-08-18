@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { C, F, alpha } from "../../../lib/constants";
 import { Mono } from "../../../components/shared/Primitives";
 import analyzeFood from "../../../services/analyzeFood";
+import { useFavorites } from "../../../hooks/useFavorites";
+import { IconStar, IconStarOutline } from "../../shared/DuoIcon";
 
 const OPTIONS = [
   {
@@ -89,27 +91,9 @@ const OPTIONS = [
 ];
 
 const Spinner = ({ color }) => (
-  <svg
-    width="20"
-    height="20"
-    viewBox="0 0 24 24"
-    fill="none"
-    style={{ animation: "spin 0.8s linear infinite" }}
-  >
-    <circle
-      cx="12"
-      cy="12"
-      r="9"
-      stroke={color}
-      strokeWidth="2.5"
-      strokeOpacity="0.2"
-    />
-    <path
-      d="M21 12a9 9 0 0 0-9-9"
-      stroke={color}
-      strokeWidth="2.5"
-      strokeLinecap="round"
-    />
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style={{ animation: "spin 0.8s linear infinite" }}>
+    <circle cx="12" cy="12" r="9" stroke={color} strokeWidth="2.5" strokeOpacity="0.2" />
+    <path d="M21 12a9 9 0 0 0-9-9" stroke={color} strokeWidth="2.5" strokeLinecap="round" />
   </svg>
 );
 
@@ -118,6 +102,7 @@ export function MealAddOptionSelectModal() {
   const fileInputRef = useRef(null);
   const [albumLoading, setAlbumLoading] = useState(false);
   const [error, setError] = useState(null);
+  const { favorites, recentMeals, loading: favsLoading } = useFavorites();
 
   const handleOptionClick = (key) => {
     if (key === "album") {
@@ -140,13 +125,7 @@ export function MealAddOptionSelectModal() {
         const photoDataUrl = reader.result;
         const parsed = await analyzeFood(photoDataUrl);
 
-        navigate("/add-meal/confirm", {
-          state: {
-            meal: parsed,
-            photoData: photoDataUrl,
-            isAlbum: true,
-          },
-        });
+        navigate("/add-meal/confirm", { state: { meal: parsed, photoData: photoDataUrl, isAlbum: true } });
       } catch (err) {
         if (err.code === "RATE_LIMITED") {
           setError("Daily AI limit reached. Try again tomorrow.");
@@ -163,36 +142,142 @@ export function MealAddOptionSelectModal() {
 
   return (
     <div>
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*"
-        onChange={handleFileChange}
-        style={{ display: "none" }}
-      />
+      <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} style={{ display: "none" }} />
 
       <div style={{ marginBottom: 20 }}>
-        <div
-          style={{
-            fontFamily: F.head,
-            fontSize: 20,
-            fontWeight: 900,
-            color: C.text,
-          }}
-        >
-          Add Meal
-        </div>
-        <div
-          style={{
-            fontFamily: F.body,
-            fontSize: 13,
-            color: C.soft,
-            marginTop: 4,
-          }}
-        >
+        <div style={{ fontFamily: F.head, fontSize: 20, fontWeight: 900, color: C.text }}>Add Meal</div>
+        <div style={{ fontFamily: F.body, fontSize: 13, color: C.soft, marginTop: 4 }}>
           How would you like to log it?
         </div>
       </div>
+
+      {favorites.length > 0 && (
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
+            <IconStar size={12} color={C.gold} />
+            <Mono size={8} color={C.gold}>
+              Favorites
+            </Mono>
+          </div>
+          <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 4, scrollbarWidth: "none" }}>
+            {favorites.map((fav) => (
+              <div
+                key={fav.id}
+                onClick={() =>
+                  navigate("/add-meal/confirm", {
+                    state: {
+                      meal: {
+                        name: fav.name,
+                        calories: fav.calories,
+                        protein_g: fav.protein,
+                        carbs_g: fav.carbs,
+                        fat_g: fav.fat,
+                        type: fav.type,
+                      },
+                    },
+                  })
+                }
+                className="hover-card press"
+                style={{
+                  flexShrink: 0,
+                  background: C.card,
+                  border: `1px solid ${C.border}`,
+                  borderRadius: 12,
+                  padding: "10px 14px",
+                  minWidth: 120,
+                  maxWidth: 160,
+                  cursor: "pointer",
+                }}
+              >
+                <div
+                  style={{
+                    fontFamily: F.body,
+                    fontSize: 12,
+                    fontWeight: 600,
+                    color: C.text,
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    marginBottom: 4,
+                  }}
+                >
+                  {fav.name}
+                </div>
+                <Mono size={8} color={C.muted}>
+                  {fav.calories} kcal
+                </Mono>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {recentMeals.length > 0 && (
+        <div style={{ marginBottom: 16 }}>
+          <Mono size={8} color={C.mutedLight}>
+            Recently Added
+          </Mono>
+          <div
+            style={{
+              display: "flex",
+              gap: 8,
+              overflowX: "auto",
+              paddingBottom: 4,
+              marginTop: 8,
+              scrollbarWidth: "none",
+            }}
+          >
+            {recentMeals.map((meal, idx) => (
+              <div
+                key={`recent-${idx}`}
+                onClick={() =>
+                  navigate("/add-meal/confirm", {
+                    state: {
+                      meal: {
+                        name: meal.name,
+                        calories: meal.calories,
+                        protein_g: meal.protein,
+                        carbs_g: meal.carbs,
+                        fat_g: meal.fat,
+                        type: meal.type,
+                      },
+                    },
+                  })
+                }
+                className="hover-card press"
+                style={{
+                  flexShrink: 0,
+                  background: C.card,
+                  border: `1px solid ${C.border}`,
+                  borderRadius: 12,
+                  padding: "10px 14px",
+                  minWidth: 120,
+                  maxWidth: 160,
+                  cursor: "pointer",
+                }}
+              >
+                <div
+                  style={{
+                    fontFamily: F.body,
+                    fontSize: 12,
+                    fontWeight: 600,
+                    color: C.text,
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    marginBottom: 4,
+                  }}
+                >
+                  {meal.name}
+                </div>
+                <Mono size={8} color={C.muted}>
+                  {meal.calories} kcal
+                </Mono>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         {OPTIONS.map(({ key, label, sub, icon, color }) => {
@@ -203,9 +288,7 @@ export function MealAddOptionSelectModal() {
           return (
             <div
               key={key}
-              onClick={() =>
-                !isDisabled && !isLoading && handleOptionClick(key)
-              }
+              onClick={() => !isDisabled && !isLoading && handleOptionClick(key)}
               className={isDisabled || isLoading ? "" : "hover-card press"}
               style={{
                 display: "flex",
@@ -239,15 +322,7 @@ export function MealAddOptionSelectModal() {
               </div>
 
               <div style={{ flex: 1 }}>
-                <div
-                  style={{
-                    fontFamily: F.body,
-                    fontSize: 14,
-                    fontWeight: 700,
-                    color: C.text,
-                    marginBottom: 3,
-                  }}
-                >
+                <div style={{ fontFamily: F.body, fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 3 }}>
                   {label}
                 </div>
                 <Mono size={8} color={C.muted}>
@@ -255,11 +330,7 @@ export function MealAddOptionSelectModal() {
                 </Mono>
               </div>
 
-              {isLoading ? (
-                <Spinner color={color} />
-              ) : (
-                <span style={{ color: C.muted, fontSize: 18 }}>›</span>
-              )}
+              {isLoading ? <Spinner color={color} /> : <span style={{ color: C.muted, fontSize: 18 }}>›</span>}
 
               {isLoading && (
                 <div
@@ -300,5 +371,3 @@ export function MealAddOptionSelectModal() {
     </div>
   );
 }
-
-

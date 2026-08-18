@@ -9,6 +9,7 @@ import {
   IconArrowUp,
   IconFire,
   IconCheck,
+  IconX,
 } from "./DuoIcon";
 
 const CONFIGS = {
@@ -19,6 +20,7 @@ const CONFIGS = {
   levelup: { color: C.accent, icon: IconArrowUp, duration: 6500 },
   streak: { color: C.orange, icon: IconFire, duration: 5500 },
   success: { color: "#10B981", icon: IconCheck, duration: 4000 },
+  error: { color: C.red || "#EF4444", icon: IconX, duration: 4000 },
 };
 
 function ToastContent({ notification }) {
@@ -47,8 +49,8 @@ function ToastContent({ notification }) {
     );
   }
 
-  // success generic toast
-  if (type === "success") {
+  // success / error generic toast
+  if (type === "success" || type === "error") {
     return (
       <div
         className="flex items-center bg-panel"
@@ -62,7 +64,7 @@ function ToastContent({ notification }) {
       >
         <span className="flex" style={{ color }}><cfg.icon size={18} /></span>
         <span className="font-body font-semibold text-primary" style={{ fontSize: 13 }}>
-          {name || "Success"}
+          {name || (type === "success" ? "Success" : "Error")}
         </span>
       </div>
     );

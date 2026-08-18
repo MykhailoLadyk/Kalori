@@ -110,6 +110,7 @@ export default function ProfileModal({ handleClose }) {
               onChange={(e) =>
                 setForm((prev) => ({ ...prev, [key]: e.target.value }))
               }
+              maxLength={key === "name" ? 50 : undefined}
               style={{
                 width: "100%",
                 marginTop: 6,

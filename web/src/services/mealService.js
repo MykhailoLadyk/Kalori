@@ -80,3 +80,32 @@ export async function fetchMealsByRange(userId, startDate, endDate) {
   if (error) throw new Error(error.message);
   return data;
 }
+
+export async function fetchRecentUniqueMeals(userId, limit = 5) {
+  if (!userId) throw new Error("No authenticated user ID provided");
+
+  // Fetch more than needed to deduplicate client-side
+  const { data, error } = await supabase
+    .from("meals")
+    .select("name, calories, protein, carbs, fat, type, created_at")
+    .eq("user_id", userId)
+    .not("name", "eq", "water")
+    .order("created_at", { ascending: false })
+    .limit(50);
+
+  if (error) throw new Error(error.message);
+
+  // Deduplicate by name (case-insensitive), keep the most recent
+  const seen = new Set();
+  const unique = [];
+  for (const meal of data) {
+    const key = meal.name.toLowerCase().trim();
+    if (!seen.has(key)) {
+      seen.add(key);
+      unique.push(meal);
+      if (unique.length >= limit) break;
+    }
+  }
+
+  return unique;
+}

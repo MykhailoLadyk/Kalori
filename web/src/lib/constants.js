@@ -171,7 +171,7 @@ export const achievements = [
     xp: 150,
     triggers: [TRIGGERS.ADD_WATER],
     evaluate: (payload, ctx) => {
-      const todayStr = new Date().toISOString().split("T")[0];
+      const todayStr = getTodayDateString();
       if (ctx.item.lastCountedDate === todayStr) return { progress: ctx.item.progress };
       return { progress: ctx.item.progress + 1, lastCountedDate: todayStr };
     },
@@ -259,7 +259,7 @@ export const achievements = [
     xp: 400,
     triggers: [TRIGGERS.ADD_MEAL, TRIGGERS.ADD_WATER],
     evaluate: (payload, ctx) => {
-      const todayStr = new Date().toISOString().split("T")[0];
+      const todayStr = getTodayDateString();
       if (ctx.item.lastCountedDate === todayStr) return { progress: ctx.item.progress };
       return { progress: ctx.item.progress + 1, lastCountedDate: todayStr };
     },
@@ -272,7 +272,7 @@ export const achievements = [
     xp: 1000,
     triggers: [TRIGGERS.ADD_MEAL, TRIGGERS.ADD_WATER],
     evaluate: (payload, ctx) => {
-      const todayStr = new Date().toISOString().split("T")[0];
+      const todayStr = getTodayDateString();
       if (ctx.item.lastCountedDate === todayStr) return { progress: ctx.item.progress };
       return { progress: ctx.item.progress + 1, lastCountedDate: todayStr };
     },
@@ -350,7 +350,7 @@ export const quests = [
     max: 7,
     triggers: [TRIGGERS.ADD_MEAL],
     evaluate: (p, ctx) => {
-      const todayStr = new Date().toISOString().split("T")[0];
+      const todayStr = getTodayDateString();
       const totalCals = ctx.meals.reduce((sum, m) => sum + (m.calories || 0), 0);
 
       let newProgress = ctx.item.progress;
@@ -386,7 +386,7 @@ export const quests = [
     max: 7,
     triggers: [TRIGGERS.ADD_WATER],
     evaluate: (p, ctx) => {
-      const todayStr = new Date().toISOString().split("T")[0];
+      const todayStr = getTodayDateString();
       if (ctx.item.lastCountedDate === todayStr) return { progress: ctx.item.progress };
       return { progress: ctx.item.progress + 1, lastCountedDate: todayStr };
     },
@@ -401,7 +401,7 @@ export const quests = [
     max: 5,
     triggers: [TRIGGERS.ADD_MEAL],
     evaluate: (p, ctx) => {
-      const todayStr = new Date().toISOString().split("T")[0];
+      const todayStr = getTodayDateString();
       if (ctx.item.lastCountedDate === todayStr) return { progress: ctx.item.progress };
       const totalProtein = ctx.meals.reduce((sum, m) => sum + (m.protein || 0), 0);
       if (totalProtein >= ctx.user.targets.protein)
@@ -442,7 +442,7 @@ export const quests = [
     max: 10,
     triggers: [TRIGGERS.ADD_MEAL],
     evaluate: (p, ctx) => {
-      const todayStr = new Date().toISOString().split("T")[0];
+      const todayStr = getTodayDateString();
       if (ctx.item.lastCountedDate === todayStr) return { progress: ctx.item.progress };
       const totalProtein = ctx.meals.reduce((sum, m) => sum + (m.protein || 0), 0);
       if (totalProtein >= ctx.user.targets.protein)
@@ -460,7 +460,7 @@ export const quests = [
     max: 5,
     triggers: [TRIGGERS.ADD_MEAL],
     evaluate: (p, ctx) => {
-      const todayStr = new Date().toISOString().split("T")[0];
+      const todayStr = getTodayDateString();
       if (ctx.item.lastCountedDate === todayStr) return { progress: ctx.item.progress };
       if (p.type === "lunch") return { progress: ctx.item.progress + 1, lastCountedDate: todayStr };
       return { progress: ctx.item.progress };
@@ -488,7 +488,7 @@ export const quests = [
     max: 5,
     triggers: [TRIGGERS.ADD_MEAL],
     evaluate: (p, ctx) => {
-      const todayStr = new Date().toISOString().split("T")[0];
+      const todayStr = getTodayDateString();
       const totalCals = ctx.meals.reduce((sum, m) => sum + (m.calories || 0), 0);
 
       let newProgress = ctx.item.progress;
@@ -513,7 +513,7 @@ export const quests = [
     max: 7,
     triggers: [TRIGGERS.ADD_WATER],
     evaluate: (p, ctx) => {
-      const todayStr = new Date().toISOString().split("T")[0];
+      const todayStr = getTodayDateString();
       if (ctx.item.lastCountedDate === todayStr) return { progress: ctx.item.progress };
       const w = ctx.meals.filter((m) => m.name === "water").reduce((s, m) => s + (m.amount || 0), 0) / 1000;
       if (w >= 3) return { progress: ctx.item.progress + 1, lastCountedDate: todayStr };
@@ -530,7 +530,7 @@ export const quests = [
     max: 5,
     triggers: [TRIGGERS.ADD_MEAL],
     evaluate: (p, ctx) => {
-      const todayStr = new Date().toISOString().split("T")[0];
+      const todayStr = getTodayDateString();
       if (ctx.item.lastCountedDate === todayStr) return { progress: ctx.item.progress };
       const totalProtein = ctx.meals.reduce((sum, m) => sum + (m.protein || 0), 0);
       if (totalProtein >= ctx.user.targets.protein)
@@ -571,7 +571,7 @@ export const quests = [
     max: 7,
     triggers: [TRIGGERS.ADD_MEAL],
     evaluate: (p, ctx) => {
-      const todayStr = new Date().toISOString().split("T")[0];
+      const todayStr = getTodayDateString();
       if (ctx.item.lastCountedDate === todayStr) return { progress: ctx.item.progress };
       return { progress: ctx.item.progress + 1, lastCountedDate: todayStr };
     },
@@ -586,7 +586,7 @@ export const quests = [
     max: 7,
     triggers: [TRIGGERS.ADD_WATER],
     evaluate: (p, ctx) => {
-      const todayStr = new Date().toISOString().split("T")[0];
+      const todayStr = getTodayDateString();
       if (ctx.item.lastCountedDate === todayStr) return { progress: ctx.item.progress };
       return { progress: ctx.item.progress + 1, lastCountedDate: todayStr };
     },
@@ -601,7 +601,7 @@ export const quests = [
     max: 7,
     triggers: [TRIGGERS.ADD_MEAL],
     evaluate: (p, ctx) => {
-      const todayStr = new Date().toISOString().split("T")[0];
+      const todayStr = getTodayDateString();
       if (ctx.item.lastCountedDate === todayStr) return { progress: ctx.item.progress };
       const totalProtein = ctx.meals.reduce((sum, m) => sum + (m.protein || 0), 0);
       if (totalProtein >= ctx.user.targets.protein)

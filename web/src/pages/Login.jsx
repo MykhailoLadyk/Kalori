@@ -1,10 +1,9 @@
 // pages/AuthPage.jsx
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { C, F, alpha } from "../lib/constants";
 import { Mono } from "../components/shared/Primitives";
 import { supabase } from "../services/supabase";
-import { Modal } from "../components/modals/Modal";
-import LegalModal from "../components/modals/settings/LegalModal";
 import { IconCheck, IconX } from "../components/shared/DuoIcon";
 
 // ── Kalori wordmark ───────────────────────────────────────────
@@ -92,6 +91,7 @@ function AuthInput({ label, type = "text", value, onChange, placeholder, error, 
 
 // ── Main component ────────────────────────────────────────────
 export default function Login() {
+  const navigate = useNavigate();
   const [mode, setMode] = useState("login"); // "login" | "signup" | "forgot"
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -99,7 +99,6 @@ export default function Login() {
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState(null); // success message
   const [authError, setAuthError] = useState(null); // server error
-  const [showLegal, setShowLegal] = useState(false);
 
   const isLogin = mode === "login";
   const isSignup = mode === "signup";
@@ -419,18 +418,14 @@ export default function Login() {
           >
             <span style={{ fontFamily: F.body, fontSize: 11, color: C.muted }}>
               By signing up you agree to our{" "}
-              <span onClick={() => setShowLegal(true)} style={{ color: C.mutedLight, textDecoration: "underline", cursor: "pointer" }}>Terms</span> and{" "}
-              <span onClick={() => setShowLegal(true)} style={{ color: C.mutedLight, textDecoration: "underline", cursor: "pointer" }}>
+              <span onClick={() => navigate("/terms")} style={{ color: C.mutedLight, textDecoration: "underline", cursor: "pointer" }}>Terms</span> and{" "}
+              <span onClick={() => navigate("/privacy")} style={{ color: C.mutedLight, textDecoration: "underline", cursor: "pointer" }}>
                 Privacy Policy
               </span>
             </span>
           </div>
         )}
       </div>
-
-      <Modal id={showLegal ? "legal" : null} close={() => setShowLegal(false)}>
-        <LegalModal handleClose={() => setShowLegal(false)} />
-      </Modal>
     </div>
   );
 }

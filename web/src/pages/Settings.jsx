@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { Mono } from "../components/shared/Primitives";
 import { C, F } from "../lib/constants";
@@ -14,9 +15,7 @@ import BodyStatsModal from "../components/modals/settings/BodyStatsModal";
 import LanguageModal from "../components/modals/settings/LanguageModal";
 import TimezoneModal from "../components/modals/settings/TimezonesModal";
 import MeasurementsModal from "../components/modals/settings/MeasurmentsModal";
-import PrivacyModal from "../components/modals/settings/PrivacyModal";
 import ExportModal from "../components/modals/settings/ExportModal";
-import LegalModal from "../components/modals/settings/LegalModal";
 import SettingsThemeModal from "../components/modals/settings/SettingsThemesModal";
 import LogoutModal from "../components/modals/settings/LogOutModal";
 import DeleteAccountModal from "../components/modals/settings/DeleteAccountModal";
@@ -40,6 +39,7 @@ import {
 } from "../components/shared/DuoIcon";
 
 export default function Settings() {
+  const navigate = useNavigate();
   const { user } = useUser();
   const { gameData } = useGameStats();
   const [toggles, setToggles] = useState({ meal: true, water: true, streak: false });
@@ -51,9 +51,7 @@ export default function Settings() {
     // language: <LanguageModal handleClose={() => setModal(null)} />,
     timezone: <TimezoneModal handleClose={() => setModal(null)} />,
     measurements: <MeasurementsModal handleClose={() => setModal(null)} />,
-    privacy: <PrivacyModal handleClose={() => setModal(null)} />,
     export: <ExportModal handleClose={() => setModal(null)} />,
-    legal: <LegalModal handleClose={() => setModal(null)} />,
     theme: <SettingsThemeModal handleClose={() => setModal(null)} />,
     logout: <LogoutModal handleClose={() => setModal(null)} />,
     deleteAccount: <DeleteAccountModal handleClose={() => setModal(null)} />,
@@ -217,11 +215,9 @@ export default function Settings() {
         <SectionLabel>App</SectionLabel>
         <div style={{ background: C.card, borderRadius: 16, border: `1px solid ${C.border}`, overflow: "hidden" }}>
           <SettingsCard
-            onClick={() => {
-              setModal("privacy");
-            }}
+            onClick={() => navigate("/privacy")}
             icon={<IconLock size={18} color={C.soft} />}
-            label="Privacy"
+            label="Privacy Policy"
             arrow
           />
           {/* <SettingsCard
@@ -234,11 +230,9 @@ export default function Settings() {
             withTopBorder
           /> */}
           <SettingsCard
-            onClick={() => {
-              setModal("legal");
-            }}
+            onClick={() => navigate("/terms")}
             icon={<IconCalendar size={18} color={C.soft} />}
-            label="Legal"
+            label="Terms of Service"
             arrow
             withTopBorder
           />

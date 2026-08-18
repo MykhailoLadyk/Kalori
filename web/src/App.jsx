@@ -13,6 +13,8 @@ import PhotoAddMeal from "./pages/PhotoAddMeal";
 import ManualAddMeal from "./pages/ManualAddMeal";
 import ConfirmMeal from "./pages/ConfirmMeal";
 import Onboarding from "./pages/Onboarding";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
 import { UserProvider } from "./context/UserContext";
 import { useUser } from "./hooks/useUser";
 import { MealProvider } from "./context/MealContext";
@@ -97,6 +99,8 @@ function App() {
                 <Routes>
                   <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
                   <Route path="/onboarding" element={<OnboardingRoute><Onboarding /></OnboardingRoute>} />
+                  <Route path="/terms" element={<Terms />} />
+                  <Route path="/privacy" element={<Privacy />} />
                   <Route element={<ProtectedRoute />}>
                     <Route element={<Nav />}>
                       <Route path="/" element={<Home />} />

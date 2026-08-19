@@ -7,7 +7,7 @@ import { useGameStats } from "../../../hooks/useGameStats";
 import { supabase } from "../../../services/supabase";
 
 export default function ShopOtherModal() {
-  const { shopItems, updateShopItems, gameData, updateGameData } = useGameStats();
+  const { gameData, refreshGameData } = useGameStats();
   const [error, setError] = useState(null);
   const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -18,8 +18,7 @@ export default function ShopOtherModal() {
     setError(null);
     setMessage(null);
     
-    const newCoiins = gameData.coins - price;
-    if (newCoiins < 0) {
+    if (gameData.coins < price) {
       setError("Not enough coins.");
       setLoading(false);
       return;
@@ -33,9 +32,7 @@ export default function ShopOtherModal() {
 
       if (rpcError) throw rpcError;
 
-      const newStreakShields = shopItems.streak_shields + parseInt(qty);
-      await updateShopItems({ streak_shields: newStreakShields });
-      await updateGameData({ coins: newCoiins });
+      await refreshGameData();
       setMessage(`Purchased ${qty} Streak Shield(s) for ${price} coins!`);
       setTimeout(() => setMessage(null), 3000);
     } catch (err) {
@@ -44,6 +41,7 @@ export default function ShopOtherModal() {
       setLoading(false);
     }
   }
+
   return (
     <div>
       <div

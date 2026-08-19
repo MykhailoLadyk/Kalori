@@ -8,7 +8,7 @@ import { useGameStats } from "../../../hooks/useGameStats";
 import { supabase } from "../../../services/supabase";
 export default function ShopThemesModal({ themes = [], currentTheme, coins }) {
   const { updateUser } = useUser();
-  const { updateShopItems, shopItems, updateGameData, gameData } = useGameStats();
+  const { refreshGameData } = useGameStats();
   const [error, setError] = useState(null);
   const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -39,8 +39,7 @@ export default function ShopThemesModal({ themes = [], currentTheme, coins }) {
       if (rpcError) throw rpcError;
 
       await updateUser({ settings: { theme: theme.id } });
-      await updateShopItems({ themesOwned: [...(shopItems?.themesOwned || []), theme.id] });
-      await updateGameData({ coins: gameData.coins - theme.price });
+      await refreshGameData();
 
       setMessage(`Unlocked ${theme.name} theme!`);
       setTimeout(() => setMessage(null), 3000);
@@ -50,6 +49,7 @@ export default function ShopThemesModal({ themes = [], currentTheme, coins }) {
       setLoading(false);
     }
   };
+
 
   const handleThemeClick = async (theme, isLocked, isCurrent, isOwned) => {
     if (isLocked || loading) return;

@@ -5,9 +5,7 @@ import { Mono } from "../components/shared/Primitives";
 import { useMeals } from "../hooks/useMeals";
 import { useGameStats } from "../hooks/useGameStats";
 import { useUser } from "../hooks/useUser";
-import { getStreakMultiplier } from "../lib/utils";
 import { getLocalYMD } from "../lib/dateUtils";
-import { processProgress } from "../lib/progressEngine";
 const ChevronLeft = () => (
   <svg
     width="18"
@@ -34,8 +32,8 @@ const FIELD_CONFIG = [
 ];
 
 export default function ManualMealPage() {
-  const { gameData, quests, achievements, updateGameData, updateQuests, updateAchievements } = useGameStats();
-  const { meals, addMeal, selectedDate } = useMeals();
+  const { syncProgress } = useGameStats();
+  const { addMeal, selectedDate } = useMeals();
   const { user } = useUser();
   const navigate = useNavigate();
   const location = useLocation();
@@ -85,34 +83,6 @@ export default function ManualMealPage() {
       const todayStr = getLocalYMD(new Date());
       const isToday = mealDateStr === todayStr;
 
-      let streakUpdates = {};
-      let xpAwarded = 0;
-      let coinsAwarded = 0;
-
-      if (isToday) {
-        const multiplier = getStreakMultiplier(gameData.streak);
-        const baseXp = 10;
-        xpAwarded = Math.round(baseXp * multiplier);
-        const baseCoins = 5;
-        coinsAwarded = Math.round(baseCoins * multiplier);
-
-        const yesterdayD = new Date();
-        yesterdayD.setDate(yesterdayD.getDate() - 1);
-        const yesterdayStr = getLocalYMD(yesterdayD);
-
-        if (gameData.last_log_date !== todayStr) {
-          const isConsecutive = gameData.last_log_date === yesterdayStr;
-          const newStreak = isConsecutive ? (gameData.streak || 0) + 1 : 1;
-          streakUpdates = { streak: newStreak, last_log_date: todayStr };
-        }
-
-        await updateGameData({ 
-          xp_total: (gameData.xp_total || 0) + xpAwarded, 
-          coins: (gameData.coins || 0) + coinsAwarded,
-          ...streakUpdates
-        });
-      }
-
       const mealObj = {
         ...form,
         calories: Number(form.calories),
@@ -125,16 +95,7 @@ export default function ManualMealPage() {
       await addMeal(mealObj);
 
       if (isToday) {
-        const contextBag = {
-          meals: [...meals, mealObj],
-          user,
-          userQuests: quests || [],
-          userAchievements: achievements || [],
-          gameData: { ...gameData, xp_total: (gameData.xp_total || 0) + xpAwarded, coins: (gameData.coins || 0) + coinsAwarded, ...streakUpdates },
-        };
-        const { updatedQuests, updatedAchievements } = processProgress("ADD_MEAL", mealObj, contextBag);
-        if (updatedQuests.length) updateQuests(updatedQuests);
-        if (updatedAchievements.length) updateAchievements(updatedAchievements);
+        await syncProgress(mealDateStr, true);
       }
 
       navigate("/");
@@ -143,6 +104,7 @@ export default function ManualMealPage() {
       setLoading(false);
     }
   };
+
 
   return (
     <div

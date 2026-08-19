@@ -6,33 +6,24 @@ import { IconDrop } from "../shared/DuoIcon";
 import { useMeals } from "../../hooks/useMeals";
 import { useUser } from "../../hooks/useUser";
 import { useGameStats } from "../../hooks/useGameStats";
-import { processProgress } from "../../lib/progressEngine";
 import { getLocalYMD } from "../../lib/dateUtils";
 export function WaterTracker() {
   const { meals, addMeal, selectedDate } = useMeals();
   const { user } = useUser();
-  const { gameData, quests, achievements, updateQuests, updateAchievements } = useGameStats();
+  const { syncProgress } = useGameStats();
   const waterMeals = meals.filter((m) => m.name.toLowerCase() === "water");
   const current = waterMeals.reduce((sum, m) => sum + m.amount, 0);
   const goal = user?.targets?.water || 2500;
   const [inputValue, setInputValue] = useState("");
 
-  const handleAddWater = (amount) => {
-    addMeal({ name: "water", amount });
+  const handleAddWater = async (amount) => {
+    await addMeal({ name: "water", amount });
     const isToday = !selectedDate || getLocalYMD(selectedDate) === getLocalYMD(new Date());
     if (isToday) {
-      const contextBag = {
-        meals: [...meals, { name: "water", amount }],
-        user,
-        userQuests: quests || [],
-        userAchievements: achievements || [],
-        gameData,
-      };
-      const { updatedQuests, updatedAchievements } = processProgress("ADD_WATER", { amount }, contextBag);
-      if (updatedQuests.length) updateQuests(updatedQuests);
-      if (updatedAchievements.length) updateAchievements(updatedAchievements);
+      await syncProgress(getLocalYMD(new Date()), false);
     }
   };
+
 
   const handleCustomAdd = () => {
     const amount = parseInt(inputValue);

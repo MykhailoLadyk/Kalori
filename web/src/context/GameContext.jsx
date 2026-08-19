@@ -1,11 +1,10 @@
 import { createContext, useState, useEffect, useRef } from "react";
 import { useNotifications } from "./NotificationContext";
-import { fetchGameData, updateGameData } from "../services/gameService";
-import { achievements as achievementDefinitions, quests as questDefinitions, levels } from "../lib/constants";
+import { fetchGameData, syncGameProgress, applyStreakDecay } from "../services/gameService";
+import { achievements as achievementDefinitions, quests as questDefinitions } from "../lib/constants";
 import { useUser } from "../hooks/useUser";
 import { supabase } from "../services/supabase";
-import { getTodayDateString, getDaysBetweenDates, getLocalYMD } from "../lib/dateUtils";
-import { processProgress } from "../lib/progressEngine";
+import { getTodayDateString, getDaysBetweenDates } from "../lib/dateUtils";
 
 export const GameContext = createContext(null);
 
@@ -67,34 +66,14 @@ export function GameProvider({ children }) {
         if (data.streak_shields !== undefined)
           setShopItems((prev) => ({ ...prev, streak_shields: data.streak_shields }));
 
-        // --- Streak & Shield Inactivity Decay Logic ---
+        // --- Server-Authoritative Streak Decay Logic ---
         const today = getTodayDateString();
-        let currentStreak = data.streak || 0;
-        let currentShields = data.streak_shields || 0;
-        let currentLastLog = data.last_log_date;
-
-        if (currentLastLog && currentStreak > 0) {
-          const daysSinceLog = getDaysBetweenDates(currentLastLog, today);
-          if (daysSinceLog > 1) {
-            const missedDays = daysSinceLog - 1;
-            if (currentShields >= missedDays) {
-              currentShields -= missedDays;
-              const yesterday = new Date();
-              yesterday.setDate(yesterday.getDate() - 1);
-              currentLastLog = getLocalYMD(yesterday);
-              data.streak_shields = currentShields;
-              data.last_log_date = currentLastLog;
-              setShopItems((prev) => ({ ...prev, streak_shields: currentShields }));
-              await updateGameData({ streak_shields: currentShields, last_log_date: currentLastLog });
-            } else {
-              currentStreak = 0;
-              currentShields = 0;
-              data.streak = 0;
-              data.streak_shields = 0;
-              setShopItems((prev) => ({ ...prev, streak_shields: 0 }));
-              await updateGameData({ streak: 0, streak_shields: 0 });
-            }
-          }
+        const decayResult = await applyStreakDecay(today);
+        if (decayResult.changed) {
+          data.streak = decayResult.streak;
+          data.streak_shields = decayResult.streak_shields;
+          data.last_log_date = decayResult.last_log_date;
+          setShopItems((prev) => ({ ...prev, streak_shields: decayResult.streak_shields }));
         }
 
         // --- Quest Lazy Loading Logic ---
@@ -163,277 +142,83 @@ export function GameProvider({ children }) {
     loadGameData();
   }, [user?.userAuth]);
 
-  const handleUpdateGameData = async (updates) => {
-    const prev = gameDataRef.current;
+  const refreshGameData = async () => {
+    try {
+      const data = await fetchGameData();
+      if (data.achievements) {
+        setAchievements(data.achievements);
+        achievementsRef.current = data.achievements;
+      }
+      if (data.quests) {
+        setQuests(data.quests);
+        questsRef.current = data.quests;
+      }
+      if (data.themesOwned) setShopItems((prev) => ({ ...prev, themesOwned: data.themesOwned }));
+      if (data.streak_shields !== undefined)
+        setShopItems((prev) => ({ ...prev, streak_shields: data.streak_shields }));
+
+      const baseData = { ...data };
+      delete baseData.achievements;
+      delete baseData.quests;
+      delete baseData.themesOwned;
+      delete baseData.streak_shields;
+      delete baseData.last_daily_refresh;
+      delete baseData.last_weekly_refresh;
+
+      setGameData(baseData);
+      gameDataRef.current = baseData;
+    } catch (e) {
+      setError("Failed to refresh game data");
+    }
+  };
+
+  const handleSyncProgress = async (localDate, isMealLog = false) => {
     try {
       setUpdating(true);
+      const result = await syncGameProgress(localDate, isMealLog);
 
-      const newGameData = { ...prev, ...updates };
+      const newGameData = {
+        ...gameDataRef.current,
+        xp_total: result.xp_total,
+        coins: result.coins,
+        streak: result.streak,
+        level: result.level,
+        last_log_date: result.last_log_date,
+      };
       gameDataRef.current = newGameData;
       setGameData(newGameData);
 
-      // We still update the database
-      await updateGameData(updates);
+      if (result.quests) {
+        setQuests(result.quests);
+        questsRef.current = result.quests;
+      }
+      if (result.achievements) {
+        setAchievements(result.achievements);
+        achievementsRef.current = result.achievements;
+      }
 
-      // Notifications: xp, coins, level
+      // Notifications
       try {
-        const prevXP = prev.xp_total ?? 0;
-        const newXP = newGameData.xp_total ?? prevXP;
-        const xpDelta = newXP - prevXP;
-        if (xpDelta > 0) {
-          addNotification({ type: "xp", amount: xpDelta });
-
-          let prevLevel = 1;
-          let newLevel = 1;
-          for (let [lvl, xp] of Object.entries(levels)) {
-            if (prevXP >= xp) prevLevel = parseInt(lvl);
-            if (newXP >= xp) newLevel = parseInt(lvl);
-          }
-
-          if (newLevel > prevLevel) {
-            addNotification({ type: "levelup", level: newLevel });
-          }
-
-          const { updatedAchievements } = processProgress(
-            "EARN_XP",
-            { xp: xpDelta },
-            {
-              gameData: newGameData,
-              level: newLevel,
-              userQuests: questsRef.current,
-              userAchievements: achievementsRef.current,
-            },
-          );
-          if (updatedAchievements && updatedAchievements.length > 0) {
-            handleUpdateAchievements(updatedAchievements);
-          }
+        if (result.xp_awarded > 0) {
+          addNotification({ type: "xp", amount: result.xp_awarded });
         }
-
-        const prevCoins = prev.coins ?? 0;
-        const newCoins = newGameData.coins ?? prevCoins;
-        const coinsDelta = newCoins - prevCoins;
-        if (coinsDelta > 0) addNotification({ type: "coins", amount: coinsDelta });
+        if (result.coins_awarded > 0) {
+          addNotification({ type: "coins", amount: result.coins_awarded });
+        }
+        (result.notifications || []).forEach((notif) => {
+          if (notif.type === "quest") {
+            const def = questDefinitions.find((q) => q.id === notif.id);
+            addNotification({ ...def, type: "quest", coins: notif.reward });
+          } else if (notif.type === "achievement") {
+            const def = achievementDefinitions.find((a) => a.id === notif.id);
+            addNotification({ ...def, type: "achievement", xp: notif.xp });
+          }
+        });
       } catch (e) {}
-    } catch (error) {
-      gameDataRef.current = prev;
-      setGameData(prev);
-      setError(error.message || "Failed to update game data");
-      throw error;
-    } finally {
-      setUpdating(false);
-    }
-  };
 
-  const handleUpdateAchievements = async (updates) => {
-    if (!updates || !updates.length) return;
-
-    const achDefMap = new Map(achievementDefinitions.map((a) => [a.id, a]));
-    const currentAchievements = achievementsRef.current;
-    const prevGameData = gameDataRef.current;
-
-    let xpEarned = 0;
-
-    updates.forEach((update) => {
-      const a = currentAchievements.find((ach) => ach.id === update.id);
-      const def = achDefMap.get(update.id);
-      if (a) {
-        const wasCompleted = a.completedAt != null;
-        const isNowCompleted = update.progress >= (def?.max ?? 1);
-        if (isNowCompleted && !wasCompleted) {
-          xpEarned += def?.xp || 0;
-          try {
-            addNotification({ ...def, ...a, ...update, type: "achievement" });
-          } catch (e) {}
-        }
-      } else {
-        if (update.progress >= (def?.max ?? 1)) {
-          xpEarned += def?.xp || 0;
-          try {
-            addNotification({ ...def, ...update, type: "achievement" });
-          } catch (e) {}
-        }
-      }
-    });
-
-    // Compute merged array
-    const merged = currentAchievements.map((a) => {
-      const update = updates.find((u) => u.id === a.id);
-      if (!update) return a;
-
-      const def = achDefMap.get(a.id);
-      const result = { ...a, ...update };
-      if (update.progress >= (def?.max ?? 1) && !a.completedAt) {
-        result.completedAt = new Date().toISOString();
-      }
       return result;
-    });
-
-    const newOnes = updates.filter((u) => !currentAchievements.some((p) => p.id === u.id));
-    newOnes.forEach((update) => {
-      const def = achDefMap.get(update.id);
-      if (update.progress >= (def?.max ?? 1)) {
-        update.completedAt = new Date().toISOString();
-      }
-      merged.unshift(update);
-    });
-
-    achievementsRef.current = merged;
-    setAchievements(merged);
-
-    let dbUpdates = { achievements: merged };
-
-    if (xpEarned > 0) {
-      const prev = gameDataRef.current;
-      const prevXP = prev.xp_total || 0;
-      const newXpTotal = prevXP + xpEarned;
-      dbUpdates.xp_total = newXpTotal;
-      const nextData = { ...prev, xp_total: newXpTotal };
-      gameDataRef.current = nextData;
-      setGameData(nextData);
-
-      try {
-        let prevLevel = 1;
-        let newLevel = 1;
-        for (let [lvl, xp] of Object.entries(levels)) {
-          if (prevXP >= xp) prevLevel = parseInt(lvl);
-          if (newXpTotal >= xp) newLevel = parseInt(lvl);
-        }
-
-        if (newLevel > prevLevel) {
-          addNotification({ type: "levelup", level: newLevel });
-        }
-      } catch (e) {}
-    }
-
-    // Persist to Supabase
-    try {
-      setUpdating(true);
-      await updateGameData(dbUpdates);
-    } catch (e) {
-      achievementsRef.current = currentAchievements;
-      setAchievements(currentAchievements);
-      if (xpEarned > 0) {
-        gameDataRef.current = prevGameData;
-        setGameData(prevGameData);
-      }
-      setError(e.message || "Failed to update achievements");
-      throw e;
-    } finally {
-      setUpdating(false);
-    }
-  };
-
-  const handleUpdateQuests = async (updates) => {
-    if (!updates || !updates.length) return;
-
-    const questDefMap = new Map(questDefinitions.map((q) => [q.id, q]));
-    const currentQuests = questsRef.current;
-    const prevGameData = gameDataRef.current;
-
-    let coinsEarned = 0;
-    let questsCompleted = 0;
-
-    updates.forEach((update) => {
-      const q = currentQuests.find((quest) => quest.id === update.id);
-      const def = questDefMap.get(update.id);
-      if (q) {
-        const wasCompleted = q.completedAt != null;
-        const isNowCompleted = update.progress >= (def?.max ?? 1);
-        if (isNowCompleted && !wasCompleted) {
-          coinsEarned += def?.reward || 0;
-          questsCompleted++;
-          try {
-            addNotification({ ...def, ...q, ...update, type: "quest", coins: def.reward });
-          } catch (e) {}
-        }
-      } else {
-        if (update.progress >= (def?.max ?? 1)) {
-          coinsEarned += def?.reward || 0;
-          questsCompleted++;
-          try {
-            addNotification({ ...def, ...update, type: "quest", coins: def.reward });
-          } catch (e) {}
-        }
-      }
-    });
-
-    // Compute merged quests
-    const mergedQuests = currentQuests.map((q) => {
-      const update = updates.find((u) => u.id === q.id);
-      if (!update) return q;
-
-      const def = questDefMap.get(q.id);
-      const result = { ...q, ...update };
-      if (update.progress >= (def?.max ?? 1) && !q.completedAt) {
-        result.completedAt = new Date().toISOString();
-      }
-      return result;
-    });
-
-    questsRef.current = mergedQuests;
-    setQuests(mergedQuests);
-
-    let dbUpdates = { quests: mergedQuests };
-
-    if (coinsEarned > 0) {
-      const prev = gameDataRef.current;
-      const newCoins = (prev.coins || 0) + coinsEarned;
-      dbUpdates.coins = newCoins;
-      const nextData = { ...prev, coins: newCoins };
-      gameDataRef.current = nextData;
-      setGameData(nextData);
-    }
-
-    if (questsCompleted > 0) {
-      const { updatedAchievements } = processProgress(
-        "COMPLETE_QUEST",
-        { count: questsCompleted },
-        {
-          gameData: gameDataRef.current,
-          level: gameDataRef.current.level || 1,
-          userQuests: mergedQuests,
-          userAchievements: achievementsRef.current,
-        },
-      );
-      if (updatedAchievements && updatedAchievements.length > 0) {
-        handleUpdateAchievements(updatedAchievements);
-      }
-    }
-
-    // Persist to Supabase
-    try {
-      setUpdating(true);
-      await updateGameData(dbUpdates);
-    } catch (e) {
-      questsRef.current = currentQuests;
-      setQuests(currentQuests);
-      if (coinsEarned > 0) {
-        gameDataRef.current = prevGameData;
-        setGameData(prevGameData);
-      }
-      setError(e.message || "Failed to update quests");
-      throw e;
-    } finally {
-      setUpdating(false);
-    }
-  };
-
-  const handleUpdateShopItems = async (updates) => {
-    const prevShop = shopItems;
-    const newThemesOwned = updates.themesOwned
-      ? [...shopItems.themesOwned, ...updates.themesOwned]
-      : shopItems.themesOwned;
-
-    const newItems = { ...shopItems, ...updates, themesOwned: newThemesOwned };
-
-    setShopItems(newItems);
-
-    try {
-      setUpdating(true);
-      await updateGameData(newItems);
     } catch (error) {
-      setShopItems(prevShop);
-      setError(error.message || "Failed to update shop items");
+      setError(error.message || "Failed to sync game progress");
       throw error;
     } finally {
       setUpdating(false);
@@ -450,13 +235,12 @@ export function GameProvider({ children }) {
         achievements,
         quests,
         shopItems,
-        updateGameData: handleUpdateGameData,
-        updateAchievements: handleUpdateAchievements,
-        updateQuests: handleUpdateQuests,
-        updateShopItems: handleUpdateShopItems,
+        syncProgress: handleSyncProgress,
+        refreshGameData,
       }}
     >
       {children}
     </GameContext.Provider>
   );
 }
+

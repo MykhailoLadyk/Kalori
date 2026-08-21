@@ -1,12 +1,14 @@
 import { useState, useMemo } from "react";
 
-import { C, F } from "../lib/constants";
+import { C, F, alpha } from "../lib/constants";
 
 import { Mono } from "../components/shared/Primitives";
 import StatsBarChart from "../components/stats/StatsBarChart";
 import StatsLineChart from "../components/stats/StatsLineChart";
 import StatsItemQuick from "../components/stats/StatsItemQuick";
 import StatsMacroSplit from "../components/stats/StatsMacroSplit";
+import { Modal } from "../components/modals/Modal";
+import { WeightLogModal } from "../components/modals/stats/WeightLogModal";
 import { useStats } from "../hooks/useStats";
 import { useUser } from "../hooks/useUser";
 
@@ -14,8 +16,11 @@ export default function Stats() {
   const { getWeekData, getMonthData, get3MonthData, get3MonthWeeklyAverages } = useStats();
   const { user } = useUser();
   const [period, setPeriod] = useState("W");
+  const [modal, setModal] = useState(null);
 
   const targets = user?.targets || { calories: 2000, protein: 150, carbs: 250, fat: 70, water: 3000 };
+  const currentWeight = Number(user?.settings?.weight) || 0;
+  const weightUnit = user?.settings?.weight_unit || "kg";
 
   // Get data for the current period
   const periodData = useMemo(() => {
@@ -76,12 +81,14 @@ export default function Stats() {
     { label: "Carbs", key: "carbs", color: C.gold, goal: targets.carbs, unit: "g" },
     { label: "Fat", key: "fat", color: C.pink, goal: targets.fat, unit: "g" },
     { label: "Water", key: "water", color: C.blue, goal: targets.water, unit: "L" },
+    { label: "Weight", key: "weight", color: C.pink, goal: null, unit: weightUnit },
   ];
 
   // Determine max for bar charts
   const getBarMax = (key, goal) => {
     const vals = periodData.map((d) => d[key]);
-    return Math.max(...vals, goal) * 1.15;
+    const maxVal = Math.max(...vals, goal || 0);
+    return maxVal > 0 ? maxVal * 1.15 : 100;
   };
 
   return (
@@ -96,8 +103,26 @@ export default function Stats() {
             animation: "fadeUp 0.4s ease both",
           }}
         >
-          <div style={{ fontFamily: F.head, fontSize: 22, fontWeight: 900, color: C.text }}>
-            Stats
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{ fontFamily: F.head, fontSize: 22, fontWeight: 900, color: C.text }}>
+              Stats
+            </div>
+            <div
+              onClick={() => setModal("weight")}
+              className="hover-btn press cursor-pointer flex items-center"
+              style={{
+                gap: 5,
+                background: alpha(C.pink, 12),
+                border: `1px solid ${alpha(C.pink, 28)}`,
+                borderRadius: 8,
+                padding: "4px 8px",
+              }}
+            >
+              <span style={{ fontFamily: F.mono, fontSize: 10, fontWeight: 700, color: C.pink, lineHeight: 1 }}>+</span>
+              <span style={{ fontFamily: F.mono, fontSize: 8, fontWeight: 700, color: C.pink, letterSpacing: 0.5 }}>
+                LOG WEIGHT
+              </span>
+            </div>
           </div>
           <div style={{ display: "flex", gap: 5 }}>
             {["W", "M", "3M"].map((p) => (
@@ -214,6 +239,10 @@ export default function Stats() {
           </div>
         </div>
       </div>
+
+      <Modal id={modal} close={() => setModal(null)}>
+        {modal === "weight" && <WeightLogModal handleClose={() => setModal(null)} />}
+      </Modal>
     </>
   );
 }

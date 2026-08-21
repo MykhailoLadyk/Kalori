@@ -18,8 +18,22 @@ export default function StatsLineChart({ label, data, dates, color, goalV, unit,
   const chartW = svgW - padLeft - padRight;
   const chartH = svgH - padTop - padBottom;
 
-  const maxVal = Math.max(...data, goalV || 0) * 1.15;
-  const minVal = 0;
+  const isWeight = unit === "kg" || unit === "lbs" || label?.toLowerCase().includes("weight");
+
+  let minVal = 0;
+  let maxVal = Math.max(...data, goalV || 0) * 1.15;
+
+  if (isWeight) {
+    const validVals = data.filter((v) => v > 0);
+    if (goalV && goalV > 0) validVals.push(goalV);
+    if (validVals.length > 0) {
+      const minD = Math.min(...validVals);
+      const maxD = Math.max(...validVals);
+      const padding = Math.max((maxD - minD) * 0.3, 1.5);
+      minVal = Math.max(0, Math.floor(minD - padding));
+      maxVal = Math.ceil(maxD + padding);
+    }
+  }
 
   const toX = (idx) => padLeft + (idx / (data.length - 1 || 1)) * chartW;
   const toY = (v) => padTop + chartH - ((v - minVal) / (maxVal - minVal || 1)) * chartH;
@@ -62,6 +76,7 @@ export default function StatsLineChart({ label, data, dates, color, goalV, unit,
   // Format tooltip
   const formatValue = (v) => {
     if (unit === "L") return `${(v / 1000).toFixed(1)} L`;
+    if (isWeight) return `${Number(v).toFixed(1)} ${unit || ""}`;
     return `${v.toLocaleString()} ${unit || ""}`;
   };
 
@@ -70,7 +85,7 @@ export default function StatsLineChart({ label, data, dates, color, goalV, unit,
   };
 
   // Goal line Y
-  const goalY = goalV != null ? toY(goalV) : null;
+  const goalY = !isWeight && goalV != null ? toY(goalV) : null;
 
   return (
     <div
@@ -94,9 +109,11 @@ export default function StatsLineChart({ label, data, dates, color, goalV, unit,
         <Mono size={9} color={C.mutedLight}>
           {label}
         </Mono>
-        <Mono size={8} color={C.soft}>
-          Goal: {unit === "L" ? `${(goalV / 1000).toFixed(1)} L` : (goalV || 0).toLocaleString()}
-        </Mono>
+        {!isWeight && goalV != null && (
+          <Mono size={8} color={C.soft}>
+            Goal: {unit === "L" ? `${(goalV / 1000).toFixed(1)} L` : (goalV || 0).toLocaleString()}
+          </Mono>
+        )}
       </div>
 
       <svg

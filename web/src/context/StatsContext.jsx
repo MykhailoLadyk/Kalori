@@ -2,6 +2,7 @@ import { createContext, useMemo, useCallback, useState, useEffect } from "react"
 import { useMeals } from "../hooks/useMeals";
 import { useUser } from "../hooks/useUser";
 import { fetchMealsByRange } from "../services/mealService";
+import { fetchWeightLogsByRange } from "../services/weightService";
 import { getLocalYMD } from "../lib/dateUtils";
 
 export const StatsContext = createContext(null);
@@ -10,34 +11,41 @@ export function StatsProvider({ children }) {
   const { meals } = useMeals(); // Today's meals
   const { user } = useUser();
   const [historicalMeals, setHistoricalMeals] = useState([]);
+  const [historicalWeights, setHistoricalWeights] = useState([]);
   const [loadingStats, setLoadingStats] = useState(false);
 
-  useEffect(() => {
-    if (!user?.userAuth) {
+  const loadHistoricalData = useCallback(async () => {
+    if (!user?.id) {
       setHistoricalMeals([]);
+      setHistoricalWeights([]);
       return;
     }
+    try {
+      setLoadingStats(true);
+      const today = new Date();
+      const ninetyDaysAgo = new Date(today);
+      ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 89);
 
-    const loadHistoricalData = async () => {
-      try {
-        setLoadingStats(true);
-        const today = new Date();
-        const ninetyDaysAgo = new Date(today);
-        ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 89);
+      const endDate = getLocalYMD(today);
+      const startDate = getLocalYMD(ninetyDaysAgo);
 
-        const endDate = getLocalYMD(today);
-        const startDate = getLocalYMD(ninetyDaysAgo);
+      const [mealData, weightData] = await Promise.all([
+        fetchMealsByRange(user.id, startDate, endDate),
+        fetchWeightLogsByRange(user.id, startDate, endDate),
+      ]);
+      setHistoricalMeals(mealData || []);
+      setHistoricalWeights(weightData || []);
+    } catch (err) {
+    } finally {
+      setLoadingStats(false);
+    }
+  }, [user?.id]);
 
-        const data = await fetchMealsByRange(user.id, startDate, endDate);
-        setHistoricalMeals(data);
-      } catch (err) {
-      } finally {
-        setLoadingStats(false);
-      }
-    };
-
-    loadHistoricalData();
-  }, [user?.userAuth]);
+  useEffect(() => {
+    if (user?.userAuth) {
+      loadHistoricalData();
+    }
+  }, [user?.userAuth, loadHistoricalData]);
 
   const dailyData = useMemo(() => {
     const dataMap = new Map();
@@ -49,7 +57,7 @@ export function StatsProvider({ children }) {
       const d = new Date(today);
       d.setDate(d.getDate() - i);
       const dateStr = getLocalYMD(d);
-      dataMap.set(dateStr, { date: dateStr, calories: 0, protein: 0, carbs: 0, fat: 0, water: 0 });
+      dataMap.set(dateStr, { date: dateStr, calories: 0, protein: 0, carbs: 0, fat: 0, water: 0, weight: 0 });
     }
 
     // Process historical meals
@@ -89,8 +97,61 @@ export function StatsProvider({ children }) {
       });
     }
 
-    return Array.from(dataMap.values());
-  }, [historicalMeals, meals]);
+    // Process historical weights & linear interpolation across gaps
+    const daysList = Array.from(dataMap.values());
+    historicalWeights.forEach((w) => {
+      if (w.date && dataMap.has(w.date)) {
+        dataMap.get(w.date).weight = Number(w.weight) || 0;
+      }
+    });
+
+    const recordedIndices = [];
+    daysList.forEach((day, idx) => {
+      if (day.weight > 0) recordedIndices.push(idx);
+    });
+
+    if (recordedIndices.length === 0) {
+      const fallback = user?.settings?.weight ? Number(user.settings.weight) : 0;
+      daysList.forEach((day) => {
+        day.weight = fallback;
+      });
+    } else if (recordedIndices.length === 1) {
+      const singleWeight = daysList[recordedIndices[0]].weight;
+      daysList.forEach((day) => {
+        day.weight = singleWeight;
+      });
+    } else {
+      // Backfill before first recorded point
+      const firstIdx = recordedIndices[0];
+      const firstWeight = daysList[firstIdx].weight;
+      for (let i = 0; i < firstIdx; i++) {
+        daysList[i].weight = firstWeight;
+      }
+
+      // Linearly interpolate between each consecutive pair of recorded points
+      for (let k = 0; k < recordedIndices.length - 1; k++) {
+        const startIdx = recordedIndices[k];
+        const endIdx = recordedIndices[k + 1];
+        const startWeight = daysList[startIdx].weight;
+        const endWeight = daysList[endIdx].weight;
+        const steps = endIdx - startIdx;
+
+        for (let i = startIdx + 1; i < endIdx; i++) {
+          const progress = (i - startIdx) / steps;
+          daysList[i].weight = Math.round((startWeight + (endWeight - startWeight) * progress) * 10) / 10;
+        }
+      }
+
+      // Forward-fill after last recorded point
+      const lastIdx = recordedIndices[recordedIndices.length - 1];
+      const lastWeight = daysList[lastIdx].weight;
+      for (let i = lastIdx + 1; i < daysList.length; i++) {
+        daysList[i].weight = lastWeight;
+      }
+    }
+
+    return daysList;
+  }, [historicalMeals, historicalWeights, meals, user?.settings?.weight]);
 
   // Memoize functions to prevent downstream consumers from re-rendering unexpectedly
   const getWeekData = useCallback(() => dailyData.slice(-7), [dailyData]);
@@ -104,6 +165,11 @@ export function StatsProvider({ children }) {
       if (chunk.length === 0) continue;
 
       const midIndex = Math.floor(chunk.length / 2);
+      const validWeights = chunk.filter((d) => d.weight > 0).map((d) => d.weight);
+      const avgWeight = validWeights.length
+        ? Math.round((validWeights.reduce((s, w) => s + w, 0) / validWeights.length) * 10) / 10
+        : 0;
+
       weeks.push({
         date: chunk[midIndex].date,
         calories: Math.round(chunk.reduce((s, d) => s + d.calories, 0) / chunk.length),
@@ -111,14 +177,23 @@ export function StatsProvider({ children }) {
         carbs: Math.round(chunk.reduce((s, d) => s + d.carbs, 0) / chunk.length),
         fat: Math.round(chunk.reduce((s, d) => s + d.fat, 0) / chunk.length),
         water: Math.round(chunk.reduce((s, d) => s + d.water, 0) / chunk.length),
+        weight: avgWeight,
       });
     }
     return weeks;
   }, [dailyData]);
 
   const contextValue = useMemo(
-    () => ({ dailyData, loadingStats, getWeekData, getMonthData, get3MonthData, get3MonthWeeklyAverages }),
-    [dailyData, loadingStats, getWeekData, getMonthData, get3MonthData, get3MonthWeeklyAverages],
+    () => ({
+      dailyData,
+      loadingStats,
+      getWeekData,
+      getMonthData,
+      get3MonthData,
+      get3MonthWeeklyAverages,
+      refreshStats: loadHistoricalData,
+    }),
+    [dailyData, loadingStats, getWeekData, getMonthData, get3MonthData, get3MonthWeeklyAverages, loadHistoricalData],
   );
 
   return <StatsContext.Provider value={contextValue}>{children}</StatsContext.Provider>;

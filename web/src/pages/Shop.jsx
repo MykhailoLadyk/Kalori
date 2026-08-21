@@ -1,14 +1,36 @@
 import { useState } from "react";
 import { useGameStats } from "../hooks/useGameStats";
 import { useUser } from "../hooks/useUser";
-import { C, F, levels, themesDefinitions } from "../lib/constants";
+import {
+  C,
+  F,
+  levels,
+  themesDefinitions,
+  avatarsDefinitions,
+  flameColorsDefinitions,
+  upgradesDefinitions,
+} from "../lib/constants";
 import { Modal } from "../components/modals/Modal";
 import { Mono, Tag } from "../components/shared/Primitives";
-import { IconCoin, IconPalette, IconTrophy, IconShield } from "../components/shared/DuoIcon";
+import {
+  IconCoin,
+  IconPalette,
+  IconTrophy,
+  IconShield,
+  IconUser,
+  IconFire,
+  IconArrowUp,
+} from "../components/shared/DuoIcon";
 import ShopItemThemes from "../components/shop/ShopItemThemes";
+import ShopItemAvatars from "../components/shop/ShopItemAvatars";
+import ShopItemFlames from "../components/shop/ShopItemFlames";
+import ShopItemUpgrades from "../components/shop/ShopItemUpgrades";
 import ShopItemChests from "../components/shop/ShopItemChests";
 import ShopItemOther from "../components/shop/ShopItemOther";
 import ShopThemesModal from "../components/modals/shop/shopThemesModal";
+import ShopAvatarsModal from "../components/modals/shop/shopAvatarsModal";
+import ShopFlamesModal from "../components/modals/shop/shopFlamesModal";
+import ShopUpgradesModal from "../components/modals/shop/shopUpgradesModal";
 import ShopOtherModal from "../components/modals/shop/shopOtherModal";
 import ChestsModal from "../components/modals/shop/chestsModal";
 
@@ -19,6 +41,9 @@ export default function Shop() {
 
   const coins = gameData.coins;
   const themesOwned = shopItems?.themesOwned ?? [];
+  const avatarsOwned = shopItems?.avatarsOwned ?? ["initial"];
+  const flameColorsOwned = shopItems?.flameColorsOwned ?? ["orange"];
+  const upgradesOwned = shopItems?.upgradesOwned ?? user?.settings?.upgrades_owned ?? [];
 
   let level = 0;
   for (const [lvl, xp] of Object.entries(levels)) {
@@ -33,6 +58,22 @@ export default function Shop() {
     const isLocked = level < theme.lvlUnlocked;
     return { ...theme, owned: themesOwned.includes(theme.id), lock: isLocked ? `Lv ${theme.lvlUnlocked}` : null };
   });
+
+  const avatars = avatarsDefinitions.map((avatar) => {
+    const isLocked = level < avatar.lvlUnlocked;
+    return { ...avatar, owned: avatarsOwned.includes(avatar.id), lock: isLocked ? `Lv ${avatar.lvlUnlocked}` : null };
+  });
+
+  const flameColors = flameColorsDefinitions.map((flame) => {
+    const isLocked = level < flame.lvlUnlocked;
+    return { ...flame, owned: flameColorsOwned.includes(flame.id), lock: isLocked ? `Lv ${flame.lvlUnlocked}` : null };
+  });
+
+  const upgrades = upgradesDefinitions.map((upgrade) => {
+    const isLocked = level < upgrade.lvlUnlocked;
+    return { ...upgrade, owned: upgradesOwned.includes(upgrade.id), lock: isLocked ? `Lv ${upgrade.lvlUnlocked}` : null };
+  });
+
   const chests = [
     {
       id: "basic",
@@ -59,7 +100,26 @@ export default function Shop() {
       drops: ["Coins ×150-500", "Epic theme", "3× Shields"],
     },
   ];
+
   const sections = [
+    {
+      id: "avatars",
+      label: "Avatars",
+      Icon: IconUser,
+      desc: "Customize your profile icon",
+      count: `${avatars.length} available`,
+      color: C.accent,
+      preview: <ShopItemAvatars avatars={avatars} />,
+    },
+    {
+      id: "flames",
+      label: "Streak Flames",
+      Icon: IconFire,
+      desc: "Ignite your streak color",
+      count: `${flameColors.length} colors`,
+      color: C.orange,
+      preview: <ShopItemFlames flames={flameColors} />,
+    },
     {
       id: "themes",
       label: "Themes",
@@ -68,6 +128,15 @@ export default function Shop() {
       count: `${themes.length} available`,
       color: C.pink,
       preview: <ShopItemThemes previewColors={themes.map((t) => t.colors)} />,
+    },
+    {
+      id: "upgrades",
+      label: "Perma Upgrades",
+      Icon: IconArrowUp,
+      desc: "Permanent account boosts",
+      count: `${upgrades.filter((u) => u.owned).length}/${upgrades.length}`,
+      color: C.accent,
+      preview: <ShopItemUpgrades upgrades={upgrades} />,
     },
     // {
     //   id: "chests",
@@ -90,7 +159,10 @@ export default function Shop() {
   ];
 
   const modals = {
+    avatars: <ShopAvatarsModal avatars={avatars} currentAvatar={user?.settings?.avatar} coins={coins} user={user} />,
+    flames: <ShopFlamesModal flames={flameColors} currentFlame={user?.settings?.flame_color} coins={coins} />,
     themes: <ShopThemesModal themes={themes} currentTheme={user?.settings?.theme} coins={coins} />,
+    upgrades: <ShopUpgradesModal upgrades={upgrades} coins={coins} user={user} />,
     chests: <ChestsModal />,
     other: <ShopOtherModal />,
   };

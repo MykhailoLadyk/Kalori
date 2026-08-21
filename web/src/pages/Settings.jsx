@@ -7,6 +7,7 @@ import { useUser } from "../hooks/useUser";
 import { useGameStats } from "../hooks/useGameStats";
 
 import SettingsCard from "../components/settings/SettingsCard";
+import Avatar from "../components/shared/Avatar";
 
 import { Modal } from "../components/modals/Modal";
 import ProfileModal from "../components/modals/settings/ProfileModal";
@@ -17,6 +18,8 @@ import TimezoneModal from "../components/modals/settings/TimezonesModal";
 import MeasurementsModal from "../components/modals/settings/MeasurmentsModal";
 import ExportModal from "../components/modals/settings/ExportModal";
 import SettingsThemeModal from "../components/modals/settings/SettingsThemesModal";
+import SettingsAvatarModal from "../components/modals/settings/SettingsAvatarModal";
+import SettingsFlameModal from "../components/modals/settings/SettingsFlameModal";
 import LogoutModal from "../components/modals/settings/LogOutModal";
 import DeleteAccountModal from "../components/modals/settings/DeleteAccountModal";
 
@@ -53,6 +56,8 @@ export default function Settings() {
     measurements: <MeasurementsModal handleClose={() => setModal(null)} />,
     export: <ExportModal handleClose={() => setModal(null)} />,
     theme: <SettingsThemeModal handleClose={() => setModal(null)} />,
+    avatar: <SettingsAvatarModal handleClose={() => setModal(null)} />,
+    flame: <SettingsFlameModal handleClose={() => setModal(null)} />,
     logout: <LogoutModal handleClose={() => setModal(null)} />,
     deleteAccount: <DeleteAccountModal handleClose={() => setModal(null)} />,
   };
@@ -79,24 +84,7 @@ export default function Settings() {
       <div
         style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20, animation: "fadeUp 0.4s ease both" }}
       >
-        <div
-          style={{
-            width: 52,
-            height: 52,
-            borderRadius: 16,
-            background: `linear-gradient(135deg, ${C.accent}, ${C.pink})`,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontFamily: F.head,
-            fontSize: 24,
-            fontWeight: 900,
-            color: "#000",
-            flexShrink: 0,
-          }}
-        >
-          {user?.name?.[0]?.toUpperCase() ?? "?"}
-        </div>
+        <Avatar user={user} size={52} fontSize={24} borderRadius={16} />
         <div>
           <div style={{ fontFamily: F.head, fontSize: 18, fontWeight: 900, color: C.text }}>{user?.name || "User"}</div>
         </div>
@@ -163,6 +151,23 @@ export default function Settings() {
             arrow
             withTopBorder
           /> */}
+          <SettingsCard
+            onClick={() => {
+              setModal("avatar");
+            }}
+            icon={<IconUser size={18} color={C.soft} />}
+            label="Avatar"
+            arrow
+          />
+          <SettingsCard
+            onClick={() => {
+              setModal("flame");
+            }}
+            icon={<IconFire size={18} color={C.soft} />}
+            label="Streak Flame"
+            arrow
+            withTopBorder
+          />
           <SettingsCard
             onClick={() => {
               setModal("theme");

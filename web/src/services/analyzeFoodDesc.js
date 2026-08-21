@@ -7,9 +7,9 @@ import { supabase } from "./supabase";
  * Returns the parsed nutrition data object directly.
  * Throws an error with a `code` property for structured error handling.
  */
-export default async function analyzeFoodDesc(description) {
+export default async function analyzeFoodDesc(description, clarifications) {
   const { data, error } = await supabase.functions.invoke("analyze-food-desc", {
-    body: { description },
+    body: { description, clarifications },
   });
 
   if (error) {

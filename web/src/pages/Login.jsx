@@ -174,7 +174,13 @@ export default function Login() {
   const handleGoogle = async () => {
     try {
       setLoading(true);
-      const { error } = await supabase.auth.signInWithOAuth({ provider: "google" });
+      setAuthError(null);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/`,
+        },
+      });
       if (error) throw error;
     } catch (err) {
       setAuthError(err.message);
@@ -396,6 +402,37 @@ export default function Login() {
               {loading ? "PLEASE WAIT..." : isLogin ? "LOG IN" : isSignup ? "CREATE ACCOUNT" : "SEND RESET LINK"}
             </span>
           </div>
+
+          {/* social login */}
+          {!isForgot && (
+            <>
+              <div className="flex items-center" style={{ gap: 12, margin: "20px 0 18px" }}>
+                <div style={{ flex: 1, height: 1, background: C.border }} />
+                <Mono size={8} color={C.muted}>
+                  OR
+                </Mono>
+                <div style={{ flex: 1, height: 1, background: C.border }} />
+              </div>
+
+              <div
+                onClick={!loading ? handleGoogle : undefined}
+                className="press flex items-center justify-center bg-card hover-card cursor-pointer"
+                style={{
+                  border: `1px solid ${C.border}`,
+                  borderRadius: 12,
+                  padding: "12px",
+                  gap: 10,
+                  transition: "all 0.2s",
+                  minHeight: 46,
+                }}
+              >
+                <GoogleIcon />
+                <span style={{ fontFamily: F.body, fontSize: 13, fontWeight: 600, color: C.text }}>
+                  Continue with Google
+                </span>
+              </div>
+            </>
+          )}
         </div>
 
         {/* back to login from forgot */}

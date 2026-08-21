@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { C, F, alpha } from "../../../lib/constants";
 import { useMeals } from "../../../hooks/useMeals";
+import { useGameStats } from "../../../hooks/useGameStats";
+import { getLocalYMD } from "../../../lib/dateUtils";
 import { Mono } from "../../shared/Primitives";
 
 const mealTypes = ["breakfast", "lunch", "dinner", "snacks"];
@@ -20,6 +22,7 @@ const formTypes = [
 
 export function MealEditModal({ meal, handleClose }) {
   const { updateMeal, loading } = useMeals();
+  const { syncProgress } = useGameStats();
   const [form, setForm] = useState({
     name: meal?.name ?? "",
     calories: meal?.calories ?? "",
@@ -69,7 +72,11 @@ export function MealEditModal({ meal, handleClose }) {
       fat: Number(form.fat),
     };
 
-    updateMeal(meal.id, payload);
+    await updateMeal(meal.id, payload);
+    const isToday = !meal?.date || meal.date === getLocalYMD(new Date());
+    if (isToday) {
+      await syncProgress(meal.date || getLocalYMD(new Date()), true);
+    }
     handleClose();
   };
 

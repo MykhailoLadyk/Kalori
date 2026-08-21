@@ -64,7 +64,7 @@ export default function DescribeAddMeal() {
       setLoading(true);
       setError(null);
       const parsed = await analyzeFoodDesc(text);
-      navigate("/add-meal/confirm", { state: { meal: parsed } });
+      navigate("/add-meal/confirm", { state: { meal: parsed, description: text } });
     } catch (err) {
       if (err.code === "RATE_LIMITED") {
         setError("Daily AI limit reached. Try again tomorrow or add meals manually.");

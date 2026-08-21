@@ -11,11 +11,14 @@ const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp", "image/heic
 const SYSTEM_INSTRUCTION = `You are a nutrition estimator. Analyze the image and identify ONLY visibly present foods.
 
 Rules:
-1. Identify ONLY foods clearly visible. Do not infer hidden ingredients (oils, sauces, seasonings) unless visible.
+1. Identify ONLY foods clearly visible. Do not infer hidden ingredients (oils, sauces, seasonings) unless visible or clarified by user.
 2. Estimate portions from visible size (e.g. "100g", "1 cup").
-3. Do not guess recipes, preparation methods, or unseen side dishes.
+3. Do not guess recipes, preparation methods, or unseen side dishes unless clarified.
 4. If no food is clearly visible, or if the image is blurry, unreadable, or not primarily focused on food, return {"error": "No food detected"}.
 5. Set the top-level "name" field to a highly descriptive title listing the main components (e.g., "Eggs, Bacon & Toast", "Grilled Chicken with Broccoli"). DO NOT use generic categorical names like "Breakfast", "Hearty Breakfast", "Lunch", or "Breakfast Plate".
+6. Set "confidence" to "high", "medium", or "low" based on visual clarity and portion visibility.
+7. Set "notes" to a concise summary explaining portion and ingredient assumptions (e.g., "Assumed 6oz grilled chicken breast and 1 cup steamed broccoli without butter").
+8. Provide 1 to 3 targeted "questions" in the questions array with 2 to 4 short, mutually exclusive options each to help the user clarify any ambiguous aspects (e.g., cooking oils, portion size, sauces, dressings). If confidence is high or clarifications were fully provided, questions can be empty.
 
 EXAMPLES OF CORRECT BEHAVIOR:
 
@@ -24,6 +27,12 @@ Example 1: A photo of a grilled chicken breast and a side of broccoli.
   "name": "Grilled Chicken & Broccoli",
   "confidence": "high",
   "notes": "Estimated 6oz chicken breast and 1 cup of steamed broccoli.",
+  "questions": [
+    {
+      "question": "Was any cooking oil or butter used?",
+      "options": ["No oil", "1 tbsp Olive Oil", "Butter"]
+    }
+  ],
   "foods": [
     {
       "name": "Grilled Chicken Breast",
@@ -67,7 +76,7 @@ Deno.serve(async (req) => {
   try {
     // Parse and validate input
     const body = await req.json();
-    const { imageBase64, mimeType } = body;
+    const { imageBase64, mimeType, clarifications } = body;
 
     if (!imageBase64 || typeof imageBase64 !== "string") {
       return jsonError("Missing or invalid imageBase64", ErrorCode.INVALID_INPUT, 400);
@@ -103,11 +112,17 @@ Deno.serve(async (req) => {
     if (rlResult instanceof Response) return rlResult;
 
     // Call Vertex AI
+    const parts: Array<Record<string, unknown>> = [
+      { inlineData: { mimeType, data: imageBase64 } },
+    ];
+    if (clarifications && typeof clarifications === "string" && clarifications.trim()) {
+      parts.push({
+        text: `User clarifications and additional details: "${clarifications.trim()}". Please recalculate nutrition and update estimates based on these details.`,
+      });
+    }
+
     const aiResult = await callVertexAI(
-      [{
-        role: "user",
-        parts: [{ inlineData: { mimeType, data: imageBase64 } }],
-      }],
+      [{ role: "user", parts }],
       SYSTEM_INSTRUCTION,
     );
 

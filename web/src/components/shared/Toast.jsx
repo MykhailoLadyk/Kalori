@@ -18,6 +18,7 @@ const CONFIGS = {
   quest: { color: C.accent, icon: IconTarget, duration: 5000 },
   achievement: { color: C.gold, icon: IconTrophy, duration: 6500 },
   levelup: { color: C.accent, icon: IconArrowUp, duration: 6500 },
+  target: { color: C.accent, icon: IconTarget, duration: 4500 },
   streak: { color: C.orange, icon: IconFire, duration: 5500 },
   success: { color: "#10B981", icon: IconCheck, duration: 4000 },
   error: { color: C.red || "#EF4444", icon: IconX, duration: 4000 },
@@ -45,6 +46,44 @@ function ToastContent({ notification }) {
         <span className="font-mono font-bold" style={{ fontSize: 12, color }}>
           +{amount} {type === "xp" ? "XP" : "coins"}
         </span>
+      </div>
+    );
+  }
+
+  // target reached card
+  if (type === "target") {
+    return (
+      <div
+        className="bg-panel"
+        style={{
+          border: `1px solid ${alpha(color, 25)}`,
+          borderRadius: 14,
+          padding: "12px 14px",
+          minWidth: 200,
+          boxShadow: `0 4px 20px ${alpha("#000", 38)}`,
+        }}
+      >
+        <div className="flex items-center" style={{ gap: 8, marginBottom: 6 }}>
+          <span className="flex" style={{ color }}><IconTarget size={16} /></span>
+          <Mono size={8} color={color}>
+            Target Reached
+          </Mono>
+        </div>
+        <div className="font-body font-semibold text-primary" style={{ fontSize: 12, marginBottom: 6 }}>
+          {name}
+        </div>
+        <div className="flex" style={{ gap: 8 }}>
+          {xp && (
+            <Mono size={8} color={C.accent}>
+              +{xp} XP
+            </Mono>
+          )}
+          {coins && (
+            <Mono size={8} color={C.gold}>
+              +{coins} coins
+            </Mono>
+          )}
+        </div>
       </div>
     );
   }

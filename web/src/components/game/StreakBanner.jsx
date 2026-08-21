@@ -1,22 +1,30 @@
-import { C, F, alpha } from "../../lib/constants";
+import { C, F, alpha, flameColorsDefinitions } from "../../lib/constants";
 import { Mono } from "../shared/Primitives";
 import { IconFire, IconShield } from "../shared/DuoIcon";
 import { useGameStats } from "../../hooks/useGameStats";
+import { useUser } from "../../hooks/useUser";
 
 export function StreakBanner() {
   const { gameData, shopItems } = useGameStats();
+  const { user } = useUser();
   const streak = gameData?.streak || 0;
   const shields = shopItems?.streak_shields || 0;
+
+  const activeFlame =
+    flameColorsDefinitions.find(
+      (f) => f.id === (user?.settings?.flame_color || "orange"),
+    ) || flameColorsDefinitions[0];
+  const flameColor = activeFlame.color;
 
   const isActive = streak > 0;
   const hasShields = shields > 0;
 
   const bannerBg = isActive
-    ? `linear-gradient(135deg, ${alpha(C.orange, 13)}, ${alpha(C.gold, 6)})`
+    ? `linear-gradient(135deg, ${alpha(flameColor, 13)}, ${alpha(C.gold, 6)})`
     : C.card;
-  const bannerBorder = isActive ? alpha(C.orange, 21) : C.border;
-  const fireColor = isActive ? C.orange : C.mutedLight;
-  const textColor = isActive ? C.orange : C.muted;
+  const bannerBorder = isActive ? alpha(flameColor, 21) : C.border;
+  const fireColor = isActive ? flameColor : C.mutedLight;
+  const textColor = isActive ? flameColor : C.muted;
 
   return (
     <div

@@ -52,7 +52,7 @@ function fileToDataUrl(file) {
  * Returns the parsed nutrition data object directly.
  * Throws an error with a `code` property for structured error handling.
  */
-export default async function analyzeFood(imageInput) {
+export default async function analyzeFood(imageInput, clarifications) {
   let dataUrl;
 
   if (typeof imageInput === "string" && imageInput.startsWith("data:")) {
@@ -67,7 +67,7 @@ export default async function analyzeFood(imageInput) {
   const { base64: imageBase64, mimeType } = await resizeImage(dataUrl);
 
   const { data, error } = await supabase.functions.invoke("analyze-food", {
-    body: { imageBase64, mimeType },
+    body: { imageBase64, mimeType, clarifications },
   });
 
   if (error) {

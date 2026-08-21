@@ -8,6 +8,8 @@ import { useMeals } from "../hooks/useMeals";
 import { useGameStats } from "../hooks/useGameStats";
 import { useUser } from "../hooks/useUser";
 import { getLocalYMD } from "../lib/dateUtils";
+import analyzeFood from "../services/analyzeFood";
+import analyzeFoodDesc from "../services/analyzeFoodDesc";
 const ChevronLeft = () => (
   <svg
     width="18"
@@ -42,6 +44,7 @@ export default function ConfirmMeal() {
   const result = location.state?.meal;
   const photo = location.state?.photoData;
   const isAlbum = location.state?.isAlbum;
+  const initialDescription = location.state?.description;
   // Get macro value from meal_total or sum from foods array
   const getMacro = (data, field) => {
     if (data?.meal_total?.[field] != null) return data.meal_total[field];
@@ -61,6 +64,14 @@ export default function ConfirmMeal() {
     type: result?.type ?? "breakfast",
   });
 
+  const [confidence, setConfidence] = useState(result?.confidence || null);
+  const [notes, setNotes] = useState(result?.notes || null);
+  const [questions, setQuestions] = useState(result?.questions || []);
+  const [selectedAnswers, setSelectedAnswers] = useState({});
+  const [customClarification, setCustomClarification] = useState("");
+  const [refining, setRefining] = useState(false);
+  const [refineError, setRefineError] = useState(null);
+
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
@@ -70,6 +81,64 @@ export default function ConfirmMeal() {
   const handleChange = (key, value) => {
     setForm((prev) => ({ ...prev, [key]: value }));
     if (errors[key]) setErrors((prev) => ({ ...prev, [key]: null }));
+  };
+
+  const handleSelectOption = (qIdx, opt) => {
+    setSelectedAnswers((prev) => ({
+      ...prev,
+      [qIdx]: prev[qIdx] === opt ? null : opt,
+    }));
+  };
+
+  const handleRefine = async () => {
+    const answers = Object.entries(selectedAnswers)
+      .filter(([_, opt]) => Boolean(opt))
+      .map(([idx, opt]) => `${questions[idx]?.question || "Detail"}: ${opt}`);
+
+    if (customClarification.trim()) {
+      answers.push(customClarification.trim());
+    }
+
+    const clarificationQuery = answers.join(". ");
+    if (!clarificationQuery) return;
+
+    try {
+      setRefining(true);
+      setRefineError(null);
+
+      let refined;
+      if (photo) {
+        refined = await analyzeFood(photo, clarificationQuery);
+      } else if (initialDescription) {
+        refined = await analyzeFoodDesc(initialDescription, clarificationQuery);
+      } else if (form.name) {
+        refined = await analyzeFoodDesc(form.name, clarificationQuery);
+      }
+
+      if (refined) {
+        setForm((prev) => ({
+          ...prev,
+          name: refined.name || prev.name,
+          calories: getMacro(refined, "calories"),
+          protein: getMacro(refined, "protein_g"),
+          carbs: getMacro(refined, "carbs_g"),
+          fat: getMacro(refined, "fat_g"),
+        }));
+        if (refined.confidence) setConfidence(refined.confidence);
+        if (refined.notes) setNotes(refined.notes);
+        if (refined.questions) setQuestions(refined.questions);
+        setSelectedAnswers({});
+        setCustomClarification("");
+      }
+    } catch (err) {
+      if (err.code === "RATE_LIMITED") {
+        setRefineError("Daily AI limit reached.");
+      } else {
+        setRefineError("Couldn't refine estimate. Try again.");
+      }
+    } finally {
+      setRefining(false);
+    }
   };
 
   const validate = () => {
@@ -340,6 +409,149 @@ export default function ConfirmMeal() {
             </div>
           ))}
         </div>
+
+        {/* AI Confidence, Notes, Questions & Clarification */}
+        {(confidence || notes || questions?.length > 0 || photo || initialDescription) && (
+          <div
+            className="bg-card"
+            style={{
+              border: `1px solid ${C.border}`,
+              borderRadius: 16,
+              padding: "16px",
+              marginBottom: 16,
+              display: "flex",
+              flexDirection: "column",
+              gap: 12,
+            }}
+          >
+            <div className="flex items-center justify-between">
+              <Mono size={8} color={C.mutedLight}>
+                AI INSIGHTS & REFINEMENT
+              </Mono>
+              {confidence && (
+                <span
+                  style={{
+                    fontFamily: F.mono,
+                    fontSize: 8,
+                    fontWeight: 700,
+                    padding: "3px 8px",
+                    borderRadius: 6,
+                    textTransform: "uppercase",
+                    background:
+                      confidence.toLowerCase() === "high"
+                        ? alpha(C.accent, 15)
+                        : confidence.toLowerCase() === "medium"
+                        ? alpha(C.gold, 15)
+                        : alpha(C.orange || C.red, 15),
+                    color:
+                      confidence.toLowerCase() === "high"
+                        ? C.accent
+                        : confidence.toLowerCase() === "medium"
+                        ? C.gold
+                        : C.orange || C.red,
+                    border: `1px solid ${
+                      confidence.toLowerCase() === "high"
+                        ? alpha(C.accent, 30)
+                        : confidence.toLowerCase() === "medium"
+                        ? alpha(C.gold, 30)
+                        : alpha(C.orange || C.red, 30)
+                    }`,
+                  }}
+                >
+                  {confidence} Confidence
+                </span>
+              )}
+            </div>
+
+            {notes && (
+              <div className="font-body text-soft" style={{ fontSize: 12, lineHeight: 1.5 }}>
+                {notes}
+              </div>
+            )}
+
+            {questions?.length > 0 && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 4 }}>
+                {questions.map((q, qIdx) => (
+                  <div key={qIdx}>
+                    <div className="font-body text-primary font-semibold" style={{ fontSize: 12, marginBottom: 6 }}>
+                      {q.question}
+                    </div>
+                    <div className="flex flex-wrap" style={{ gap: 6 }}>
+                      {q.options?.map((opt, oIdx) => {
+                        const isSelected = selectedAnswers[qIdx] === opt;
+                        return (
+                          <button
+                            type="button"
+                            key={oIdx}
+                            onClick={() => handleSelectOption(qIdx, opt)}
+                            className="press"
+                            style={{
+                              background: isSelected ? C.accent : alpha(C.border, 40),
+                              color: isSelected ? "#000" : C.soft,
+                              border: `1px solid ${isSelected ? C.accent : C.border}`,
+                              borderRadius: 8,
+                              padding: "6px 10px",
+                              fontFamily: F.mono,
+                              fontSize: 9,
+                              fontWeight: 700,
+                              cursor: "pointer",
+                              transition: "all 0.15s",
+                            }}
+                          >
+                            {opt}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div style={{ marginTop: 4 }}>
+              <input
+                type="text"
+                value={customClarification}
+                onChange={(e) => setCustomClarification(e.target.value)}
+                placeholder="Clarify ingredients, portion, or preparation..."
+                className="w-full bg-card input-field"
+                style={{
+                  border: `1px solid ${C.border}`,
+                  borderRadius: 10,
+                  padding: "10px 12px",
+                  fontFamily: F.body,
+                  fontSize: 12,
+                  color: C.text,
+                  outline: "none",
+                }}
+              />
+            </div>
+
+            {(Object.values(selectedAnswers).some(Boolean) || customClarification.trim()) && (
+              <div
+                onClick={!refining ? handleRefine : undefined}
+                className="hover-btn press flex items-center justify-center cursor-pointer"
+                style={{
+                  background: refining ? C.accentDim : alpha(C.accent, 15),
+                  border: `1px solid ${C.accent}`,
+                  borderRadius: 10,
+                  padding: "10px",
+                  cursor: refining ? "not-allowed" : "pointer",
+                }}
+              >
+                <span className="font-mono font-bold" style={{ fontSize: 10, color: C.accent }}>
+                  {refining ? "UPDATING ESTIMATE..." : "REFINE ESTIMATE WITH AI"}
+                </span>
+              </div>
+            )}
+
+            {refineError && (
+              <Mono size={8} color={C.red}>
+                {refineError}
+              </Mono>
+            )}
+          </div>
+        )}
 
         <div className="flex-1" />
 

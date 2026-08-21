@@ -14,7 +14,7 @@ const QUEST_ICON_MAP = {
   fire: QuestFireIcon,
 };
 export function QuestList() {
-  const { quests: userQuests } = useGameStats();
+  const { quests: userQuests, gameData, rerollQuest } = useGameStats();
   const questDefinitionById = new Map(
     questDefinitions.map((quest) => [quest.id, quest]),
   );
@@ -36,6 +36,15 @@ export function QuestList() {
 
   return quests.map((q, i) => {
     const Icon = q.Icon || QUEST_ICON_MAP[q.icon] || q.icon;
-    return <Quest key={q.id ?? q.name ?? i} {...q} Icon={Icon} />;
+    return (
+      <Quest
+        key={q.id ?? q.name ?? i}
+        {...q}
+        Icon={Icon}
+        onReroll={rerollQuest}
+        canAffordReroll={(gameData?.coins ?? 0) >= 20}
+        rerollCost={20}
+      />
+    );
   });
 }

@@ -1,14 +1,22 @@
-import { C, F } from "../../lib/constants";
+import { C, F, flameColorsDefinitions } from "../../lib/constants";
 import { IconCalendar, IconFire } from "../../components/shared/DuoIcon";
 import { getDayName, getMonthName } from "../../lib/utils";
 import { useGameStats } from "../../hooks/useGameStats";
+import { useUser } from "../../hooks/useUser";
 
 export function DateSection({ setModal, date }) {
   const day = getDayName(date);
   const month = getMonthName(date);
   const { gameData } = useGameStats();
+  const { user } = useUser();
   const streak = gameData?.streak || 0;
   const isActive = streak > 0;
+
+  const activeFlame =
+    flameColorsDefinitions.find(
+      (f) => f.id === (user?.settings?.flame_color || "orange"),
+    ) || flameColorsDefinitions[0];
+  const flameColor = activeFlame.color;
 
   return (
     <div
@@ -72,7 +80,7 @@ export function DateSection({ setModal, date }) {
           right: 22,
           height: 36,
           background: C.card,
-          border: `1px solid ${isActive ? C.orange + "40" : C.border}`,
+          border: `1px solid ${isActive ? flameColor + "40" : C.border}`,
           borderRadius: 11,
           display: "flex",
           alignItems: "center",
@@ -81,7 +89,7 @@ export function DateSection({ setModal, date }) {
           gap: 6,
         }}
       >
-        <IconFire size={18} color={isActive ? C.orange : C.mutedLight} />
+        <IconFire size={18} color={isActive ? flameColor : C.mutedLight} />
         <span
           style={{
             fontFamily: F.head,

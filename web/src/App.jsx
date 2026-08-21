@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import Login from "./pages/Login";
+import ResetPassword from "./pages/ResetPassword";
 import ProtectedRoute from "./components/shared/ProtectedRoute";
 import Home from "./pages/Home";
 import Nav from "./components/shared/Nav";
@@ -98,6 +99,7 @@ function App() {
               <AuthLoader>
                 <Routes>
                   <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/onboarding" element={<OnboardingRoute><Onboarding /></OnboardingRoute>} />
                   <Route path="/terms" element={<Terms />} />
                   <Route path="/privacy" element={<Privacy />} />

@@ -1,10 +1,12 @@
 import { useState } from "react";
 import {
   C,
+  F,
   achievements as achievementDefinitions,
   levels,
 } from "../lib/constants";
-import { SectionLabel } from "../components/shared/Primitives";
+import { SectionLabel, Mono, Tag } from "../components/shared/Primitives";
+import { IconLock } from "../components/shared/DuoIcon";
 import { QuestList } from "../components/shared/QuestList";
 import GameCard from "../components/game/GameCard";
 import Achievements from "../components/game/Achievements";
@@ -88,9 +90,48 @@ export default function Game() {
 
         <div style={{ animation: "fadeUp 0.4s ease 0.3s both" }}>
           <SectionLabel>Active Quests</SectionLabel>
-          <div style={{ marginTop: 10 }}>
-            <QuestList />
-          </div>
+          {level < 2 ? (
+            <div
+              style={{
+                background: C.card,
+                borderRadius: 14,
+                padding: "18px",
+                border: `1px dashed ${C.border}`,
+                textAlign: "center",
+                marginTop: 10,
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "center", marginBottom: 8 }}>
+                <div
+                  style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: 12,
+                    background: `${C.border}60`,
+                    border: `1px solid ${C.border}`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <IconLock size={22} color={C.mutedLight} />
+                </div>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginBottom: 4 }}>
+                <span style={{ fontFamily: F.head, fontSize: 15, fontWeight: 800, color: C.text }}>
+                  Quests Locked
+                </span>
+                <Tag color={C.gold}>Lv 2</Tag>
+              </div>
+              <Mono size={8} color={C.mutedLight}>
+                Reach Level 2 to unlock daily & weekly quests
+              </Mono>
+            </div>
+          ) : (
+            <div style={{ marginTop: 10 }}>
+              <QuestList />
+            </div>
+          )}
         </div>
       </div>
 

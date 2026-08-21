@@ -61,6 +61,20 @@ export const nutritionResponseSchema = {
     name: { type: "STRING" },
     confidence: { type: "STRING" },
     notes: { type: "STRING" },
+    questions: {
+      type: "ARRAY",
+      items: {
+        type: "OBJECT",
+        required: ["question", "options"],
+        properties: {
+          question: { type: "STRING" },
+          options: {
+            type: "ARRAY",
+            items: { type: "STRING" },
+          },
+        },
+      },
+    },
     foods: {
       type: "ARRAY",
       items: {
@@ -180,6 +194,7 @@ interface NutritionData {
   name?: string;
   confidence?: string;
   notes?: string;
+  questions?: Array<{ question: string; options: string[] }>;
   foods?: Array<{
     name: string;
     portion: string;

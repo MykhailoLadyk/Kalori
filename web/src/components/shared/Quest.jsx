@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { C, F, alpha } from "../../lib/constants";
 import { Tag } from "./Primitives";
 import { IconStar } from "./DuoIcon";
 
 export function Quest({
+  id,
   Icon,
   name,
   description,
@@ -11,7 +13,23 @@ export function Quest({
   type,
   color = C.accent,
   done = false,
+  onReroll,
+  canAffordReroll = true,
+  rerollCost = 20,
 }) {
+  const [rerolling, setRerolling] = useState(false);
+
+  const handleRerollClick = async (e) => {
+    e.stopPropagation();
+    if (rerolling || !onReroll) return;
+    setRerolling(true);
+    try {
+      await onReroll(id, rerollCost);
+    } finally {
+      setRerolling(false);
+    }
+  };
+
   return (
     <div
       key={name}
@@ -74,18 +92,43 @@ export function Quest({
           <IconStar size={18} color={C.accent} />
         </div>
       ) : (
-        <div
-          className="font-mono font-bold"
-          style={{
-            background: alpha(color, 9),
-            border: `1px solid ${alpha(color, 21)}`,
-            borderRadius: 7,
-            padding: "3px 7px",
-            fontSize: 9,
-            color,
-          }}
-        >
-          +{xp}
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          {onReroll && (
+            <div
+              onClick={handleRerollClick}
+              title={`Reroll quest for ${rerollCost} coins`}
+              className="press cursor-pointer hover-card"
+              style={{
+                background: alpha(C.gold, rerolling ? 25 : 12),
+                border: `1px solid ${alpha(C.gold, 30)}`,
+                borderRadius: 7,
+                padding: "3px 6px",
+                display: "flex",
+                alignItems: "center",
+                gap: 3,
+                opacity: canAffordReroll ? 1 : 0.5,
+                cursor: canAffordReroll && !rerolling ? "pointer" : "not-allowed",
+              }}
+            >
+              <span style={{ fontSize: 9, lineHeight: 1 }}>{rerolling ? "⏳" : "🔄"}</span>
+              <span style={{ fontFamily: F.mono, fontSize: 8, fontWeight: 700, color: C.gold }}>
+                {rerollCost}
+              </span>
+            </div>
+          )}
+          <div
+            className="font-mono font-bold"
+            style={{
+              background: alpha(color, 9),
+              border: `1px solid ${alpha(color, 21)}`,
+              borderRadius: 7,
+              padding: "3px 7px",
+              fontSize: 9,
+              color,
+            }}
+          >
+            +{xp}
+          </div>
         </div>
       )}
     </div>

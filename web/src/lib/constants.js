@@ -769,8 +769,40 @@ export const themesDefinitions = [
   },
 ];
 
+export const avatarsDefinitions = [
+  { id: "initial", name: "Classic Initial", emoji: null, type: "initial", lvlUnlocked: 1, price: 0, bg: "linear-gradient(135deg, var(--c-accent), var(--c-pink))" },
+  { id: "spark", name: "Electric Spark", emoji: "⚡", type: "emoji", lvlUnlocked: 2, price: 100, bg: "linear-gradient(135deg, #F59E0B, #EF4444)" },
+  { id: "avocado", name: "Avocado Joy", emoji: "🥑", type: "emoji", lvlUnlocked: 3, price: 150, bg: "linear-gradient(135deg, #10B981, #059669)" },
+  { id: "tiger", name: "Fierce Tiger", emoji: "🐯", type: "emoji", lvlUnlocked: 5, price: 250, bg: "linear-gradient(135deg, #F97316, #EA580C)" },
+  { id: "royal", name: "Golden Crown", emoji: "👑", type: "emoji", lvlUnlocked: 7, price: 400, bg: "linear-gradient(135deg, #FCD34D, #D97706)" },
+  { id: "rocket", name: "Moon Rocket", emoji: "🚀", type: "emoji", lvlUnlocked: 10, price: 600, bg: "linear-gradient(135deg, #3B82F6, #8B5CF6)" },
+  { id: "diamond", name: "Crystal Gem", emoji: "💎", type: "emoji", lvlUnlocked: 15, price: 900, bg: "linear-gradient(135deg, #06B6D4, #3B82F6)" },
+  { id: "dragon", name: "Mythic Dragon", emoji: "🐉", type: "emoji", lvlUnlocked: 20, price: 1500, bg: "linear-gradient(135deg, #DC2626, #7C2D12)" },
+];
+
+export const flameColorsDefinitions = [
+  { id: "orange", name: "Classic Blaze", color: "#FB923C", lvlUnlocked: 1, price: 0 },
+  { id: "blue", name: "Frostfire Blue", color: "#4CC9F0", lvlUnlocked: 3, price: 150 },
+  { id: "pink", name: "Neon Magenta", color: "#F72585", lvlUnlocked: 5, price: 250 },
+  { id: "gold", name: "Golden Solar", color: "#FCD34D", lvlUnlocked: 7, price: 400 },
+  { id: "green", name: "Emerald Spark", color: "#39FF14", lvlUnlocked: 10, price: 600 },
+  { id: "purple", name: "Cosmic Void", color: "#A855F7", lvlUnlocked: 15, price: 900 },
+  { id: "crimson", name: "Blood Crimson", color: "#EF4444", lvlUnlocked: 20, price: 1500 },
+];
+
 export const shieldPacks = [
   { qty: "1×", price: 150 },
   { qty: "3×", price: 400 },
   { qty: "5×", price: 600 },
+];
+
+export const upgradesDefinitions = [
+  {
+    id: "expanded_quests",
+    name: "Expanded Quest Slots",
+    desc: "+1 Daily Quest slot (3 daily + 1 weekly).",
+    lvlUnlocked: 7,
+    price: 400,
+    icon: "quest",
+  },
 ];

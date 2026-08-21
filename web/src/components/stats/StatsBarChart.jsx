@@ -22,9 +22,12 @@ export default function StatsBarChart({ label, data, dates, max, color, goalV, u
     setSelectedBar((prev) => (prev === idx ? null : idx));
   };
 
+  const isWeight = unit === "kg" || unit === "lbs" || label?.toLowerCase().includes("weight");
+
   // Format tooltip value
   const formatValue = (v) => {
     if (unit === "L") return `${(v / 1000).toFixed(1)} L`;
+    if (isWeight) return `${Number(v).toFixed(1)} ${unit || ""}`;
     return `${v.toLocaleString()} ${unit || ""}`;
   };
 
@@ -58,9 +61,11 @@ export default function StatsBarChart({ label, data, dates, max, color, goalV, u
         <Mono size={9} color={C.mutedLight}>
           {label}
         </Mono>
-        <Mono size={8} color={C.soft}>
-          Goal: {unit === "L" ? `${(goalV / 1000).toFixed(1)} L` : goalV.toLocaleString()}
-        </Mono>
+        {!isWeight && goalV != null && (
+          <Mono size={8} color={C.soft}>
+            Goal: {unit === "L" ? `${(goalV / 1000).toFixed(1)} L` : goalV.toLocaleString()}
+          </Mono>
+        )}
       </div>
       <div
         style={{
@@ -72,7 +77,7 @@ export default function StatsBarChart({ label, data, dates, max, color, goalV, u
         }}
       >
         {/* Goal dashed line — positioned relative to the bar area */}
-        {goalV != null && (
+        {!isWeight && goalV != null && (
           <div
             style={{
               position: "absolute",

@@ -4,6 +4,8 @@ import { Mono } from "../../../components/shared/Primitives";
 import { useUser } from "../../../hooks/useUser";
 import { useNotifications } from "../../../context/NotificationContext";
 
+import Avatar from "../../../components/shared/Avatar";
+
 export default function ProfileModal({ handleClose }) {
   const { user, updateUser } = useUser();
   const { addNotification } = useNotifications();
@@ -62,36 +64,16 @@ export default function ProfileModal({ handleClose }) {
       </div>
 
       {/* avatar */}
-      {/* <div
+      <div
         style={{
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          marginBottom: 24,
+          marginBottom: 20,
         }}
       >
-        <div
-          style={{
-            width: 72,
-            height: 72,
-            borderRadius: 22,
-            background: `linear-gradient(135deg, ${C.accent}, ${C.pink})`,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontFamily: F.head,
-            fontSize: 30,
-            fontWeight: 900,
-            color: "#000",
-            boxShadow: `0 0 30px ${C.accentGlow}`,
-          }}
-        >
-          {form.name?.[0]?.toUpperCase() ?? "?"}
-        </div>
-        <Mono size={8} color={C.accent} style={{ marginTop: 8 }}>
-          CHANGE AVATAR
-        </Mono>
-      </div> */}
+        <Avatar user={{ ...user, name: form.name || user?.name }} size={72} fontSize={32} borderRadius={22} />
+      </div>
 
       {/* fields */}
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>

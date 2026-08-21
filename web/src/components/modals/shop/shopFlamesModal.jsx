@@ -7,7 +7,7 @@ import { useGameStats } from "../../../hooks/useGameStats";
 import { supabase } from "../../../services/supabase";
 
 export default function ShopFlamesModal({ flames = [], currentFlame, coins }) {
-  const { user, updateUser } = useUser();
+  const { user, updateUser, refreshUser } = useUser();
   const { refreshGameData } = useGameStats();
   const [error, setError] = useState(null);
   const [message, setMessage] = useState(null);
@@ -40,7 +40,7 @@ export default function ShopFlamesModal({ flames = [], currentFlame, coins }) {
 
       if (rpcError) throw rpcError;
 
-      await updateUser({ settings: { flame_color: flame.id } });
+      await refreshUser();
       await refreshGameData();
 
       setMessage(`Unlocked ${flame.name}!`);

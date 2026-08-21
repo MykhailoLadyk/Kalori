@@ -41,9 +41,9 @@ export default function Shop() {
 
   const coins = gameData.coins;
   const themesOwned = shopItems?.themesOwned ?? [];
-  const avatarsOwned = shopItems?.avatarsOwned ?? ["initial"];
-  const flameColorsOwned = shopItems?.flameColorsOwned ?? ["orange"];
-  const upgradesOwned = shopItems?.upgradesOwned ?? user?.settings?.upgrades_owned ?? [];
+  const avatarsOwned = Array.from(new Set([...(shopItems?.avatarsOwned || ["initial"]), ...(user?.settings?.avatars_owned || [])]));
+  const flameColorsOwned = Array.from(new Set([...(shopItems?.flameColorsOwned || ["orange"]), ...(user?.settings?.flame_colors_owned || [])]));
+  const upgradesOwned = Array.from(new Set([...(shopItems?.upgradesOwned || []), ...(user?.settings?.upgrades_owned || [])]));
 
   let level = 0;
   for (const [lvl, xp] of Object.entries(levels)) {

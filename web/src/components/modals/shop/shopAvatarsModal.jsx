@@ -7,7 +7,7 @@ import { useGameStats } from "../../../hooks/useGameStats";
 import { supabase } from "../../../services/supabase";
 
 export default function ShopAvatarsModal({ avatars = [], currentAvatar, coins, user }) {
-  const { updateUser } = useUser();
+  const { updateUser, refreshUser } = useUser();
   const { refreshGameData } = useGameStats();
   const [error, setError] = useState(null);
   const [message, setMessage] = useState(null);
@@ -40,7 +40,7 @@ export default function ShopAvatarsModal({ avatars = [], currentAvatar, coins, u
 
       if (rpcError) throw rpcError;
 
-      await updateUser({ settings: { avatar: avatar.id } });
+      await refreshUser();
       await refreshGameData();
 
       setMessage(`Unlocked ${avatar.name}!`);

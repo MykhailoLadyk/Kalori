@@ -8,7 +8,7 @@ import { supabase } from "../../../services/supabase";
 
 export default function ShopUpgradesModal({ upgrades = [], coins, user }) {
   const { refreshGameData } = useGameStats();
-  const { updateUser } = useUser();
+  const { refreshUser } = useUser();
   const [error, setError] = useState(null);
   const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -32,6 +32,7 @@ export default function ShopUpgradesModal({ upgrades = [], coins, user }) {
 
       if (rpcError) throw rpcError;
 
+      await refreshUser();
       await refreshGameData();
       setMessage(`Unlocked ${upgrade.name}!`);
       setTimeout(() => setMessage(null), 3000);

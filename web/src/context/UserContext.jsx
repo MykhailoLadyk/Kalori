@@ -59,6 +59,25 @@ export function UserProvider({ children }) {
     };
   }, []);
 
+  const refreshUser = async () => {
+    try {
+      const userData = await fetchUser();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (userData) {
+        setUser({
+          ...userData,
+          userAuth: true,
+          email: session?.user?.email,
+        });
+      }
+      return userData;
+    } catch (e) {
+      console.error("Failed to refresh user profile", e);
+    }
+  };
+
   const handleUpdateUser = async (updates) => {
     const previousUser = user;
     try {
@@ -96,7 +115,7 @@ export function UserProvider({ children }) {
   };
 
   return (
-    <UserContext.Provider value={{ user, loading, updating, error, updateUser: handleUpdateUser }}>
+    <UserContext.Provider value={{ user, loading, updating, error, updateUser: handleUpdateUser, refreshUser }}>
       {children}
     </UserContext.Provider>
   );

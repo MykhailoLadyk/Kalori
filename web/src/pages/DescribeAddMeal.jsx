@@ -1,8 +1,14 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { C, F, alpha } from "../lib/constants";
-import { Mono } from "../components/shared/Primitives";
+import { Mono, Tag } from "../components/shared/Primitives";
 import analyzeFoodDesc from "../services/analyzeFoodDesc";
+import { useUser } from "../hooks/useUser";
+import { useGameStats } from "../hooks/useGameStats";
+import { IconSparkles, IconCoin, IconCrown } from "../components/shared/DuoIcon";
+import { Modal } from "../components/modals/Modal";
+import InsufficientCoinsModal from "../components/modals/home/InsufficientCoinsModal";
+import { AI_COIN_COST } from "../services/subscriptionService";
 
 const ChevronLeft = () => (
   <svg
@@ -38,10 +44,16 @@ const Spinner = ({ color = "#000", size = 16 }) => (
 
 export default function DescribeAddMeal() {
   const navigate = useNavigate();
+  const { isPro } = useUser();
+  const { gameData, deductCoins } = useGameStats();
+
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
+  const [showCoinGate, setShowCoinGate] = useState(false);
+
+  const userCoins = gameData?.coins || 0;
 
   const loadingSteps = ["Reading description...", "Searching database...", "Estimating calories...", "Calculating macros..."];
   const [loadingStepIndex, setLoadingStepIndex] = useState(0);
@@ -60,10 +72,22 @@ export default function DescribeAddMeal() {
 
   const handleAnalyze = async () => {
     if (!text.trim()) return;
+
+    if (!isPro && userCoins < AI_COIN_COST) {
+      setShowCoinGate(true);
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
       const parsed = await analyzeFoodDesc(text);
+
+      // Deduct coins for free tier users
+      if (!isPro) {
+        await deductCoins(AI_COIN_COST, "Meal Description Scan");
+      }
+
       navigate("/add-meal/confirm", { state: { meal: parsed, description: text } });
     } catch (err) {
       if (err.code === "RATE_LIMITED") {
@@ -85,28 +109,63 @@ export default function DescribeAddMeal() {
     }
   };
 
+
   return (
     <div
       className="flex flex-col flex-1"
       style={{ animation: "fadeIn 0.22s ease both" }}
     >
-      <div className="flex items-center" style={{ gap: 12, padding: "8px 22px 16px" }}>
+      <div className="flex items-center justify-between" style={{ padding: "8px 22px 16px" }}>
+        <div className="flex items-center" style={{ gap: 12 }}>
+          <div
+            onClick={() => navigate("/")}
+            className="press flex items-center justify-center bg-card"
+            style={{
+              width: 36,
+              height: 36,
+              border: `1px solid ${C.border}`,
+              borderRadius: 11,
+              color: C.soft,
+              cursor: "pointer",
+            }}
+          >
+            <ChevronLeft />
+          </div>
+          <div className="font-head font-black text-primary" style={{ fontSize: 18 }}>
+            Describe Meal
+          </div>
+        </div>
+
+        {/* Pro / Coin pill */}
         <div
-          onClick={() => navigate("/")}
-          className="press flex items-center justify-center bg-card"
+          onClick={!isPro ? () => navigate("/premium") : undefined}
+          className={!isPro ? "press" : ""}
           style={{
-            width: 36,
-            height: 36,
-            border: `1px solid ${C.border}`,
-            borderRadius: 11,
-            color: C.soft,
-            cursor: "pointer",
+            background: isPro ? alpha(C.accent, 12) : alpha(C.gold, 12),
+            border: `1px solid ${isPro ? alpha(C.accent, 30) : alpha(C.gold, 30)}`,
+            borderRadius: 16,
+            padding: "5px 10px",
+            display: "flex",
+            alignItems: "center",
+            gap: 5,
+            cursor: !isPro ? "pointer" : "default",
           }}
         >
-          <ChevronLeft />
-        </div>
-        <div className="font-head font-black text-primary" style={{ fontSize: 18 }}>
-          Describe Your Meal
+          {isPro ? (
+            <>
+              <IconCrown size={13} color={C.gold} />
+              <span style={{ fontFamily: F.mono, fontSize: 8, fontWeight: 800, color: C.accent }}>
+                PRO · 100/DAY
+              </span>
+            </>
+          ) : (
+            <>
+              <IconCoin size={13} color={C.gold} />
+              <span style={{ fontFamily: F.mono, fontSize: 8, fontWeight: 800, color: C.gold }}>
+                50 COINS ({userCoins})
+              </span>
+            </>
+          )}
         </div>
       </div>
 
@@ -117,6 +176,7 @@ export default function DescribeAddMeal() {
               Tell us what you ate in plain language. We'll estimate the
               calories and macros.
             </div>
+
 
             <textarea
               value={text}
@@ -161,9 +221,14 @@ export default function DescribeAddMeal() {
             >
               {loading && <Spinner color={C.accent} size={14} />}
               <span className="font-mono font-bold" style={{ fontSize: 11, color: loading ? C.accent : "#000" }}>
-                {loading ? loadingSteps[loadingStepIndex].toUpperCase() : "ANALYZE"}
+                {loading
+                  ? loadingSteps[loadingStepIndex].toUpperCase()
+                  : isPro
+                  ? "ANALYZE MEAL (PRO)"
+                  : `ANALYZE MEAL (${AI_COIN_COST} 🪙)`}
               </span>
             </div>
+
           </>
         ) : (
           <>
@@ -255,7 +320,12 @@ export default function DescribeAddMeal() {
           </>
         )}
       </div>
+
+      <Modal id={showCoinGate} close={() => setShowCoinGate(false)}>
+        <InsufficientCoinsModal coins={userCoins} handleClose={() => setShowCoinGate(false)} />
+      </Modal>
     </div>
   );
 }
+
 

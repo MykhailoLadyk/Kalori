@@ -1,7 +1,8 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { ErrorCode, jsonError } from "./errors.ts";
 
-const DAILY_LIMIT = 20;
+const FREE_DAILY_LIMIT = 20;
+const PRO_DAILY_LIMIT = 100;
 const GLOBAL_LIMIT = 2000;
 
 export interface RateLimitResult {
@@ -16,6 +17,7 @@ export interface RateLimitResult {
  * Atomically checks and increments both the user's daily AI usage and the project-wide global usage.
  *
  * Uses the `check_and_increment_ai_usage_v2` RPC which performs atomic checks and increments.
+ * Sets 100 scans/day for Pro subscribers, and 20 scans/day for Free users.
  *
  * The server determines the date (UTC), not the client.
  *
@@ -24,10 +26,30 @@ export interface RateLimitResult {
 export async function checkRateLimit(
   supabase: SupabaseClient,
 ): Promise<RateLimitResult | Response> {
+  let dailyLimit = FREE_DAILY_LIMIT;
+
+  try {
+    const { data: sub } = await supabase
+      .from("subscriptions")
+      .select("status, current_period_end")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (sub && (sub.status === "active" || sub.status === "trialing")) {
+      if (!sub.current_period_end || new Date(sub.current_period_end).getTime() > Date.now()) {
+        dailyLimit = PRO_DAILY_LIMIT;
+      }
+    }
+  } catch (err) {
+    console.warn("Could not check subscription status for rate limiter, defaulting to free limit:", err);
+  }
+
   const { data, error } = await supabase.rpc("check_and_increment_ai_usage_v2", {
-    p_daily_limit: DAILY_LIMIT,
+    p_daily_limit: dailyLimit,
     p_global_limit: GLOBAL_LIMIT,
   });
+
 
   if (error) {
     console.error("Rate limit RPC error:", error);

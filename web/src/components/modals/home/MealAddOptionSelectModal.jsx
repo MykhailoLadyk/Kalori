@@ -1,16 +1,21 @@
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { C, F, alpha } from "../../../lib/constants";
-import { Mono } from "../../../components/shared/Primitives";
+import { Mono, Tag } from "../../../components/shared/Primitives";
 import analyzeFood from "../../../services/analyzeFood";
 import { useFavorites } from "../../../hooks/useFavorites";
-import { IconStar, IconStarOutline } from "../../shared/DuoIcon";
+import { useUser } from "../../../hooks/useUser";
+import { useGameStats } from "../../../hooks/useGameStats";
+import { IconStar, IconStarOutline, IconSparkles, IconCoin, IconCrown } from "../../shared/DuoIcon";
+import InsufficientCoinsModal from "./InsufficientCoinsModal";
+import { AI_COIN_COST } from "../../../services/subscriptionService";
 
 const OPTIONS = [
   {
     key: "photo",
     label: "Photo",
     sub: "Take a photo of your meal",
+    isAi: true,
     icon: (color) => (
       <svg width="26" height="26" viewBox="0 0 256 256" fill="none">
         <path
@@ -35,6 +40,7 @@ const OPTIONS = [
     key: "describe",
     label: "Describe",
     sub: "Describe what you ate",
+    isAi: true,
     icon: (color) => (
       <svg width="26" height="26" viewBox="0 0 256 256" fill="none">
         <path
@@ -54,6 +60,7 @@ const OPTIONS = [
     key: "album",
     label: "Album",
     sub: "Choose from your gallery",
+    isAi: true,
     icon: (color) => (
       <svg width="26" height="26" viewBox="0 0 256 256" fill="none">
         <path
@@ -73,6 +80,7 @@ const OPTIONS = [
     key: "manual",
     label: "Manual",
     sub: "Enter nutrition details",
+    isAi: false,
     icon: (color) => (
       <svg width="26" height="26" viewBox="0 0 256 256" fill="none">
         <path
@@ -99,12 +107,22 @@ const Spinner = ({ color }) => (
 
 export function MealAddOptionSelectModal() {
   const navigate = useNavigate();
+  const { isPro } = useUser();
+  const { gameData, deductCoins } = useGameStats();
   const fileInputRef = useRef(null);
   const [albumLoading, setAlbumLoading] = useState(false);
   const [error, setError] = useState(null);
-  const { favorites, recentMeals, loading: favsLoading } = useFavorites();
+  const [showCoinGate, setShowCoinGate] = useState(false);
+  const { favorites, recentMeals } = useFavorites();
 
-  const handleOptionClick = (key) => {
+  const userCoins = gameData?.coins || 0;
+
+  const handleOptionClick = (key, isAi) => {
+    if (isAi && !isPro && userCoins < AI_COIN_COST) {
+      setShowCoinGate(true);
+      return;
+    }
+
     if (key === "album") {
       fileInputRef.current?.click();
       return;
@@ -116,6 +134,12 @@ export function MealAddOptionSelectModal() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    if (!isPro && userCoins < AI_COIN_COST) {
+      setShowCoinGate(true);
+      e.target.value = "";
+      return;
+    }
+
     setAlbumLoading(true);
     setError(null);
 
@@ -124,6 +148,11 @@ export function MealAddOptionSelectModal() {
       try {
         const photoDataUrl = reader.result;
         const parsed = await analyzeFood(photoDataUrl);
+
+        // Deduct coins for free tier
+        if (!isPro) {
+          await deductCoins(AI_COIN_COST, "Photo Album Scan");
+        }
 
         navigate("/add-meal/confirm", { state: { meal: parsed, photoData: photoDataUrl, isAlbum: true } });
       } catch (err) {
@@ -139,6 +168,11 @@ export function MealAddOptionSelectModal() {
     reader.readAsDataURL(file);
     e.target.value = "";
   };
+
+  if (showCoinGate) {
+    return <InsufficientCoinsModal coins={userCoins} handleClose={() => setShowCoinGate(false)} />;
+  }
+
 
   return (
     <div>
@@ -279,8 +313,66 @@ export function MealAddOptionSelectModal() {
         </div>
       )}
 
+      {/* Pro Membership / Upgrade Banner */}
+      {isPro ? (
+        <div
+          onClick={() => navigate("/premium")}
+          className="hover-card press"
+          style={{
+            background: alpha(C.accent, 10),
+            border: `1px solid ${alpha(C.accent, 30)}`,
+            borderRadius: 14,
+            padding: "9px 14px",
+            marginBottom: 14,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            cursor: "pointer",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+            <IconCrown size={15} color={C.gold} />
+            <span style={{ fontFamily: F.mono, fontSize: 9, fontWeight: 800, color: C.accent }}>
+              PRO MEMBER · 100 AI SCANS/DAY
+            </span>
+          </div>
+          <span style={{ color: C.accent, fontSize: 14, fontWeight: "bold" }}>›</span>
+        </div>
+      ) : (
+        <div
+          onClick={() => navigate("/premium")}
+          className="hover-card press"
+          style={{
+            background: `linear-gradient(135deg, ${alpha(C.accent, 14)}, ${alpha(C.gold, 10)})`,
+            border: `1px solid ${alpha(C.accent, 35)}`,
+            borderRadius: 14,
+            padding: "10px 14px",
+            marginBottom: 14,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            cursor: "pointer",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <IconSparkles size={16} color={C.accent} />
+            <div>
+              <div style={{ fontFamily: F.head, fontSize: 12, fontWeight: 800, color: C.text }}>
+                Upgrade to Kalori Pro
+              </div>
+              <Mono size={7} color={C.soft}>
+                High-limit AI meal scanning with 0 coin cost
+              </Mono>
+            </div>
+          </div>
+          <span style={{ fontFamily: F.mono, fontSize: 9, fontWeight: 800, color: C.accent }}>
+            VIEW PRO ›
+          </span>
+        </div>
+      )}
+
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        {OPTIONS.map(({ key, label, sub, icon, color }) => {
+        {OPTIONS.map(({ key, label, sub, isAi, icon, color }) => {
           const isAlbum = key === "album";
           const isLoading = isAlbum && albumLoading;
           const isDisabled = albumLoading && !isAlbum;
@@ -288,7 +380,7 @@ export function MealAddOptionSelectModal() {
           return (
             <div
               key={key}
-              onClick={() => !isDisabled && !isLoading && handleOptionClick(key)}
+              onClick={() => !isDisabled && !isLoading && handleOptionClick(key, isAi)}
               className={isDisabled || isLoading ? "" : "hover-card press"}
               style={{
                 display: "flex",
@@ -322,8 +414,32 @@ export function MealAddOptionSelectModal() {
               </div>
 
               <div style={{ flex: 1 }}>
-                <div style={{ fontFamily: F.body, fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 3 }}>
-                  {label}
+                <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 3 }}>
+                  <span style={{ fontFamily: F.body, fontSize: 14, fontWeight: 700, color: C.text }}>
+                    {label}
+                  </span>
+                  {isAi && (
+                    isPro ? (
+                      <Tag color={C.accent}>PRO</Tag>
+                    ) : (
+                      <div
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 3,
+                          background: alpha(C.gold, 12),
+                          border: `1px solid ${alpha(C.gold, 25)}`,
+                          borderRadius: 6,
+                          padding: "1px 6px",
+                        }}
+                      >
+                        <IconCoin size={10} color={C.gold} />
+                        <span style={{ fontFamily: F.mono, fontSize: 8, fontWeight: 800, color: C.gold }}>
+                          50
+                        </span>
+                      </div>
+                    )
+                  )}
                 </div>
                 <Mono size={8} color={C.muted}>
                   {sub}
@@ -352,6 +468,7 @@ export function MealAddOptionSelectModal() {
           );
         })}
       </div>
+
 
       {error && (
         <div

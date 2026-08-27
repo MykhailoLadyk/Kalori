@@ -114,6 +114,7 @@ export default function Nav() {
           return (
             <div
               key={id}
+              data-tour={`nav-${id}`}
               onClick={() => {
                 setPopped(id);
                 setTimeout(() => setPopped(null), 400);

@@ -1,14 +1,18 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useMemo } from "react";
 import { fetchUser, updateUser } from "../services/userService";
+import { fetchUserSubscription, isProUser } from "../services/subscriptionService";
 import { supabase } from "../services/supabase";
 
 export const UserContext = createContext(null);
 
 export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [subscription, setSubscription] = useState(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [error, setError] = useState(null);
+
+  const isPro = useMemo(() => isProUser(subscription), [subscription]);
 
   useEffect(() => {
     let mounted = true;
@@ -21,16 +25,24 @@ export function UserProvider({ children }) {
         const { data: { session } } = await supabase.auth.getSession();
         
         if (session) {
-          const userData = await fetchUser();
+          const [userData, subData] = await Promise.all([
+            fetchUser(),
+            fetchUserSubscription(),
+          ]);
           if (mounted) {
             setUser({ 
               ...userData, 
               userAuth: true,
-              email: session.user.email 
+              email: session.user.email,
+              subscription: subData,
             });
+            setSubscription(subData);
           }
         } else {
-          if (mounted) setUser(null);
+          if (mounted) {
+            setUser(null);
+            setSubscription(null);
+          }
         }
       } catch (error) {
         if (mounted) {
@@ -48,7 +60,10 @@ export function UserProvider({ children }) {
         if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
           loadUserProfile();
         } else if (event === "SIGNED_OUT") {
-          if (mounted) setUser(null);
+          if (mounted) {
+            setUser(null);
+            setSubscription(null);
+          }
         }
       }
     );
@@ -59,9 +74,24 @@ export function UserProvider({ children }) {
     };
   }, []);
 
+
+  const refreshSubscription = async () => {
+    try {
+      const subData = await fetchUserSubscription();
+      setSubscription(subData);
+      setUser((prev) => (prev ? { ...prev, subscription: subData } : null));
+      return subData;
+    } catch (e) {
+      console.error("Failed to refresh subscription", e);
+    }
+  };
+
   const refreshUser = async () => {
     try {
-      const userData = await fetchUser();
+      const [userData, subData] = await Promise.all([
+        fetchUser(),
+        fetchUserSubscription(),
+      ]);
       const {
         data: { session },
       } = await supabase.auth.getSession();
@@ -70,7 +100,9 @@ export function UserProvider({ children }) {
           ...userData,
           userAuth: true,
           email: session?.user?.email,
+          subscription: subData,
         });
+        setSubscription(subData);
       }
       return userData;
     } catch (e) {
@@ -103,6 +135,7 @@ export function UserProvider({ children }) {
       const dbUpdates = { ...fullUpdates };
       delete dbUpdates.userAuth;
       delete dbUpdates.email;
+      delete dbUpdates.subscription;
       
       await updateUser(dbUpdates);
     } catch (error) {
@@ -115,8 +148,21 @@ export function UserProvider({ children }) {
   };
 
   return (
-    <UserContext.Provider value={{ user, loading, updating, error, updateUser: handleUpdateUser, refreshUser }}>
+    <UserContext.Provider
+      value={{
+        user,
+        subscription,
+        isPro,
+        loading,
+        updating,
+        error,
+        updateUser: handleUpdateUser,
+        refreshUser,
+        refreshSubscription,
+      }}
+    >
       {children}
     </UserContext.Provider>
   );
 }
+

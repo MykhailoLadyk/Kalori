@@ -10,11 +10,15 @@ import {
   IconFire,
   IconCheck,
   IconX,
+  IconSparkles,
+  IconCrown,
+  IconInfo,
 } from "./DuoIcon";
 
 const CONFIGS = {
   xp: { color: C.accent, icon: IconLightning, duration: 3000 },
   coins: { color: C.gold, icon: IconCoin, duration: 3000 },
+  coins_deducted: { color: C.gold, icon: IconCoin, duration: 3500 },
   quest: { color: C.accent, icon: IconTarget, duration: 5000 },
   achievement: { color: C.gold, icon: IconTrophy, duration: 6500 },
   levelup: { color: C.accent, icon: IconArrowUp, duration: 6500 },
@@ -22,15 +26,18 @@ const CONFIGS = {
   streak: { color: C.orange, icon: IconFire, duration: 5500 },
   success: { color: "#10B981", icon: IconCheck, duration: 4000 },
   error: { color: C.red || "#EF4444", icon: IconX, duration: 4000 },
+  info: { color: C.accent, icon: IconInfo, duration: 4000 },
+  pro: { color: C.gold, icon: IconCrown, duration: 4500 },
 };
 
 function ToastContent({ notification }) {
   const { type, amount, name, level, days, xp, coins } = notification;
-  const cfg = CONFIGS[type] ?? CONFIGS.xp;
+  const cfg = CONFIGS[type] ?? CONFIGS.info;
   const color = cfg.color;
 
   // small pill for XP and coins
-  if (type === "xp" || type === "coins") {
+  if (type === "xp" || type === "coins" || type === "coins_deducted") {
+    const isDeducted = type === "coins_deducted" || (amount && amount < 0);
     return (
       <div
         className="flex items-center bg-panel"
@@ -44,11 +51,12 @@ function ToastContent({ notification }) {
       >
         <span className="flex" style={{ color }}><cfg.icon size={16} /></span>
         <span className="font-mono font-bold" style={{ fontSize: 12, color }}>
-          +{amount} {type === "xp" ? "XP" : "coins"}
+          {name || `${isDeducted ? amount : `+${amount}`} ${type === "xp" ? "XP" : "coins"}`}
         </span>
       </div>
     );
   }
+
 
   // target reached card
   if (type === "target") {
@@ -88,8 +96,8 @@ function ToastContent({ notification }) {
     );
   }
 
-  // success / error generic toast
-  if (type === "success" || type === "error") {
+  // success / error / info / pro generic toast
+  if (type === "success" || type === "error" || type === "info" || type === "pro") {
     return (
       <div
         className="flex items-center bg-panel"
@@ -103,11 +111,12 @@ function ToastContent({ notification }) {
       >
         <span className="flex" style={{ color }}><cfg.icon size={18} /></span>
         <span className="font-body font-semibold text-primary" style={{ fontSize: 13 }}>
-          {name || (type === "success" ? "Success" : "Error")}
+          {name || (type === "success" ? "Success" : type === "info" ? "Info" : type === "pro" ? "Kalori Pro" : "Error")}
         </span>
       </div>
     );
   }
+
 
   // medium card for quest
   if (type === "quest") {

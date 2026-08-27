@@ -34,6 +34,7 @@ export function HomeMacros() {
       }}
     >
       <div
+        data-tour="macro-bars"
         style={{
           background: C.card,
           borderRadius: 18,

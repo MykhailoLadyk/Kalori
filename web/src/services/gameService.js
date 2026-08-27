@@ -23,6 +23,24 @@ export const syncGameProgress = async (localDate, isMealLog = false) => {
   return data;
 };
 
+export const deductCoins = async (amount = 50) => {
+  const { data, error } = await supabase.rpc("deduct_coins", {
+    p_amount: amount,
+  });
+
+  if (error) {
+    console.warn(
+      "deduct_coins RPC returned an error (or is not yet installed in Supabase). Using optimistic client balance update. Run the deduct_coins SQL function in Supabase SQL editor to enable server-side deduction.",
+      error.message
+    );
+    // Return null to let the caller apply optimistic balance update without crashing
+    return null;
+  }
+
+  return data;
+};
+
+
 export const applyStreakDecay = async (localToday) => {
   const { data, error } = await supabase.rpc("apply_streak_decay", {
     p_local_today: localToday,
@@ -30,4 +48,3 @@ export const applyStreakDecay = async (localToday) => {
   if (error) throw new Error(error.message);
   return data;
 };
-

@@ -1,6 +1,6 @@
 import { createContext, useState, useEffect, useRef } from "react";
 import { useNotifications } from "./NotificationContext";
-import { fetchGameData, syncGameProgress, applyStreakDecay } from "../services/gameService";
+import { fetchGameData, syncGameProgress, applyStreakDecay, deductCoins as deductCoinsService } from "../services/gameService";
 import { achievements as achievementDefinitions, quests as questDefinitions } from "../lib/constants";
 import { useUser } from "../hooks/useUser";
 import { supabase } from "../services/supabase";
@@ -30,11 +30,7 @@ const defaultAchievements = [
   { id: 20, progress: 0 },
 ];
 
-const defaultQuests = [
-  { id: 2, progress: 0 },
-  { id: 8, progress: 0 },
-  { id: 20, progress: 0 },
-];
+const defaultQuests = [];
 
 export function GameProvider({ children }) {
   const { user } = useUser();
@@ -75,17 +71,20 @@ export function GameProvider({ children }) {
         if (data.flameColorsOwned || data.flame_colors_owned)
           setShopItems((prev) => ({ ...prev, flameColorsOwned: data.flameColorsOwned || data.flame_colors_owned }));
         if (user?.settings?.avatars_owned)
-          setShopItems((prev) => ({ ...prev, avatarsOwned: Array.from(new Set([...prev.avatarsOwned, ...user.settings.avatars_owned])) }));
+          setShopItems((prev) => ({
+            ...prev,
+            avatarsOwned: Array.from(new Set([...prev.avatarsOwned, ...user.settings.avatars_owned])),
+          }));
         if (user?.settings?.flame_colors_owned)
-          setShopItems((prev) => ({ ...prev, flameColorsOwned: Array.from(new Set([...prev.flameColorsOwned, ...user.settings.flame_colors_owned])) }));
+          setShopItems((prev) => ({
+            ...prev,
+            flameColorsOwned: Array.from(new Set([...prev.flameColorsOwned, ...user.settings.flame_colors_owned])),
+          }));
         if (data.upgrades || data.upgrades_owned || user?.settings?.upgrades_owned)
           setShopItems((prev) => ({
             ...prev,
             upgradesOwned: Array.from(
-              new Set([
-                ...(data.upgrades || data.upgrades_owned || []),
-                ...(user?.settings?.upgrades_owned || []),
-              ]),
+              new Set([...(data.upgrades || data.upgrades_owned || []), ...(user?.settings?.upgrades_owned || [])]),
             ),
           }));
         if (data.streak_shields !== undefined)
@@ -102,75 +101,61 @@ export function GameProvider({ children }) {
         }
 
         // --- Quest Lazy Loading Logic ---
-        let currentQuests = data.quests || defaultQuests;
+        if ((data.level || 1) >= 2) {
+          let currentQuests = data.quests || defaultQuests;
 
-        let needsDaily = false;
-        let needsWeekly = false;
+          let needsDaily = false;
+          let needsWeekly = false;
 
-        if (data.last_daily_refresh !== today) needsDaily = true;
+          if (data.last_daily_refresh !== today) needsDaily = true;
 
-        const daysSinceWeekly = getDaysBetweenDates(data.last_weekly_refresh, today);
-        if (!data.last_weekly_refresh || daysSinceWeekly >= 7) needsWeekly = true;
+          const daysSinceWeekly = getDaysBetweenDates(data.last_weekly_refresh, today);
+          if (!data.last_weekly_refresh || daysSinceWeekly >= 7) needsWeekly = true;
 
-        if (needsDaily || needsWeekly) {
-          const hasExpandedQuests =
-            (data.upgrades || []).includes("expanded_quests") ||
-            (data.upgrades_owned || []).includes("expanded_quests") ||
-            (user?.settings?.upgrades_owned || []).includes("expanded_quests");
-          const dailySlots = hasExpandedQuests ? 3 : 2;
+          if (needsDaily || needsWeekly) {
+            const hasExpandedQuests =
+              (data.upgrades || []).includes("expanded_quests") ||
+              (data.upgrades_owned || []).includes("expanded_quests") ||
+              (user?.settings?.upgrades_owned || []).includes("expanded_quests");
+            const dailySlots = hasExpandedQuests ? 3 : 2;
 
-          const dailyPool = questDefinitions.filter((q) => q.type === "Daily");
-          const weeklyPool = questDefinitions.filter((q) => q.type === "Weekly");
+            const dailyPool = questDefinitions.filter((q) => q.type === "Daily");
+            const weeklyPool = questDefinitions.filter((q) => q.type === "Weekly");
 
-          let newDailyQuests = currentQuests.filter(
-            (q) => questDefinitions.find((d) => d.id === q.id)?.type === "Daily",
-          );
-          let newWeeklyQuests = currentQuests.filter(
-            (q) => questDefinitions.find((d) => d.id === q.id)?.type === "Weekly",
-          );
+            let newDailyQuests = currentQuests.filter(
+              (q) => questDefinitions.find((d) => d.id === q.id)?.type === "Daily",
+            );
+            let newWeeklyQuests = currentQuests.filter(
+              (q) => questDefinitions.find((d) => d.id === q.id)?.type === "Weekly",
+            );
 
-          if (needsDaily) {
-            const shuffled = [...dailyPool].sort(() => 0.5 - Math.random());
-            newDailyQuests = shuffled.slice(0, dailySlots).map((q) => ({ id: q.id, progress: 0 }));
+            if (needsDaily) {
+              const shuffled = [...dailyPool].sort(() => 0.5 - Math.random());
+              newDailyQuests = shuffled.slice(0, dailySlots).map((q) => ({ id: q.id, progress: 0 }));
+            }
+            if (needsWeekly) {
+              const shuffled = [...weeklyPool].sort(() => 0.5 - Math.random());
+              newWeeklyQuests = shuffled.slice(0, 1).map((q) => ({ id: q.id, progress: 0 }));
+            }
+
+            currentQuests = [...newDailyQuests, ...newWeeklyQuests];
+            setQuests(currentQuests);
+            questsRef.current = currentQuests;
+
+            // Fire RPC to securely update db
+            await supabase.rpc("refresh_quests", {
+              new_quests: currentQuests,
+              is_daily_refresh: needsDaily,
+              is_weekly_refresh: needsWeekly,
+            });
+          } else {
+            setQuests(currentQuests);
+            questsRef.current = currentQuests;
           }
-          if (needsWeekly) {
-            const shuffled = [...weeklyPool].sort(() => 0.5 - Math.random());
-            newWeeklyQuests = shuffled.slice(0, 1).map((q) => ({ id: q.id, progress: 0 }));
-          }
-
-          currentQuests = [...newDailyQuests, ...newWeeklyQuests];
-          setQuests(currentQuests);
-          questsRef.current = currentQuests;
-
-          // Fire RPC to securely update db
-          await supabase.rpc("refresh_quests", {
-            new_quests: currentQuests,
-            is_daily_refresh: needsDaily,
-            is_weekly_refresh: needsWeekly,
-          });
-        } else {
-          setQuests(currentQuests);
-          questsRef.current = currentQuests;
         }
 
-        // Remove array fields from base gameData state so it's clean
-        const baseData = { ...data };
-        delete baseData.achievements;
-        delete baseData.quests;
-        delete baseData.themesOwned;
-        delete baseData.themes_owned;
-        delete baseData.avatarsOwned;
-        delete baseData.avatars_owned;
-        delete baseData.flameColorsOwned;
-        delete baseData.flame_colors_owned;
-        delete baseData.upgrades;
-        delete baseData.upgrades_owned;
-        delete baseData.streak_shields;
-        delete baseData.last_daily_refresh;
-        delete baseData.last_weekly_refresh;
-
-        setGameData(baseData);
-        gameDataRef.current = baseData;
+        setGameData(data);
+        gameDataRef.current = data;
       } catch (error) {
         setError("Failed to fetch game data");
       } finally {
@@ -178,7 +163,12 @@ export function GameProvider({ children }) {
       }
     };
     loadGameData();
-  }, [user?.userAuth, user?.settings?.avatars_owned, user?.settings?.flame_colors_owned, user?.settings?.upgrades_owned]);
+  }, [
+    user?.userAuth,
+    user?.settings?.avatars_owned,
+    user?.settings?.flame_colors_owned,
+    user?.settings?.upgrades_owned,
+  ]);
 
   const refreshGameData = async () => {
     try {
@@ -198,39 +188,26 @@ export function GameProvider({ children }) {
       if (data.flameColorsOwned || data.flame_colors_owned)
         setShopItems((prev) => ({ ...prev, flameColorsOwned: data.flameColorsOwned || data.flame_colors_owned }));
       if (user?.settings?.avatars_owned)
-        setShopItems((prev) => ({ ...prev, avatarsOwned: Array.from(new Set([...prev.avatarsOwned, ...user.settings.avatars_owned])) }));
+        setShopItems((prev) => ({
+          ...prev,
+          avatarsOwned: Array.from(new Set([...prev.avatarsOwned, ...user.settings.avatars_owned])),
+        }));
       if (user?.settings?.flame_colors_owned)
-        setShopItems((prev) => ({ ...prev, flameColorsOwned: Array.from(new Set([...prev.flameColorsOwned, ...user.settings.flame_colors_owned])) }));
+        setShopItems((prev) => ({
+          ...prev,
+          flameColorsOwned: Array.from(new Set([...prev.flameColorsOwned, ...user.settings.flame_colors_owned])),
+        }));
       if (data.upgrades || data.upgrades_owned || user?.settings?.upgrades_owned)
         setShopItems((prev) => ({
           ...prev,
           upgradesOwned: Array.from(
-            new Set([
-              ...(data.upgrades || data.upgrades_owned || []),
-              ...(user?.settings?.upgrades_owned || []),
-            ]),
+            new Set([...(data.upgrades || data.upgrades_owned || []), ...(user?.settings?.upgrades_owned || [])]),
           ),
         }));
-      if (data.streak_shields !== undefined)
-        setShopItems((prev) => ({ ...prev, streak_shields: data.streak_shields }));
+      if (data.streak_shields !== undefined) setShopItems((prev) => ({ ...prev, streak_shields: data.streak_shields }));
 
-      const baseData = { ...data };
-      delete baseData.achievements;
-      delete baseData.quests;
-      delete baseData.themesOwned;
-      delete baseData.themes_owned;
-      delete baseData.avatarsOwned;
-      delete baseData.avatars_owned;
-      delete baseData.flameColorsOwned;
-      delete baseData.flame_colors_owned;
-      delete baseData.upgrades;
-      delete baseData.upgrades_owned;
-      delete baseData.streak_shields;
-      delete baseData.last_daily_refresh;
-      delete baseData.last_weekly_refresh;
-
-      setGameData(baseData);
-      gameDataRef.current = baseData;
+      setGameData(data);
+      gameDataRef.current = data;
     } catch (e) {
       setError("Failed to refresh game data");
     }
@@ -239,6 +216,7 @@ export function GameProvider({ children }) {
   const handleSyncProgress = async (localDate, isMealLog = false) => {
     try {
       setUpdating(true);
+      const prevLevel = gameDataRef.current?.level || 1;
       const result = await syncGameProgress(localDate, isMealLog);
 
       const newGameData = {
@@ -252,7 +230,20 @@ export function GameProvider({ children }) {
       gameDataRef.current = newGameData;
       setGameData(newGameData);
 
-      if (result.quests) {
+      if (result.level >= 2 && prevLevel < 2) {
+        const dailyPool = questDefinitions.filter((q) => q.type === "Daily");
+        const weeklyPool = questDefinitions.filter((q) => q.type === "Weekly");
+        const newDaily = [...dailyPool].sort(() => 0.5 - Math.random()).slice(0, 2).map((q) => ({ id: q.id, progress: 0 }));
+        const newWeekly = [...weeklyPool].sort(() => 0.5 - Math.random()).slice(0, 1).map((q) => ({ id: q.id, progress: 0 }));
+        const newQuests = [...newDaily, ...newWeekly];
+        setQuests(newQuests);
+        questsRef.current = newQuests;
+        await supabase.rpc("refresh_quests", {
+          new_quests: newQuests,
+          is_daily_refresh: true,
+          is_weekly_refresh: true,
+        });
+      } else if (result.quests) {
         setQuests(result.quests);
         questsRef.current = result.quests;
       }
@@ -268,6 +259,9 @@ export function GameProvider({ children }) {
         }
         if (result.coins_awarded > 0) {
           addNotification({ type: "coins", amount: result.coins_awarded });
+        }
+        if (result.level > 1 && result.level > prevLevel) {
+          addNotification({ type: "levelup", level: result.level });
         }
         (result.notifications || []).forEach((notif) => {
           if (notif.type === "quest") {
@@ -301,9 +295,7 @@ export function GameProvider({ children }) {
     const questType = targetQuestDef?.type || "Daily";
     const activeIds = quests.map((q) => q.id);
 
-    const availablePool = questDefinitions.filter(
-      (q) => q.type === questType && !activeIds.includes(q.id)
-    );
+    const availablePool = questDefinitions.filter((q) => q.type === questType && !activeIds.includes(q.id));
 
     if (availablePool.length === 0) {
       addNotification({ type: "error", name: "No other quests available to reroll!" });
@@ -333,6 +325,25 @@ export function GameProvider({ children }) {
     }
   };
 
+  const deductCoins = async (amount = 50, reason = "AI Meal Scan") => {
+    if ((gameData.coins || 0) < amount) {
+      addNotification({ type: "error", name: `Need ${amount} coins for ${reason}!` });
+      return false;
+    }
+
+    try {
+      const remainingCoins = await deductCoinsService(amount);
+      const updatedCoins = typeof remainingCoins === "number" ? remainingCoins : Math.max(0, (gameData.coins || 0) - amount);
+      setGameData((prev) => ({ ...prev, coins: updatedCoins }));
+      gameDataRef.current = { ...gameDataRef.current, coins: updatedCoins };
+      addNotification({ type: "coins_deducted", amount: -amount, name: `-${amount} coins (${reason})` });
+      return true;
+    } catch (err) {
+      addNotification({ type: "error", name: err.message || "Failed to deduct coins" });
+      return false;
+    }
+  };
+
   return (
     <GameContext.Provider
       value={{
@@ -346,6 +357,7 @@ export function GameProvider({ children }) {
         syncProgress: handleSyncProgress,
         refreshGameData,
         rerollQuest,
+        deductCoins,
       }}
     >
       {children}

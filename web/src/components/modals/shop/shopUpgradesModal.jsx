@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { C, F, alpha } from "../../../lib/constants";
+import { C, F, alpha, quests as questDefinitions } from "../../../lib/constants";
 import { Mono, Tag } from "../../shared/Primitives";
 import { IconCoin, IconTarget, IconCheck, IconLock } from "../../shared/DuoIcon";
 import { useGameStats } from "../../../hooks/useGameStats";
@@ -7,7 +7,7 @@ import { useUser } from "../../../hooks/useUser";
 import { supabase } from "../../../services/supabase";
 
 export default function ShopUpgradesModal({ upgrades = [], coins, user }) {
-  const { refreshGameData } = useGameStats();
+  const { refreshGameData, quests } = useGameStats();
   const { refreshUser } = useUser();
   const [error, setError] = useState(null);
   const [message, setMessage] = useState(null);
@@ -31,6 +31,27 @@ export default function ShopUpgradesModal({ upgrades = [], coins, user }) {
       });
 
       if (rpcError) throw rpcError;
+
+      if (upgrade.id === "expanded_quests") {
+        const activeIds = (quests || []).map((q) => q.id);
+        const available = questDefinitions.filter(
+          (q) => q.type === "Daily" && !activeIds.includes(q.id)
+        );
+        const newQuest = available[Math.floor(Math.random() * available.length)];
+        if (newQuest) {
+          const dailyQuests = (quests || []).filter(
+            (q) => questDefinitions.find((d) => d.id === q.id)?.type === "Daily"
+          );
+          const weeklyQuests = (quests || []).filter(
+            (q) => questDefinitions.find((d) => d.id === q.id)?.type === "Weekly"
+          );
+          await supabase.rpc("refresh_quests", {
+            new_quests: [...dailyQuests, { id: newQuest.id, progress: 0 }, ...weeklyQuests],
+            is_daily_refresh: false,
+            is_weekly_refresh: false,
+          });
+        }
+      }
 
       await refreshUser();
       await refreshGameData();

@@ -43,6 +43,7 @@ export default function Home() {
           <SectionLabel>Today's Meals</SectionLabel>
 
           <div
+            data-tour="add-meal-btn"
             onClick={() => setModal("select_add_meal")}
             className="hover-btn press"
             style={{
@@ -63,7 +64,9 @@ export default function Home() {
           </div>
         </div>
 
-        <Meals />
+        <div data-tour="meals-list">
+          <Meals />
+        </div>
       </div>
       <WaterTracker />
 

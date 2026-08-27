@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Mono } from "../components/shared/Primitives";
 import { C, F } from "../lib/constants";
 import { useUser } from "../hooks/useUser";
+import { useTutorial } from "../hooks/useTutorial";
 import { useGameStats } from "../hooks/useGameStats";
 
 import SettingsCard from "../components/settings/SettingsCard";
@@ -39,11 +40,15 @@ import {
   IconCalendar,
   IconSignOut,
   IconTrash,
+  IconCrown,
+  IconStar,
 } from "../components/shared/DuoIcon";
+import { Tag } from "../components/shared/Primitives";
 
 export default function Settings() {
   const navigate = useNavigate();
-  const { user } = useUser();
+  const { user, isPro } = useUser();
+  const { startTutorial } = useTutorial();
   const { gameData } = useGameStats();
   const [toggles, setToggles] = useState({ meal: true, water: true, streak: false });
   const [modal, setModal] = useState(null);
@@ -94,12 +99,20 @@ export default function Settings() {
         <SectionLabel>Account</SectionLabel>
         <div style={{ background: C.card, borderRadius: 16, border: `1px solid ${C.border}`, overflow: "hidden" }}>
           <SettingsCard
+            onClick={() => navigate("/premium")}
+            icon={<IconCrown size={18} color={C.gold} />}
+            label="Kalori Pro"
+            sub={isPro ? "PRO Active · 100 scans/day" : "Free Plan · 50 🪙 per scan"}
+            arrow
+          />
+          <SettingsCard
             onClick={() => {
               setModal("profile");
             }}
             icon={<IconUser size={18} color={C.soft} />}
             label="Profile Settings"
             arrow
+            withTopBorder
           />
           <SettingsCard
             onClick={() => {
@@ -220,10 +233,21 @@ export default function Settings() {
         <SectionLabel>App</SectionLabel>
         <div style={{ background: C.card, borderRadius: 16, border: `1px solid ${C.border}`, overflow: "hidden" }}>
           <SettingsCard
+            onClick={() => {
+              startTutorial();
+              navigate("/");
+            }}
+            icon={<IconStar size={18} color={C.soft} />}
+            label="Replay Tutorial"
+            sub="Walk through the app again"
+            arrow
+          />
+          <SettingsCard
             onClick={() => navigate("/privacy")}
             icon={<IconLock size={18} color={C.soft} />}
             label="Privacy Policy"
             arrow
+            withTopBorder
           />
           {/* <SettingsCard
             onClick={() => {

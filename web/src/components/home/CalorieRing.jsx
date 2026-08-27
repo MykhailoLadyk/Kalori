@@ -26,6 +26,7 @@ export function CalorieRing() {
   const totalArc = 427;
   return (
     <div
+      data-tour="calorie-ring"
       style={{
         display: "flex",
         justifyContent: "center",

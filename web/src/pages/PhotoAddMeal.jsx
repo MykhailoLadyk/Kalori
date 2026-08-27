@@ -1,8 +1,15 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { C, F, alpha } from "../lib/constants";
-import { Mono } from "../components/shared/Primitives";
+import { Mono, Tag } from "../components/shared/Primitives";
 import analyzeFood from "../services/analyzeFood";
+import { useUser } from "../hooks/useUser";
+import { useGameStats } from "../hooks/useGameStats";
+import { IconSparkles, IconCoin, IconCrown } from "../components/shared/DuoIcon";
+import { Modal } from "../components/modals/Modal";
+import InsufficientCoinsModal from "../components/modals/home/InsufficientCoinsModal";
+import { AI_COIN_COST } from "../services/subscriptionService";
+
 const ChevronLeft = () => (
   <svg
     width="18"
@@ -44,6 +51,8 @@ const Spinner = ({ color = "#000", size = 16 }) => (
 
 export default function PhotoAddMeal() {
   const navigate = useNavigate();
+  const { isPro } = useUser();
+  const { gameData, deductCoins } = useGameStats();
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -53,6 +62,9 @@ export default function PhotoAddMeal() {
   const [analyzing, setAnalyzing] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
+  const [showCoinGate, setShowCoinGate] = useState(false);
+
+  const userCoins = gameData?.coins || 0;
 
   const loadingSteps = ["Analyzing image...", "Identifying food...", "Estimating calories...", "Calculating macros..."];
   const [loadingStepIndex, setLoadingStepIndex] = useState(0);
@@ -137,11 +149,21 @@ export default function PhotoAddMeal() {
   };
 
   const handleAnalyze = async () => {
+    if (!isPro && userCoins < AI_COIN_COST) {
+      setShowCoinGate(true);
+      return;
+    }
+
     try {
       setAnalyzing(true);
       setError(null);
       const parsed = await analyzeFood(photo);
       setResult(true);
+
+      // Deduct coins for free tier users
+      if (!isPro) {
+        await deductCoins(AI_COIN_COST, "Photo Food Scan");
+      }
 
       navigate("/add-meal/confirm", {
         state: {
@@ -160,6 +182,7 @@ export default function PhotoAddMeal() {
       setAnalyzing(false);
     }
   };
+
 
   return (
     <div
@@ -198,6 +221,47 @@ export default function PhotoAddMeal() {
       >
         <ChevronLeft />
       </div>
+
+      {/* Top Floating Pro/Coins Status Pill */}
+      <div
+        onClick={!isPro ? () => navigate("/premium") : undefined}
+        className={!isPro ? "press" : ""}
+        style={{
+          position: "absolute",
+          top: 16,
+          right: 16,
+          zIndex: 10,
+          background: alpha("#000", 45),
+          backdropFilter: "blur(8px)",
+          border: `1px solid ${isPro ? alpha(C.accent, 35) : alpha(C.gold, 35)}`,
+          borderRadius: 20,
+          padding: "7px 12px",
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+          cursor: !isPro ? "pointer" : "default",
+        }}
+      >
+        {isPro ? (
+          <>
+            <IconCrown size={14} color={C.gold} />
+            <span style={{ fontFamily: F.mono, fontSize: 9, fontWeight: 800, color: C.accent }}>
+              PRO · 100/DAY
+            </span>
+          </>
+        ) : (
+          <>
+            <IconCoin size={14} color={C.gold} />
+            <span style={{ fontFamily: F.mono, fontSize: 9, fontWeight: 800, color: C.gold }}>
+              50 COINS
+            </span>
+            <span style={{ fontFamily: F.mono, fontSize: 9, color: alpha("#fff", 70) }}>
+              ({userCoins} 🪙)
+            </span>
+          </>
+        )}
+      </div>
+
 
       {/* Camera Viewport / Captured Photo */}
       <div
@@ -324,10 +388,15 @@ export default function PhotoAddMeal() {
                     color: analyzing ? C.accent : "#000",
                   }}
                 >
-                  {analyzing ? loadingSteps[loadingStepIndex].toUpperCase() : "USE PHOTO"}
+                  {analyzing
+                    ? loadingSteps[loadingStepIndex].toUpperCase()
+                    : isPro
+                    ? "USE PHOTO (PRO)"
+                    : `USE PHOTO (${AI_COIN_COST} 🪙)`}
                 </span>
               </div>
             </div>
+
           ) : (
             <div
               onClick={handleCapture}
@@ -348,7 +417,13 @@ export default function PhotoAddMeal() {
           )}
         </div>
       )}
+
+      <Modal id={showCoinGate} close={() => setShowCoinGate(false)}>
+        <InsufficientCoinsModal coins={userCoins} handleClose={() => setShowCoinGate(false)} />
+      </Modal>
     </div>
   );
 }
+
+
 

@@ -16,6 +16,7 @@ import ConfirmMeal from "./pages/ConfirmMeal";
 import Onboarding from "./pages/Onboarding";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
+import Premium from "./pages/Premium";
 import { UserProvider } from "./context/UserContext";
 import { useUser } from "./hooks/useUser";
 import { MealProvider } from "./context/MealContext";
@@ -24,6 +25,8 @@ import { StatsProvider } from "./context/StatsContext";
 import { NotificationProvider } from "./context/NotificationContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { FavoriteProvider } from "./context/FavoriteContext";
+import { TutorialProvider } from "./context/TutorialContext";
+import AppTutorial from "./components/shared/AppTutorial";
 import { C, alpha } from "./lib/constants";
 
 // Global loading screen component
@@ -96,7 +99,9 @@ function App() {
           <StatsProvider>
           <GameProvider>
             <BrowserRouter>
+              <TutorialProvider>
               <AuthLoader>
+                <AppTutorial />
                 <Routes>
                   <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
                   <Route path="/reset-password" element={<ResetPassword />} />
@@ -118,9 +123,11 @@ function App() {
                     <Route path="/add-meal/photo" element={<PhotoAddMeal />} />
                     <Route path="/add-meal/manual" element={<ManualAddMeal />} />
                     <Route path="/add-meal/confirm" element={<ConfirmMeal />} />
+                    <Route path="/premium" element={<Premium />} />
                   </Route>
                 </Routes>
               </AuthLoader>
+              </TutorialProvider>
             </BrowserRouter>
           </GameProvider>
           </StatsProvider>

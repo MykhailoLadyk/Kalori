@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { C, F, alpha } from "../lib/constants";
 import { Mono } from "../components/shared/Primitives";
-import { IconStar, IconStarOutline } from "../components/shared/DuoIcon";
+import { IconStar, IconStarOutline, IconSparkles, IconCoin, IconCrown } from "../components/shared/DuoIcon";
 import { useFavorites } from "../hooks/useFavorites";
 import { useMeals } from "../hooks/useMeals";
 import { useGameStats } from "../hooks/useGameStats";
@@ -10,6 +10,10 @@ import { useUser } from "../hooks/useUser";
 import { getLocalYMD } from "../lib/dateUtils";
 import analyzeFood from "../services/analyzeFood";
 import analyzeFoodDesc from "../services/analyzeFoodDesc";
+import { Modal } from "../components/modals/Modal";
+import InsufficientCoinsModal from "../components/modals/home/InsufficientCoinsModal";
+import { AI_COIN_COST } from "../services/subscriptionService";
+
 const ChevronLeft = () => (
   <svg
     width="18"
@@ -36,10 +40,14 @@ const FIELD_CONFIG = [
 
 export default function ConfirmMeal() {
   const { addMeal, selectedDate } = useMeals();
-  const { syncProgress } = useGameStats();
-  const { user } = useUser();
+  const { syncProgress, gameData, deductCoins } = useGameStats();
+  const { user, isPro } = useUser();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const userCoins = gameData?.coins || 0;
+  const [showCoinGate, setShowCoinGate] = useState(false);
+
 
   const result = location.state?.meal;
   const photo = location.state?.photoData;
@@ -102,6 +110,11 @@ export default function ConfirmMeal() {
     const clarificationQuery = answers.join(". ");
     if (!clarificationQuery) return;
 
+    if (!isPro && userCoins < AI_COIN_COST) {
+      setShowCoinGate(true);
+      return;
+    }
+
     try {
       setRefining(true);
       setRefineError(null);
@@ -116,6 +129,11 @@ export default function ConfirmMeal() {
       }
 
       if (refined) {
+        // Deduct coins for free tier users
+        if (!isPro) {
+          await deductCoins(AI_COIN_COST, "AI Refinement");
+        }
+
         setForm((prev) => ({
           ...prev,
           name: refined.name || prev.name,
@@ -140,6 +158,7 @@ export default function ConfirmMeal() {
       setRefining(false);
     }
   };
+
 
   const validate = () => {
     const newErrors = {};
@@ -535,12 +554,18 @@ export default function ConfirmMeal() {
                   background: refining ? C.accentDim : alpha(C.accent, 15),
                   border: `1px solid ${C.accent}`,
                   borderRadius: 10,
-                  padding: "10px",
+                  padding: "12px",
+                  gap: 6,
                   cursor: refining ? "not-allowed" : "pointer",
                 }}
               >
+                <IconSparkles size={14} color={C.accent} />
                 <span className="font-mono font-bold" style={{ fontSize: 10, color: C.accent }}>
-                  {refining ? "UPDATING ESTIMATE..." : "REFINE ESTIMATE WITH AI"}
+                  {refining
+                    ? "UPDATING ESTIMATE..."
+                    : isPro
+                    ? "REFINE ESTIMATE WITH AI (PRO)"
+                    : `REFINE ESTIMATE WITH AI · ${AI_COIN_COST} 🪙`}
                 </span>
               </div>
             )}
@@ -582,6 +607,11 @@ export default function ConfirmMeal() {
           </div>
         </div>
       </div>
+
+      <Modal id={showCoinGate} close={() => setShowCoinGate(false)}>
+        <InsufficientCoinsModal coins={userCoins} handleClose={() => setShowCoinGate(false)} />
+      </Modal>
     </div>
   );
 }
+

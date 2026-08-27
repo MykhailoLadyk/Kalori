@@ -75,6 +75,7 @@ export function DateSection({ setModal, date }) {
       </div>
 
       <div
+        data-tour="streak-badge"
         style={{
           position: "absolute",
           right: 22,

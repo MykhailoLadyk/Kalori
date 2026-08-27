@@ -32,6 +32,10 @@ export function QuestList() {
       done,
       color: quest.type === "Daily" ? C.accent : C.gold,
     };
+  }).sort((a, b) => {
+    if (a.type === "Daily" && b.type === "Weekly") return -1;
+    if (a.type === "Weekly" && b.type === "Daily") return 1;
+    return 0;
   });
 
   return quests.map((q, i) => {

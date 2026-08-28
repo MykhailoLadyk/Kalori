@@ -136,37 +136,28 @@ export default function DescribeAddMeal() {
           </div>
         </div>
 
-        {/* Pro / Coin pill */}
-        <div
-          onClick={!isPro ? () => navigate("/premium") : undefined}
-          className={!isPro ? "press" : ""}
-          style={{
-            background: isPro ? alpha(C.accent, 12) : alpha(C.gold, 12),
-            border: `1px solid ${isPro ? alpha(C.accent, 30) : alpha(C.gold, 30)}`,
-            borderRadius: 16,
-            padding: "5px 10px",
-            display: "flex",
-            alignItems: "center",
-            gap: 5,
-            cursor: !isPro ? "pointer" : "default",
-          }}
-        >
-          {isPro ? (
-            <>
-              <IconCrown size={13} color={C.gold} />
-              <span style={{ fontFamily: F.mono, fontSize: 8, fontWeight: 800, color: C.accent }}>
-                PRO · 100/DAY
-              </span>
-            </>
-          ) : (
-            <>
-              <IconCoin size={13} color={C.gold} />
-              <span style={{ fontFamily: F.mono, fontSize: 8, fontWeight: 800, color: C.gold }}>
-                50 COINS ({userCoins})
-              </span>
-            </>
-          )}
-        </div>
+        {/* Pro / Coin pill (Free Tier) */}
+        {!isPro && (
+          <div
+            onClick={() => navigate("/premium")}
+            className="press"
+            style={{
+              background: alpha(C.gold, 12),
+              border: `1px solid ${alpha(C.gold, 30)}`,
+              borderRadius: 16,
+              padding: "5px 10px",
+              display: "flex",
+              alignItems: "center",
+              gap: 5,
+              cursor: "pointer",
+            }}
+          >
+            <IconCoin size={13} color={C.gold} />
+            <span style={{ fontFamily: F.mono, fontSize: 8, fontWeight: 800, color: C.gold }}>
+              50 COINS ({userCoins})
+            </span>
+          </div>
+        )}
       </div>
 
       <div className="flex-1 flex flex-col" style={{ padding: "0 22px" }}>
@@ -221,11 +212,11 @@ export default function DescribeAddMeal() {
             >
               {loading && <Spinner color={C.accent} size={14} />}
               <span className="font-mono font-bold" style={{ fontSize: 11, color: loading ? C.accent : "#000" }}>
-                {loading
-                  ? loadingSteps[loadingStepIndex].toUpperCase()
-                  : isPro
-                  ? "ANALYZE MEAL (PRO)"
-                  : `ANALYZE MEAL (${AI_COIN_COST} 🪙)`}
+                  {loading
+                    ? loadingSteps[loadingStepIndex].toUpperCase()
+                    : isPro
+                    ? "ANALYZE MEAL"
+                    : `ANALYZE MEAL (${AI_COIN_COST} 🪙)`}
               </span>
             </div>
 

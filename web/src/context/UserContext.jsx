@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, useMemo } from "react";
+import { createContext, useState, useEffect, useMemo, useCallback } from "react";
 import { fetchUser, updateUser } from "../services/userService";
 import { fetchUserSubscription, isProUser } from "../services/subscriptionService";
 import { supabase } from "../services/supabase";
@@ -9,8 +9,6 @@ export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
   const [subscription, setSubscription] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [updating, setUpdating] = useState(false);
-  const [error, setError] = useState(null);
 
   const isPro = useMemo(() => isProUser(subscription), [subscription]);
 
@@ -20,7 +18,6 @@ export function UserProvider({ children }) {
     const loadUserProfile = async () => {
       try {
         setLoading(true);
-        setError(null);
         
         const { data: { session } } = await supabase.auth.getSession();
         
@@ -44,10 +41,8 @@ export function UserProvider({ children }) {
             setSubscription(null);
           }
         }
-      } catch (error) {
-        if (mounted) {
-          setError(error.message || "Failed to fetch user");
-        }
+      } catch {
+        if (mounted) { /* load failure leaves user null; loading flips to false */ }
       } finally {
         if (mounted) setLoading(false);
       }
@@ -75,7 +70,7 @@ export function UserProvider({ children }) {
   }, []);
 
 
-  const refreshSubscription = async () => {
+  const refreshSubscription = useCallback(async () => {
     try {
       const subData = await fetchUserSubscription();
       setSubscription(subData);
@@ -84,9 +79,9 @@ export function UserProvider({ children }) {
     } catch (e) {
       console.error("Failed to refresh subscription", e);
     }
-  };
+  }, []);
 
-  const refreshUser = async () => {
+  const refreshUser = useCallback(async () => {
     try {
       const [userData, subData] = await Promise.all([
         fetchUser(),
@@ -108,14 +103,11 @@ export function UserProvider({ children }) {
     } catch (e) {
       console.error("Failed to refresh user profile", e);
     }
-  };
+  }, []);
 
-  const handleUpdateUser = async (updates) => {
+  const handleUpdateUser = useCallback(async (updates) => {
     const previousUser = user;
     try {
-      setUpdating(true);
-      setError(null);
-      
       const newSettings = updates.settings ? { ...user?.settings, ...updates.settings } : user?.settings;
       const newTargets = updates.targets ? { ...user?.targets, ...updates.targets } : user?.targets;
 
@@ -140,26 +132,26 @@ export function UserProvider({ children }) {
       await updateUser(dbUpdates);
     } catch (error) {
       setUser(previousUser);
-      setError(error.message || "Failed to update user");
       throw error;
-    } finally {
-      setUpdating(false);
     }
-  };
+  }, [user]);
+
+  const value = useMemo(
+    () => ({
+      user,
+      subscription,
+      isPro,
+      loading,
+      updateUser: handleUpdateUser,
+      refreshUser,
+      refreshSubscription,
+    }),
+    [user, subscription, isPro, loading, handleUpdateUser, refreshUser, refreshSubscription],
+  );
 
   return (
     <UserContext.Provider
-      value={{
-        user,
-        subscription,
-        isPro,
-        loading,
-        updating,
-        error,
-        updateUser: handleUpdateUser,
-        refreshUser,
-        refreshSubscription,
-      }}
+      value={value}
     >
       {children}
     </UserContext.Provider>

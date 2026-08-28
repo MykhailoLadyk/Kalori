@@ -1,4 +1,4 @@
-import { createContext, useMemo, useCallback, useState, useEffect } from "react";
+import { createContext, useMemo, useCallback, useState } from "react";
 import { useMeals } from "../hooks/useMeals";
 import { useUser } from "../hooks/useUser";
 import { fetchMealsByRange } from "../services/mealService";
@@ -12,7 +12,6 @@ export function StatsProvider({ children }) {
   const { user } = useUser();
   const [historicalMeals, setHistoricalMeals] = useState([]);
   const [historicalWeights, setHistoricalWeights] = useState([]);
-  const [loadingStats, setLoadingStats] = useState(false);
 
   const loadHistoricalData = useCallback(async () => {
     if (!user?.id) {
@@ -21,7 +20,6 @@ export function StatsProvider({ children }) {
       return;
     }
     try {
-      setLoadingStats(true);
       const today = new Date();
       const ninetyDaysAgo = new Date(today);
       ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 89);
@@ -36,16 +34,8 @@ export function StatsProvider({ children }) {
       setHistoricalMeals(mealData || []);
       setHistoricalWeights(weightData || []);
     } catch (err) {
-    } finally {
-      setLoadingStats(false);
     }
   }, [user?.id]);
-
-  useEffect(() => {
-    if (user?.userAuth) {
-      loadHistoricalData();
-    }
-  }, [user?.userAuth, loadHistoricalData]);
 
   const dailyData = useMemo(() => {
     const dataMap = new Map();
@@ -186,14 +176,13 @@ export function StatsProvider({ children }) {
   const contextValue = useMemo(
     () => ({
       dailyData,
-      loadingStats,
       getWeekData,
       getMonthData,
       get3MonthData,
       get3MonthWeeklyAverages,
       refreshStats: loadHistoricalData,
     }),
-    [dailyData, loadingStats, getWeekData, getMonthData, get3MonthData, get3MonthWeeklyAverages, loadHistoricalData],
+    [dailyData, getWeekData, getMonthData, get3MonthData, get3MonthWeeklyAverages, loadHistoricalData],
   );
 
   return <StatsContext.Provider value={contextValue}>{children}</StatsContext.Provider>;

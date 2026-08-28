@@ -1,5 +1,5 @@
 import { C, F } from "../../lib/constants";
-import { Mono, Tag } from "../shared/Primitives";
+import { Tag } from "../shared/Primitives";
 import { IconTarget, IconCoin } from "../shared/DuoIcon";
 
 export default function ShopItemUpgrades({ upgrades = [] }) {
@@ -15,9 +15,6 @@ export default function ShopItemUpgrades({ upgrades = [] }) {
         <div style={{ fontFamily: F.body, fontSize: 13, fontWeight: 600, color: C.text }}>
           {item.name}
         </div>
-        <Mono size={8} color={C.muted}>
-          {item.desc}
-        </Mono>
       </div>
       <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 4 }}>
         {item.owned ? (

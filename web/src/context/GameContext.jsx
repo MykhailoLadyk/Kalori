@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, useRef } from "react";
+import { createContext, useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useNotifications } from "./NotificationContext";
 import { fetchGameData, syncGameProgress, applyStreakDecay, deductCoins as deductCoinsService } from "../services/gameService";
 import { achievements as achievementDefinitions, quests as questDefinitions } from "../lib/constants";
@@ -47,9 +47,6 @@ export function GameProvider({ children }) {
     flameColorsOwned: ["orange"],
     upgradesOwned: [],
   });
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [updating, setUpdating] = useState(false);
   const { addNotification } = useNotifications();
 
   useEffect(() => {
@@ -57,7 +54,6 @@ export function GameProvider({ children }) {
 
     const loadGameData = async () => {
       try {
-        setLoading(true);
         const data = await fetchGameData();
 
         if (data.achievements) {
@@ -156,10 +152,8 @@ export function GameProvider({ children }) {
 
         setGameData(data);
         gameDataRef.current = data;
-      } catch (error) {
-        setError("Failed to fetch game data");
-      } finally {
-        setLoading(false);
+      } catch {
+        /* game data load failure keeps last known state */
       }
     };
     loadGameData();
@@ -170,7 +164,7 @@ export function GameProvider({ children }) {
     user?.settings?.upgrades_owned,
   ]);
 
-  const refreshGameData = async () => {
+  const refreshGameData = useCallback(async () => {
     try {
       const data = await fetchGameData();
       if (data.achievements) {
@@ -208,84 +202,80 @@ export function GameProvider({ children }) {
 
       setGameData(data);
       gameDataRef.current = data;
-    } catch (e) {
-      setError("Failed to refresh game data");
+    } catch {
+      /* refresh failure keeps last known state */
     }
-  };
+  }, [
+    user?.settings?.avatars_owned,
+    user?.settings?.flame_colors_owned,
+    user?.settings?.upgrades_owned,
+  ]);
 
-  const handleSyncProgress = async (localDate, isMealLog = false) => {
+  const handleSyncProgress = useCallback(async (localDate, isMealLog = false) => {
+    const prevLevel = gameDataRef.current?.level || 1;
+    const result = await syncGameProgress(localDate, isMealLog);
+
+    const newGameData = {
+      ...gameDataRef.current,
+      xp_total: result.xp_total,
+      coins: result.coins,
+      streak: result.streak,
+      level: result.level,
+      last_log_date: result.last_log_date,
+    };
+    gameDataRef.current = newGameData;
+    setGameData(newGameData);
+
+    if (result.level >= 2 && prevLevel < 2) {
+      const dailyPool = questDefinitions.filter((q) => q.type === "Daily");
+      const weeklyPool = questDefinitions.filter((q) => q.type === "Weekly");
+      const newDaily = [...dailyPool].sort(() => 0.5 - Math.random()).slice(0, 2).map((q) => ({ id: q.id, progress: 0 }));
+      const newWeekly = [...weeklyPool].sort(() => 0.5 - Math.random()).slice(0, 1).map((q) => ({ id: q.id, progress: 0 }));
+      const newQuests = [...newDaily, ...newWeekly];
+      setQuests(newQuests);
+      questsRef.current = newQuests;
+      await supabase.rpc("refresh_quests", {
+        new_quests: newQuests,
+        is_daily_refresh: true,
+        is_weekly_refresh: true,
+      });
+    } else if (result.quests) {
+      setQuests(result.quests);
+      questsRef.current = result.quests;
+    }
+    if (result.achievements) {
+      setAchievements(result.achievements);
+      achievementsRef.current = result.achievements;
+    }
+
+    // Notifications
     try {
-      setUpdating(true);
-      const prevLevel = gameDataRef.current?.level || 1;
-      const result = await syncGameProgress(localDate, isMealLog);
-
-      const newGameData = {
-        ...gameDataRef.current,
-        xp_total: result.xp_total,
-        coins: result.coins,
-        streak: result.streak,
-        level: result.level,
-        last_log_date: result.last_log_date,
-      };
-      gameDataRef.current = newGameData;
-      setGameData(newGameData);
-
-      if (result.level >= 2 && prevLevel < 2) {
-        const dailyPool = questDefinitions.filter((q) => q.type === "Daily");
-        const weeklyPool = questDefinitions.filter((q) => q.type === "Weekly");
-        const newDaily = [...dailyPool].sort(() => 0.5 - Math.random()).slice(0, 2).map((q) => ({ id: q.id, progress: 0 }));
-        const newWeekly = [...weeklyPool].sort(() => 0.5 - Math.random()).slice(0, 1).map((q) => ({ id: q.id, progress: 0 }));
-        const newQuests = [...newDaily, ...newWeekly];
-        setQuests(newQuests);
-        questsRef.current = newQuests;
-        await supabase.rpc("refresh_quests", {
-          new_quests: newQuests,
-          is_daily_refresh: true,
-          is_weekly_refresh: true,
-        });
-      } else if (result.quests) {
-        setQuests(result.quests);
-        questsRef.current = result.quests;
+      if (result.xp_awarded > 0) {
+        addNotification({ type: "xp", amount: result.xp_awarded });
       }
-      if (result.achievements) {
-        setAchievements(result.achievements);
-        achievementsRef.current = result.achievements;
+      if (result.coins_awarded > 0) {
+        addNotification({ type: "coins", amount: result.coins_awarded });
       }
-
-      // Notifications
-      try {
-        if (result.xp_awarded > 0) {
-          addNotification({ type: "xp", amount: result.xp_awarded });
+      if (result.level > 1 && result.level > prevLevel) {
+        addNotification({ type: "levelup", level: result.level });
+      }
+      (result.notifications || []).forEach((notif) => {
+        if (notif.type === "quest") {
+          const def = questDefinitions.find((q) => q.id === notif.id);
+          addNotification({ ...def, type: "quest", coins: notif.reward });
+        } else if (notif.type === "target") {
+          addNotification({ type: "target", name: notif.name, xp: notif.xp, coins: notif.coins });
+        } else if (notif.type === "achievement") {
+          const def = achievementDefinitions.find((a) => a.id === notif.id);
+          addNotification({ ...def, type: "achievement", xp: notif.xp });
         }
-        if (result.coins_awarded > 0) {
-          addNotification({ type: "coins", amount: result.coins_awarded });
-        }
-        if (result.level > 1 && result.level > prevLevel) {
-          addNotification({ type: "levelup", level: result.level });
-        }
-        (result.notifications || []).forEach((notif) => {
-          if (notif.type === "quest") {
-            const def = questDefinitions.find((q) => q.id === notif.id);
-            addNotification({ ...def, type: "quest", coins: notif.reward });
-          } else if (notif.type === "target") {
-            addNotification({ type: "target", name: notif.name, xp: notif.xp, coins: notif.coins });
-          } else if (notif.type === "achievement") {
-            const def = achievementDefinitions.find((a) => a.id === notif.id);
-            addNotification({ ...def, type: "achievement", xp: notif.xp });
-          }
-        });
-      } catch (e) {}
+      });
+    } catch (e) {}
 
-      return result;
-    } catch (error) {
-      setError(error.message || "Failed to sync game progress");
-      throw error;
-    } finally {
-      setUpdating(false);
-    }
-  };
+    return result;
+  }, [addNotification]);
 
-  const rerollQuest = async (questId, cost = 20) => {
+  const rerollQuest = useCallback(async (questId, cost = 20) => {
     if (gameData.coins < cost) {
       addNotification({ type: "error", name: `Need ${cost} coins to reroll quest!` });
       return false;
@@ -323,9 +313,9 @@ export function GameProvider({ children }) {
       addNotification({ type: "error", name: err.message || "Failed to reroll quest" });
       return false;
     }
-  };
+  }, [gameData, quests, addNotification]);
 
-  const deductCoins = async (amount = 50, reason = "AI Meal Scan") => {
+  const deductCoins = useCallback(async (amount = 50, reason = "AI Meal Scan") => {
     if ((gameData.coins || 0) < amount) {
       addNotification({ type: "error", name: `Need ${amount} coins for ${reason}!` });
       return false;
@@ -342,23 +332,25 @@ export function GameProvider({ children }) {
       addNotification({ type: "error", name: err.message || "Failed to deduct coins" });
       return false;
     }
-  };
+  }, [gameData, addNotification]);
+
+  const value = useMemo(
+    () => ({
+      gameData,
+      achievements,
+      quests,
+      shopItems,
+      syncProgress: handleSyncProgress,
+      refreshGameData,
+      rerollQuest,
+      deductCoins,
+    }),
+    [gameData, achievements, quests, shopItems, handleSyncProgress, refreshGameData, rerollQuest, deductCoins],
+  );
 
   return (
     <GameContext.Provider
-      value={{
-        gameData,
-        error,
-        loading,
-        updating,
-        achievements,
-        quests,
-        shopItems,
-        syncProgress: handleSyncProgress,
-        refreshGameData,
-        rerollQuest,
-        deductCoins,
-      }}
+      value={value}
     >
       {children}
     </GameContext.Provider>

@@ -1,5 +1,4 @@
 import { C, F } from "../../lib/constants";
-import { Mono } from "../shared/Primitives";
 import { IconShield, IconCoin } from "../shared/DuoIcon";
 export default function ShopItemOther({ price = 150 }) {
   return (
@@ -18,9 +17,6 @@ export default function ShopItemOther({ price = 150 }) {
         >
           Streak Shield
         </div>
-        <Mono size={8} color={C.muted}>
-          Protects 1 missed day
-        </Mono>
       </div>
       <div
         style={{

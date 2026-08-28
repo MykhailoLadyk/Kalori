@@ -4,6 +4,7 @@ import { Mono } from "../../shared/Primitives";
 import { useUser } from "../../../hooks/useUser";
 import { useStats } from "../../../hooks/useStats";
 import { logWeight } from "../../../services/weightService";
+import { calcMacros, calculateTargets } from "../../../lib/macroCalc";
 import { getTodayDateString } from "../../../lib/dateUtils";
 
 export function WeightLogModal({ handleClose, initialDate }) {
@@ -28,15 +29,31 @@ export function WeightLogModal({ handleClose, initialDate }) {
       setError(null);
       await logWeight(user.id, { weight: Number(weight), unit, date });
 
+      const weightKg = unit === "lbs" ? Number(weight) * 0.453592 : Number(weight);
+      const settings = { ...user?.settings, weight: Number(weight), weight_unit: unit };
+
+      // Recompute daily targets from the new weight (mirrors BodyStatsModal).
+      // Skipped when body stats are incomplete so we don't clobber targets
+      // with the default 2000-kcal fallback.
+      const hasBodyStats = Number(settings.height) > 0 && Number(user?.age) > 0;
+      let targets = user?.targets;
+
+      if (hasBodyStats) {
+        const goal = settings.weight_goal || "maintain";
+        const { calories, water } = calculateTargets({
+          weight: weightKg,
+          height: settings.height,
+          age: user.age,
+          sex: settings.sex || "male",
+          activity_level: settings.activity_level || "moderate",
+          goal,
+        });
+        targets = { calories, water, ...calcMacros({ weight: weightKg, calories, goal }) };
+      }
+
       // Update current weight in user settings
       if (updateUser) {
-        await updateUser({
-          settings: {
-            ...user?.settings,
-            weight: Number(weight),
-            weight_unit: unit,
-          },
-        });
+        await updateUser({ settings, targets });
       }
 
       if (refreshStats) {

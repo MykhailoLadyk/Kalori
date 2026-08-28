@@ -564,7 +564,7 @@ export default function ConfirmMeal() {
                   {refining
                     ? "UPDATING ESTIMATE..."
                     : isPro
-                    ? "REFINE ESTIMATE WITH AI (PRO)"
+                    ? "REFINE ESTIMATE WITH AI"
                     : `REFINE ESTIMATE WITH AI · ${AI_COIN_COST} 🪙`}
                 </span>
               </div>

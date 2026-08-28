@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 
 import { C, F, alpha } from "../lib/constants";
 
@@ -13,10 +13,15 @@ import { useStats } from "../hooks/useStats";
 import { useUser } from "../hooks/useUser";
 
 export default function Stats() {
-  const { getWeekData, getMonthData, get3MonthData, get3MonthWeeklyAverages } = useStats();
+  const { getWeekData, getMonthData, get3MonthData, get3MonthWeeklyAverages, refreshStats } = useStats();
   const { user } = useUser();
   const [period, setPeriod] = useState("W");
   const [modal, setModal] = useState(null);
+
+  // Fetch history lazily on first visit instead of eagerly on login
+  useEffect(() => {
+    refreshStats();
+  }, [refreshStats]);
 
   const targets = user?.targets || { calories: 2000, protein: 150, carbs: 250, fat: 70, water: 3000 };
   const currentWeight = Number(user?.settings?.weight) || 0;

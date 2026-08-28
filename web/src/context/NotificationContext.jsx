@@ -1,21 +1,23 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useCallback, useMemo } from "react";
 import { NotificationLayer } from "../components/shared/NotificationLayer";
 const NotificationContext = createContext(null);
 
 export function NotificationProvider({ children }) {
   const [notifications, setNotifications] = useState([]);
 
-  const addNotification = (notification) => {
+  const addNotification = useCallback((notification) => {
     const id = `notif_${Date.now()}_${Math.random()}`;
 
     setNotifications((prev) => [...prev, { ...notification, id }]);
     setTimeout(() => {
       setNotifications((prev) => prev.filter((n) => n.id !== id));
     }, notification.duration ?? 3000);
-  };
+  }, []);
+
+  const value = useMemo(() => ({ addNotification }), [addNotification]);
 
   return (
-    <NotificationContext.Provider value={{ addNotification }}>
+    <NotificationContext.Provider value={value}>
       {children}
       <NotificationLayer notifications={notifications} />
     </NotificationContext.Provider>

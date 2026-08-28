@@ -1,13 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Outlet, useLocation } from "react-router-dom";
-import {
-  IconHome,
-  IconPlus,
-  IconChartLine,
-  IconGamepad,
-  IconShoppingBag,
-  IconGear,
-} from "../shared/DuoIcon";
+import { IconHome, IconPlus, IconChartLine, IconGamepad, IconShoppingBag, IconGear } from "../shared/DuoIcon";
 import { MealAddOptionSelectModal } from "../modals/home/MealAddOptionSelectModal";
 import { Modal } from "../modals/Modal";
 import { C, F } from "../../lib/constants";
@@ -26,9 +19,9 @@ export default function Nav() {
 
   const tabs = [
     { id: "stats", label: "Stats", Icon: IconChartLine },
-    { id: "game", label: "Game", Icon: IconGamepad },
+    { id: "game", label: "Level", Icon: IconGamepad },
     { id: "shop", label: "Shop", Icon: IconShoppingBag },
-    { id: "settings", label: "Set", Icon: IconGear },
+    { id: "settings", label: "Settings", Icon: IconGear },
   ];
 
   const handleHomeClick = () => {
@@ -79,20 +72,11 @@ export default function Nav() {
               boxShadow: isHome ? `0 0 20px ${C.accentGlow}` : "none",
             }}
           >
-            {isHome ? (
-              <IconPlus size={22} color="#000" />
-            ) : (
-              <IconHome size={22} color={C.muted} />
-            )}
+            {isHome ? <IconPlus size={22} color="#000" /> : <IconHome size={22} color={C.muted} />}
           </div>
           <span
             className="font-mono font-bold"
-            style={{
-              fontSize: 7,
-              letterSpacing: 1,
-              color: isHome ? C.accent : C.muted,
-              transition: "color 0.2s",
-            }}
+            style={{ fontSize: 7, letterSpacing: 1, color: isHome ? C.accent : C.muted, transition: "color 0.2s" }}
           >
             {isHome ? "ADD" : "HOME"}
           </span>
@@ -135,12 +119,7 @@ export default function Nav() {
               </div>
               <span
                 className="font-mono font-bold"
-                style={{
-                  fontSize: 7,
-                  letterSpacing: 1,
-                  color: on ? C.accent : C.muted,
-                  transition: "color 0.2s",
-                }}
+                style={{ fontSize: 7, letterSpacing: 1, color: on ? C.accent : C.muted, transition: "color 0.2s" }}
               >
                 {label.toUpperCase()}
               </span>
@@ -157,7 +136,6 @@ export default function Nav() {
             </div>
           );
         })}
-
       </div>
       {/* Selection Modal Context Integration */}
       <Modal id={modal} close={() => setModal(null)}>

@@ -313,32 +313,8 @@ export function MealAddOptionSelectModal() {
         </div>
       )}
 
-      {/* Pro Membership / Upgrade Banner */}
-      {isPro ? (
-        <div
-          onClick={() => navigate("/premium")}
-          className="hover-card press"
-          style={{
-            background: alpha(C.accent, 10),
-            border: `1px solid ${alpha(C.accent, 30)}`,
-            borderRadius: 14,
-            padding: "9px 14px",
-            marginBottom: 14,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            cursor: "pointer",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-            <IconCrown size={15} color={C.gold} />
-            <span style={{ fontFamily: F.mono, fontSize: 9, fontWeight: 800, color: C.accent }}>
-              PRO MEMBER · 100 AI SCANS/DAY
-            </span>
-          </div>
-          <span style={{ color: C.accent, fontSize: 14, fontWeight: "bold" }}>›</span>
-        </div>
-      ) : (
+      {/* Upgrade Banner for Free Users */}
+      {!isPro && (
         <div
           onClick={() => navigate("/premium")}
           className="hover-card press"
@@ -418,27 +394,23 @@ export function MealAddOptionSelectModal() {
                   <span style={{ fontFamily: F.body, fontSize: 14, fontWeight: 700, color: C.text }}>
                     {label}
                   </span>
-                  {isAi && (
-                    isPro ? (
-                      <Tag color={C.accent}>PRO</Tag>
-                    ) : (
-                      <div
-                        style={{
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: 3,
-                          background: alpha(C.gold, 12),
-                          border: `1px solid ${alpha(C.gold, 25)}`,
-                          borderRadius: 6,
-                          padding: "1px 6px",
-                        }}
-                      >
-                        <IconCoin size={10} color={C.gold} />
-                        <span style={{ fontFamily: F.mono, fontSize: 8, fontWeight: 800, color: C.gold }}>
-                          50
-                        </span>
-                      </div>
-                    )
+                  {isAi && !isPro && (
+                    <div
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 3,
+                        background: alpha(C.gold, 12),
+                        border: `1px solid ${alpha(C.gold, 25)}`,
+                        borderRadius: 6,
+                        padding: "1px 6px",
+                      }}
+                    >
+                      <IconCoin size={10} color={C.gold} />
+                      <span style={{ fontFamily: F.mono, fontSize: 8, fontWeight: 800, color: C.gold }}>
+                        50
+                      </span>
+                    </div>
                   )}
                 </div>
                 <Mono size={8} color={C.muted}>

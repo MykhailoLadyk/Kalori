@@ -11,7 +11,6 @@ import {
   upgradesDefinitions,
 } from "../lib/constants";
 import { Modal } from "../components/modals/Modal";
-import { Mono, Tag } from "../components/shared/Primitives";
 import {
   IconCoin,
   IconPalette,
@@ -106,8 +105,6 @@ export default function Shop() {
       id: "avatars",
       label: "Avatars",
       Icon: IconUser,
-      desc: "Customize your profile icon",
-      count: `${avatars.length} available`,
       color: C.accent,
       preview: <ShopItemAvatars avatars={avatars} />,
     },
@@ -115,8 +112,6 @@ export default function Shop() {
       id: "flames",
       label: "Streak Flames",
       Icon: IconFire,
-      desc: "Ignite your streak color",
-      count: `${flameColors.length} colors`,
       color: C.orange,
       preview: <ShopItemFlames flames={flameColors} />,
     },
@@ -124,8 +119,6 @@ export default function Shop() {
       id: "themes",
       label: "Themes",
       Icon: IconPalette,
-      desc: "Personalize your look",
-      count: `${themes.length} available`,
       color: C.pink,
       preview: <ShopItemThemes previewColors={themes.map((t) => t.colors)} />,
     },
@@ -133,8 +126,6 @@ export default function Shop() {
       id: "upgrades",
       label: "Perma Upgrades",
       Icon: IconArrowUp,
-      desc: "Permanent account boosts",
-      count: `${upgrades.filter((u) => u.owned).length}/${upgrades.length}`,
       color: C.accent,
       preview: <ShopItemUpgrades upgrades={upgrades} />,
     },
@@ -151,8 +142,6 @@ export default function Shop() {
       id: "other",
       label: "Other",
       Icon: IconShield,
-      desc: "Streak shields & more",
-      count: "Shields",
       color: C.orange,
       preview: <ShopItemOther />,
     },
@@ -190,7 +179,7 @@ export default function Shop() {
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        {sections.map(({ id, label, Icon, desc, count, color, preview }, i) => (
+        {sections.map(({ id, label, Icon, color, preview }, i) => (
           <div
             key={id}
             onClick={() => setModal(id)}
@@ -204,21 +193,10 @@ export default function Shop() {
             }}
           >
             <div
-              style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}
+              style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}
             >
-              <div>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                  <Icon size={20} color={color} />
-                  <span style={{ fontFamily: F.head, fontSize: 17, fontWeight: 800, color: C.text }}>{label}</span>
-                </div>
-                <Mono size={8} color={C.muted}>
-                  {desc}
-                </Mono>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <Tag color={color}>{count}</Tag>
-                <span style={{ color: C.muted, fontSize: 16 }}>›</span>
-              </div>
+              <Icon size={20} color={color} />
+              <span style={{ fontFamily: F.head, fontSize: 17, fontWeight: 800, color: C.text }}>{label}</span>
             </div>
             {preview}
           </div>

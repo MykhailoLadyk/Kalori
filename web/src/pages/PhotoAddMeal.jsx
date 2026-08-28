@@ -222,45 +222,36 @@ export default function PhotoAddMeal() {
         <ChevronLeft />
       </div>
 
-      {/* Top Floating Pro/Coins Status Pill */}
-      <div
-        onClick={!isPro ? () => navigate("/premium") : undefined}
-        className={!isPro ? "press" : ""}
-        style={{
-          position: "absolute",
-          top: 16,
-          right: 16,
-          zIndex: 10,
-          background: alpha("#000", 45),
-          backdropFilter: "blur(8px)",
-          border: `1px solid ${isPro ? alpha(C.accent, 35) : alpha(C.gold, 35)}`,
-          borderRadius: 20,
-          padding: "7px 12px",
-          display: "flex",
-          alignItems: "center",
-          gap: 6,
-          cursor: !isPro ? "pointer" : "default",
-        }}
-      >
-        {isPro ? (
-          <>
-            <IconCrown size={14} color={C.gold} />
-            <span style={{ fontFamily: F.mono, fontSize: 9, fontWeight: 800, color: C.accent }}>
-              PRO · 100/DAY
-            </span>
-          </>
-        ) : (
-          <>
-            <IconCoin size={14} color={C.gold} />
-            <span style={{ fontFamily: F.mono, fontSize: 9, fontWeight: 800, color: C.gold }}>
-              50 COINS
-            </span>
-            <span style={{ fontFamily: F.mono, fontSize: 9, color: alpha("#fff", 70) }}>
-              ({userCoins} 🪙)
-            </span>
-          </>
-        )}
-      </div>
+      {/* Top Floating Coins Status Pill (Free Tier) */}
+      {!isPro && (
+        <div
+          onClick={() => navigate("/premium")}
+          className="press"
+          style={{
+            position: "absolute",
+            top: 16,
+            right: 16,
+            zIndex: 10,
+            background: alpha("#000", 45),
+            backdropFilter: "blur(8px)",
+            border: `1px solid ${alpha(C.gold, 35)}`,
+            borderRadius: 20,
+            padding: "7px 12px",
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            cursor: "pointer",
+          }}
+        >
+          <IconCoin size={14} color={C.gold} />
+          <span style={{ fontFamily: F.mono, fontSize: 9, fontWeight: 800, color: C.gold }}>
+            50 COINS
+          </span>
+          <span style={{ fontFamily: F.mono, fontSize: 9, color: alpha("#fff", 70) }}>
+            ({userCoins} 🪙)
+          </span>
+        </div>
+      )}
 
 
       {/* Camera Viewport / Captured Photo */}
@@ -391,7 +382,7 @@ export default function PhotoAddMeal() {
                   {analyzing
                     ? loadingSteps[loadingStepIndex].toUpperCase()
                     : isPro
-                    ? "USE PHOTO (PRO)"
+                    ? "USE PHOTO"
                     : `USE PHOTO (${AI_COIN_COST} 🪙)`}
                 </span>
               </div>

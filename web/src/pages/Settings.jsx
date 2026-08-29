@@ -112,7 +112,6 @@ export default function Settings() {
                 </>
               )
             }
-            arrow
           />
           <SettingsCard
             onClick={() => {
@@ -120,7 +119,6 @@ export default function Settings() {
             }}
             icon={<IconUser size={18} color={C.soft} />}
             label="Profile Settings"
-            arrow
             withTopBorder
           />
           <SettingsCard
@@ -129,7 +127,6 @@ export default function Settings() {
             }}
             icon={<IconTarget size={18} color={C.soft} />}
             label="Goals & Targets"
-            arrow
             withTopBorder
           />
           <SettingsCard
@@ -138,7 +135,6 @@ export default function Settings() {
             }}
             icon={<IconWeight size={18} color={C.soft} />}
             label="Body Stats"
-            arrow
             withTopBorder
           />
         </div>
@@ -153,7 +149,6 @@ export default function Settings() {
             }}
             icon={<IconGlobe size={18} color={C.soft} />}
             label="Language"
-            arrow
           /> */}
           {/* <SettingsCard
             onClick={() => {
@@ -161,7 +156,6 @@ export default function Settings() {
             }}
             icon={<IconClock size={18} color={C.soft} />}
             label="Timezone"
-            arrow
             withTopBorder
           /> */}
           {/* <SettingsCard
@@ -170,7 +164,6 @@ export default function Settings() {
             }}
             icon={<IconRuler size={18} color={C.soft} />}
             label="Measurements"
-            arrow
             withTopBorder
           /> */}
           <SettingsCard
@@ -179,7 +172,6 @@ export default function Settings() {
             }}
             icon={<IconUser size={18} color={C.soft} />}
             label="Avatar"
-            arrow
           />
           <SettingsCard
             onClick={() => {
@@ -187,7 +179,6 @@ export default function Settings() {
             }}
             icon={<IconFire size={18} color={C.soft} />}
             label="Streak Flame"
-            arrow
             withTopBorder
           />
           <SettingsCard
@@ -196,7 +187,6 @@ export default function Settings() {
             }}
             icon={<IconPalette size={18} color={C.soft} />}
             label="Theme"
-            arrow
             withTopBorder
           />
         </div>
@@ -249,13 +239,11 @@ export default function Settings() {
             icon={<IconStar size={18} color={C.soft} />}
             label="Replay Tutorial"
             sub="Walk through the app again"
-            arrow
           />
           <SettingsCard
             onClick={() => navigate("/privacy")}
             icon={<IconLock size={18} color={C.soft} />}
             label="Privacy Policy"
-            arrow
             withTopBorder
           />
           {/* <SettingsCard
@@ -264,14 +252,12 @@ export default function Settings() {
             }}
             icon={<IconExport size={18} color={C.soft} />}
             label="Export My Data"
-            arrow
             withTopBorder
           /> */}
           <SettingsCard
             onClick={() => navigate("/terms")}
             icon={<IconCalendar size={18} color={C.soft} />}
             label="Terms of Service"
-            arrow
             withTopBorder
           />
           <SettingsCard
@@ -297,7 +283,7 @@ export default function Settings() {
 
       <div style={{ textAlign: "center", marginTop: 8, animation: "fadeIn 0.4s ease 0.6s both" }}>
         <Mono size={8} color={C.muted}>
-          Kalori v1.4.0
+          Kalori v1.4.1
         </Mono>
       </div>
       <Modal id={modal} close={() => setModal(null)}>

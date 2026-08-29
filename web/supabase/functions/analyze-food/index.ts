@@ -1,5 +1,5 @@
 import "@supabase/functions-js/edge-runtime.d.ts";
-import { handleCors } from "../_shared/cors.ts";
+import { handleCors, getCorsHeaders } from "../_shared/cors.ts";
 import { ErrorCode, jsonError, jsonSuccess } from "../_shared/errors.ts";
 import { authenticateRequest } from "../_shared/auth.ts";
 import { checkRateLimit, rateLimitHeaders } from "../_shared/rateLimiter.ts";
@@ -18,7 +18,7 @@ Rules:
 5. Set the top-level "name" field to a highly descriptive title listing the main components (e.g., "Eggs, Bacon & Toast", "Grilled Chicken with Broccoli"). DO NOT use generic categorical names like "Breakfast", "Hearty Breakfast", "Lunch", or "Breakfast Plate".
 6. Set "confidence" to "high", "medium", or "low" based on visual clarity and portion visibility.
 7. Set "notes" to a concise summary explaining portion and ingredient assumptions (e.g., "Assumed 6oz grilled chicken breast and 1 cup steamed broccoli without butter").
-8. Provide 1 to 3 targeted "questions" in the questions array with 2 to 4 short, mutually exclusive options each to help the user clarify any ambiguous aspects (e.g., cooking oils, portion size, sauces, dressings). If confidence is high or clarifications were fully provided, questions can be empty.
+8. Provide 1 to 3 targeted "questions" in the questions array with 2 to 4 short, mutually exclusive options each to help the user clarify any ambiguous aspects (e.g., cooking oils, portion size, sauces, dressings). NEVER repeat questions that have already been answered or addressed in user clarifications. If clarifications were provided, confidence is high, or key ambiguities are resolved, set "questions": [].
 
 EXAMPLES OF CORRECT BEHAVIOR:
 
@@ -69,21 +69,28 @@ Example 2: A photo of a steering wheel (no food).
 `;
 
 Deno.serve(async (req) => {
-  // Handle CORS preflight
+  // Handle CORS preflight & validate origin
   const corsResponse = handleCors(req);
   if (corsResponse) return corsResponse;
 
+  const corsHeaders = getCorsHeaders(req);
+
   try {
+    // Authenticate user
+    const authResult = await authenticateRequest(req);
+    if (authResult instanceof Response) return authResult;
+    const { supabase } = authResult;
+
     // Parse and validate input
     const body = await req.json();
     const { imageBase64, mimeType, clarifications } = body;
 
     if (!imageBase64 || typeof imageBase64 !== "string") {
-      return jsonError("Missing or invalid imageBase64", ErrorCode.INVALID_INPUT, 400);
+      return jsonError("Missing or invalid imageBase64", ErrorCode.INVALID_INPUT, 400, corsHeaders);
     }
 
     if (!mimeType || typeof mimeType !== "string") {
-      return jsonError("Missing or invalid mimeType", ErrorCode.INVALID_INPUT, 400);
+      return jsonError("Missing or invalid mimeType", ErrorCode.INVALID_INPUT, 400, corsHeaders);
     }
 
     if (!ALLOWED_MIME_TYPES.includes(mimeType)) {
@@ -91,6 +98,7 @@ Deno.serve(async (req) => {
         `Unsupported image type: ${mimeType}. Allowed: ${ALLOWED_MIME_TYPES.join(", ")}`,
         ErrorCode.INVALID_INPUT,
         400,
+        corsHeaders,
       );
     }
 
@@ -99,16 +107,12 @@ Deno.serve(async (req) => {
         "Image too large (max ~7.5MB)",
         ErrorCode.INVALID_INPUT,
         400,
+        corsHeaders,
       );
     }
 
-    // Authenticate user
-    const authResult = await authenticateRequest(req);
-    if (authResult instanceof Response) return authResult;
-    const { supabase } = authResult;
-
     // Atomic rate-limit check + increment
-    const rlResult = await checkRateLimit(supabase);
+    const rlResult = await checkRateLimit(supabase, corsHeaders);
     if (rlResult instanceof Response) return rlResult;
 
     // Call Vertex AI
@@ -117,7 +121,7 @@ Deno.serve(async (req) => {
     ];
     if (clarifications && typeof clarifications === "string" && clarifications.trim()) {
       parts.push({
-        text: `User clarifications and additional details: "${clarifications.trim()}". Please recalculate nutrition and update estimates based on these details.`,
+        text: `User clarifications and answered questions: "${clarifications.trim()}". Recalculate nutrition and update estimates based on these answers. CRITICAL: Do NOT re-ask or repeat any questions that were answered or addressed above. Set "questions": [] unless there is a completely new and critical ambiguity.`,
       });
     }
 
@@ -131,16 +135,18 @@ Deno.serve(async (req) => {
 
     // Check if AI detected no food
     if (parsed.error) {
-      return jsonError(parsed.error, ErrorCode.NO_FOOD_DETECTED, 422, rateLimitHeaders(rlResult));
+      return jsonError(parsed.error, ErrorCode.NO_FOOD_DETECTED, 422, { ...corsHeaders, ...rateLimitHeaders(rlResult) });
     }
 
-    return jsonSuccess(parsed, rateLimitHeaders(rlResult));
+    return jsonSuccess(parsed, { ...corsHeaders, ...rateLimitHeaders(rlResult) });
   } catch (error) {
     console.error("analyze-food error:", error);
     return jsonError(
       "An unexpected error occurred while analyzing the image",
       ErrorCode.INTERNAL_ERROR,
       500,
+      corsHeaders,
     );
   }
 });
+

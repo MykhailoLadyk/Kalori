@@ -28,7 +28,41 @@ export default function MeasurementsModal({ handleClose }) {
   const handleSave = async () => {
     try {
       setLoading(true);
-      await updateUser({ settings: { measurement_system: selected } });
+      const updates = {
+        measurement_system: selected,
+        weight_unit: selected === "imperial" ? "lbs" : "kg",
+        height_unit: selected === "imperial" ? "ft" : "cm",
+      };
+
+      if (user?.settings?.weight) {
+        const currentWeightUnit = user?.settings?.weight_unit || "kg";
+        const targetWeightUnit = updates.weight_unit;
+        if (currentWeightUnit !== targetWeightUnit) {
+          const w = Number(user.settings.weight);
+          if (w > 0) {
+            updates.weight = targetWeightUnit === "lbs"
+              ? Math.round((w / 0.453592) * 10) / 10
+              : Math.round((w * 0.453592) * 10) / 10;
+          }
+        }
+      }
+
+      if (user?.settings?.height) {
+        const currentHeightUnit = user?.settings?.height_unit || "cm";
+        const targetHeightUnit = updates.height_unit;
+        if (currentHeightUnit !== targetHeightUnit) {
+          const h = Number(user.settings.height);
+          if (h > 0) {
+            updates.height = targetHeightUnit === "ft"
+              ? Math.round((h / 30.48) * 10) / 10
+              : Math.round(h * 30.48);
+          }
+        }
+      }
+
+      await updateUser({
+        settings: updates,
+      });
       handleClose();
     } finally {
       setLoading(false);

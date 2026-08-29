@@ -6,7 +6,6 @@ export default function SettingsCard({
   label,
   sub,
   danger = false,
-  arrow = false,
   toggle,
   onClick,
   onToggle,
@@ -61,7 +60,6 @@ export default function SettingsCard({
           </Mono>
         )}
       </div>
-      {arrow && <span style={{ color: C.muted, fontSize: 16 }}>›</span>}
       {toggle !== undefined && (
         <div
           style={{

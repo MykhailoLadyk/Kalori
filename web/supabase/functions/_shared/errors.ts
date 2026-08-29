@@ -1,5 +1,3 @@
-import { corsHeaders } from "./cors.ts";
-
 /** Standard error codes for structured client-side handling. */
 export const ErrorCode = {
   RATE_LIMITED: "RATE_LIMITED",
@@ -27,7 +25,6 @@ export function jsonError(
     {
       status,
       headers: {
-        ...corsHeaders,
         "Content-Type": "application/json",
         ...extraHeaders,
       },
@@ -47,10 +44,10 @@ export function jsonSuccess(
     {
       status: 200,
       headers: {
-        ...corsHeaders,
         "Content-Type": "application/json",
         ...extraHeaders,
       },
     },
   );
 }
+

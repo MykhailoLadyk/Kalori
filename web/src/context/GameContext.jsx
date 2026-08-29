@@ -158,11 +158,29 @@ export function GameProvider({ children }) {
 
     // Notifications
     try {
-      if (result.xp_awarded > 0) {
-        addNotification({ type: "xp", amount: result.xp_awarded });
+      let extraCoins = 0;
+      let extraXp = 0;
+      (result.notifications || []).forEach((notif) => {
+        if (notif.type === "quest") {
+          extraCoins += notif.reward || notif.coins || 0;
+          extraXp += notif.xp || 0;
+        } else if (notif.type === "target") {
+          extraCoins += notif.coins || 0;
+          extraXp += notif.xp || 0;
+        } else if (notif.type === "achievement") {
+          extraCoins += notif.coins || 0;
+          extraXp += notif.xp || 0;
+        }
+      });
+
+      const baseXp = Math.max(0, (result.xp_awarded || 0) - extraXp);
+      const baseCoins = Math.max(0, (result.coins_awarded || 0) - extraCoins);
+
+      if (baseXp > 0) {
+        addNotification({ type: "xp", amount: baseXp });
       }
-      if (result.coins_awarded > 0) {
-        addNotification({ type: "coins", amount: result.coins_awarded });
+      if (baseCoins > 0) {
+        addNotification({ type: "coins", amount: baseCoins });
       }
       if (result.level > 1 && result.level > prevLevel) {
         addNotification({ type: "levelup", level: result.level });

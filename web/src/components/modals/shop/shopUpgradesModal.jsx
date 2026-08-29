@@ -1,28 +1,26 @@
 import { useState } from "react";
 import { C, F, alpha } from "../../../lib/constants";
-import { Mono, Tag } from "../../shared/Primitives";
+import { Tag } from "../../shared/Primitives";
 import { IconCoin, IconTarget, IconCheck, IconLock } from "../../shared/DuoIcon";
 import { useGameStats } from "../../../hooks/useGameStats";
 import { useUser } from "../../../hooks/useUser";
+import { useNotifications } from "../../../context/NotificationContext";
 import { supabase } from "../../../services/supabase";
 
 export default function ShopUpgradesModal({ upgrades = [], coins, user }) {
   const { refreshGameData, setQuests } = useGameStats();
   const { refreshUser } = useUser();
-  const [error, setError] = useState(null);
-  const [message, setMessage] = useState(null);
+  const { addNotification } = useNotifications();
   const [loading, setLoading] = useState(false);
 
   const onPurchase = async (upgrade) => {
     if (loading || upgrade.owned || upgrade.lock) return;
     if (coins < upgrade.price) {
-      setError("Not enough coins to purchase this upgrade.");
+      addNotification({ type: "error", name: "Not enough coins" });
       return;
     }
 
     setLoading(true);
-    setError(null);
-    setMessage(null);
 
     try {
       const { data, error: rpcError } = await supabase.rpc("purchase_upgrade", {
@@ -36,10 +34,9 @@ export default function ShopUpgradesModal({ upgrades = [], coins, user }) {
       }
       await refreshUser();
       await refreshGameData();
-      setMessage(`Unlocked ${upgrade.name}!`);
-      setTimeout(() => setMessage(null), 3000);
+      addNotification({ type: "success", name: `Unlocked ${upgrade.name}!` });
     } catch (err) {
-      setError(err.message || "Purchase failed.");
+      addNotification({ type: "error", name: err.message || "Purchase failed." });
     } finally {
       setLoading(false);
     }
@@ -132,14 +129,6 @@ export default function ShopUpgradesModal({ upgrades = [], coins, user }) {
           </div>
         ))}
       </div>
-
-      {(error || message) && (
-        <div style={{ marginTop: 16, textAlign: "center" }}>
-          <Mono size={9} color={error ? C.red : C.accent}>
-            {error || message}
-          </Mono>
-        </div>
-      )}
     </div>
   );
 }

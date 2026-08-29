@@ -16,15 +16,21 @@ export async function fetchFavorites(userId) {
 export async function addFavorite(userId, meal) {
   if (!userId) throw new Error("No authenticated user ID provided");
 
+  const sanitizeNum = (val, max = 20000) => {
+    if (val == null) return null;
+    const num = Math.round(Number(val));
+    return isNaN(num) || num < 0 || num > max ? null : num;
+  };
+
   const { data, error } = await supabase
     .from("user_favorites")
     .insert({
       user_id: userId,
-      name: meal.name,
-      calories: meal.calories != null ? Math.round(Number(meal.calories)) : null,
-      protein: meal.protein != null ? Math.round(Number(meal.protein)) : null,
-      carbs: meal.carbs != null ? Math.round(Number(meal.carbs)) : null,
-      fat: meal.fat != null ? Math.round(Number(meal.fat)) : null,
+      name: typeof meal.name === "string" ? meal.name.trim().slice(0, 100) : "Favorite",
+      calories: sanitizeNum(meal.calories, 20000),
+      protein: sanitizeNum(meal.protein, 5000),
+      carbs: sanitizeNum(meal.carbs, 5000),
+      fat: sanitizeNum(meal.fat, 5000),
       type: meal.type || "breakfast",
     })
     .select()

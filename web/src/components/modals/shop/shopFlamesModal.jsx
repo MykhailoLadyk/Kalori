@@ -1,16 +1,16 @@
 import { useState } from "react";
 import { C, F, alpha } from "../../../lib/constants";
-import { Mono, Tag } from "../../shared/Primitives";
+import { Tag } from "../../shared/Primitives";
 import { IconCoin, IconFire } from "../../shared/DuoIcon";
 import { useUser } from "../../../hooks/useUser";
 import { useGameStats } from "../../../hooks/useGameStats";
+import { useNotifications } from "../../../context/NotificationContext";
 import { supabase } from "../../../services/supabase";
 
 export default function ShopFlamesModal({ flames = [], currentFlame, coins }) {
   const { user, updateUser, refreshUser } = useUser();
   const { refreshGameData } = useGameStats();
-  const [error, setError] = useState(null);
-  const [message, setMessage] = useState(null);
+  const { addNotification } = useNotifications();
   const [loading, setLoading] = useState(false);
 
   const activeFlameId = currentFlame || "orange";
@@ -18,8 +18,6 @@ export default function ShopFlamesModal({ flames = [], currentFlame, coins }) {
   const onPurchase = async (flameId) => {
     if (loading) return;
     setLoading(true);
-    setError(null);
-    setMessage(null);
 
     const flame = flames.find((f) => f.id === flameId);
     if (!flame) {
@@ -27,7 +25,7 @@ export default function ShopFlamesModal({ flames = [], currentFlame, coins }) {
       return;
     }
     if (coins < flame.price) {
-      setError("Not enough coins to purchase this flame color.");
+      addNotification({ type: "error", name: "Not enough coins" });
       setLoading(false);
       return;
     }
@@ -42,10 +40,9 @@ export default function ShopFlamesModal({ flames = [], currentFlame, coins }) {
       await refreshUser();
       await refreshGameData();
 
-      setMessage(`Unlocked ${flame.name}!`);
-      setTimeout(() => setMessage(null), 3000);
+      addNotification({ type: "success", name: `Unlocked ${flame.name}!` });
     } catch (err) {
-      setError(err.message || "Purchase failed.");
+      addNotification({ type: "error", name: err.message || "Purchase failed." });
     } finally {
       setLoading(false);
     }
@@ -68,14 +65,6 @@ export default function ShopFlamesModal({ flames = [], currentFlame, coins }) {
       <div style={{ fontFamily: F.head, fontSize: 20, fontWeight: 900, color: C.text, marginBottom: 16 }}>
         Streak Flame Colors
       </div>
-
-      {(error || message) && (
-        <div style={{ marginBottom: 16, textAlign: "center", animation: "fadeIn 0.3s ease" }}>
-          <Mono size={9} color={error ? C.red : C.accent}>
-            {error || message}
-          </Mono>
-        </div>
-      )}
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         {flames.map(({ id, name, color, price, lock, owned }) => {

@@ -1,6 +1,17 @@
 import { supabase } from "./supabase";
 import { getTodayDateString } from "../lib/dateUtils";
 
+function sanitizeNum(val, max = 20000) {
+  if (val == null) return null;
+  const n = Math.round(Number(val));
+  return isNaN(n) || n < 0 || n > max ? null : n;
+}
+
+function sanitizeStr(val, maxLen = 100) {
+  if (typeof val !== "string") return "";
+  return val.trim().slice(0, maxLen);
+}
+
 export const fetchMeals = async (userId, date = getTodayDateString()) => {
   if (!userId) throw new Error("No authenticated user ID provided");
   const { data, error } = await supabase
@@ -16,11 +27,12 @@ export const fetchMeals = async (userId, date = getTodayDateString()) => {
 export const updateMeal = async (userId, id, updates) => {
   if (!userId) throw new Error("No authenticated user ID provided");
   const sanitizedUpdates = { ...updates };
-  if (sanitizedUpdates.calories != null) sanitizedUpdates.calories = Math.round(Number(sanitizedUpdates.calories));
-  if (sanitizedUpdates.protein != null) sanitizedUpdates.protein = Math.round(Number(sanitizedUpdates.protein));
-  if (sanitizedUpdates.carbs != null) sanitizedUpdates.carbs = Math.round(Number(sanitizedUpdates.carbs));
-  if (sanitizedUpdates.fat != null) sanitizedUpdates.fat = Math.round(Number(sanitizedUpdates.fat));
-  if (sanitizedUpdates.amount != null) sanitizedUpdates.amount = Math.round(Number(sanitizedUpdates.amount));
+  if (sanitizedUpdates.name !== undefined) sanitizedUpdates.name = sanitizeStr(sanitizedUpdates.name);
+  if (sanitizedUpdates.calories !== undefined) sanitizedUpdates.calories = sanitizeNum(sanitizedUpdates.calories, 20000);
+  if (sanitizedUpdates.protein !== undefined) sanitizedUpdates.protein = sanitizeNum(sanitizedUpdates.protein, 5000);
+  if (sanitizedUpdates.carbs !== undefined) sanitizedUpdates.carbs = sanitizeNum(sanitizedUpdates.carbs, 5000);
+  if (sanitizedUpdates.fat !== undefined) sanitizedUpdates.fat = sanitizeNum(sanitizedUpdates.fat, 5000);
+  if (sanitizedUpdates.amount !== undefined) sanitizedUpdates.amount = sanitizeNum(sanitizedUpdates.amount, 10000);
 
   const { data, error } = await supabase
     .from("meals")
@@ -51,14 +63,14 @@ export async function addMeal(userId, meal) {
     .from("meals")
     .insert({
       user_id: userId,
-      name: meal.name,
-      calories: meal.calories != null ? Math.round(Number(meal.calories)) : null,
-      protein: meal.protein != null ? Math.round(Number(meal.protein)) : null,
-      carbs: meal.carbs != null ? Math.round(Number(meal.carbs)) : null,
-      fat: meal.fat != null ? Math.round(Number(meal.fat)) : null,
+      name: sanitizeStr(meal.name) || "Meal",
+      calories: sanitizeNum(meal.calories, 20000),
+      protein: sanitizeNum(meal.protein, 5000),
+      carbs: sanitizeNum(meal.carbs, 5000),
+      fat: sanitizeNum(meal.fat, 5000),
       type: meal.type, // "breakfast" | "lunch" | "dinner" | "snacks"
       date: meal.date || getTodayDateString(),
-      amount: meal.amount != null ? Math.round(Number(meal.amount)) : null,
+      amount: sanitizeNum(meal.amount, 10000),
     })
     .select()
     .single();

@@ -37,7 +37,9 @@ export function MealEditModal({ meal, handleClose }) {
   const validate = () => {
     const newErrors = {};
     if (!form.name.trim()) newErrors.name = "Name is required";
+    if (form.name.trim().length > 100) newErrors.name = "Max 100 characters";
 
+    const limits = { calories: 20000, protein: 5000, carbs: 5000, fat: 5000 };
     const numericKeys = ["calories", "protein", "carbs", "fat"];
     numericKeys.forEach((k) => {
       const val = form[k];
@@ -46,6 +48,8 @@ export function MealEditModal({ meal, handleClose }) {
         newErrors[k] = `${k.charAt(0).toUpperCase() + k.slice(1)} is required`;
       } else if (n < 0) {
         newErrors[k] = "Cannot be negative";
+      } else if (n > limits[k]) {
+        newErrors[k] = `Max ${limits[k]}`;
       }
     });
 

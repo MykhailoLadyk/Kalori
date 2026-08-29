@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { C, F, alpha } from "../lib/constants";
 import { Mono } from "../components/shared/Primitives";
@@ -84,6 +84,17 @@ export default function ConfirmMeal() {
 
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const isBusy = refining || loading;
+
+  useEffect(() => {
+    if (!isBusy) return;
+    const handleBeforeUnload = (e) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [isBusy]);
 
   const { isFavorite, addFavorite, removeFavorite, getFavoriteByName } = useFavorites();
   const formIsFav = isFavorite(form.name);
@@ -172,14 +183,22 @@ export default function ConfirmMeal() {
   const validate = () => {
     const newErrors = {};
     if (!form.name.trim()) newErrors.name = "Name is required";
-    if (form.calories === "") newErrors.calories = "Required";
-    if (form.protein === "") newErrors.protein = "Required";
-    if (form.carbs === "") newErrors.carbs = "Required";
-    if (form.fat === "") newErrors.fat = "Required";
-    if (form.calories < 0) newErrors.calories = "Cannot be negative";
-    if (form.protein < 0) newErrors.protein = "Cannot be negative";
-    if (form.carbs < 0) newErrors.carbs = "Cannot be negative";
-    if (form.fat < 0) newErrors.fat = "Cannot be negative";
+    if (form.name.trim().length > 100) newErrors.name = "Max 100 characters";
+
+    const fields = [
+      { key: "calories", max: 20000 },
+      { key: "protein", max: 5000 },
+      { key: "carbs", max: 5000 },
+      { key: "fat", max: 5000 },
+    ];
+    fields.forEach(({ key, max }) => {
+      const val = form[key];
+      const n = Number(val);
+      if (val === "" || val == null) newErrors[key] = "Required";
+      else if (isNaN(n)) newErrors[key] = "Invalid";
+      else if (n < 0) newErrors[key] = "Cannot be negative";
+      else if (n > max) newErrors[key] = `Max ${max}`;
+    });
     return newErrors;
   };
 
@@ -221,15 +240,17 @@ export default function ConfirmMeal() {
     <div className="sy flex flex-col flex-1" style={{ animation: "fadeIn 0.22s ease both" }}>
       <div className="flex items-center" style={{ gap: 12, padding: "8px 22px 16px" }}>
         <div
-          onClick={() => navigate("/")}
-          className="press flex items-center justify-center bg-card"
+          onClick={!isBusy ? () => navigate("/") : undefined}
+          className={isBusy ? "flex items-center justify-center bg-card" : "press flex items-center justify-center bg-card"}
           style={{
             width: 36,
             height: 36,
             border: `1px solid ${C.border}`,
             borderRadius: 11,
             color: C.soft,
-            cursor: "pointer",
+            cursor: isBusy ? "not-allowed" : "pointer",
+            opacity: isBusy ? 0.35 : 1,
+            pointerEvents: isBusy ? "none" : "auto",
           }}
         >
           <ChevronLeft />
@@ -248,8 +269,8 @@ export default function ConfirmMeal() {
             <img src={photo} alt="meal" className="w-full h-full" style={{ objectFit: "cover" }} />
             {!isAlbum && (
               <div
-                onClick={() => navigate("/add-meal/photo")}
-                className="hover-btn press absolute"
+                onClick={!isBusy ? () => navigate("/add-meal/photo") : undefined}
+                className={isBusy ? "absolute" : "hover-btn press absolute"}
                 style={{
                   bottom: 10,
                   right: 10,
@@ -258,7 +279,9 @@ export default function ConfirmMeal() {
                   border: `1px solid ${C.border}`,
                   borderRadius: 9,
                   padding: "6px 12px",
-                  cursor: "pointer",
+                  cursor: isBusy ? "not-allowed" : "pointer",
+                  opacity: isBusy ? 0.4 : 1,
+                  pointerEvents: isBusy ? "none" : "auto",
                 }}
               >
                 <span className="font-mono font-bold" style={{ fontSize: 9, color: "#fff" }}>
@@ -591,27 +614,36 @@ export default function ConfirmMeal() {
 
         <div className="flex" style={{ gap: 10, marginTop: 8 }}>
           <div
-            onClick={() => navigate("/")}
-            className="hover-btn press flex-1 bg-card text-center cursor-pointer"
-            style={{ border: `1px solid ${C.border}`, borderRadius: 12, padding: "15px", minHeight: 50 }}
+            onClick={!isBusy ? () => navigate("/") : undefined}
+            className={isBusy ? "flex-1 bg-card text-center cursor-pointer" : "hover-btn press flex-1 bg-card text-center cursor-pointer"}
+            style={{
+              border: `1px solid ${C.border}`,
+              borderRadius: 12,
+              padding: "15px",
+              minHeight: 50,
+              opacity: isBusy ? 0.4 : 1,
+              cursor: isBusy ? "not-allowed" : "pointer",
+              pointerEvents: isBusy ? "none" : "auto",
+            }}
           >
             <span className="font-mono font-bold" style={{ fontSize: 10, color: C.soft }}>
               CANCEL
             </span>
           </div>
           <div
-            onClick={!loading ? handleConfirm : undefined}
-            className="hover-btn press text-center cursor-pointer"
+            onClick={!isBusy ? handleConfirm : undefined}
+            className={isBusy ? "text-center cursor-pointer" : "hover-btn press text-center cursor-pointer"}
             style={{
               flex: 2,
-              background: loading ? C.accentDim : C.accent,
+              background: isBusy ? C.accentDim : C.accent,
               borderRadius: 12,
               padding: "15px",
               minHeight: 50,
+              cursor: isBusy ? "not-allowed" : "pointer",
             }}
           >
-            <span className="font-mono font-bold" style={{ fontSize: 11, color: loading ? C.accent : "#000" }}>
-              {loading ? "SAVING..." : "ADD MEAL"}
+            <span className="font-mono font-bold" style={{ fontSize: 11, color: isBusy ? C.accent : "#000" }}>
+              {loading ? "SAVING..." : refining ? "REFINING..." : "ADD MEAL"}
             </span>
           </div>
         </div>

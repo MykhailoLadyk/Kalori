@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { C, F } from "../../lib/constants";
-import { Mono } from "../shared/Primitives";
+import { C, F, alpha } from "../../lib/constants";
 import { AnimBar } from "../shared/AnimBar";
 import { IconDrop } from "../shared/DuoIcon";
 import { useMeals } from "../../hooks/useMeals";
@@ -26,137 +25,151 @@ export function WaterTracker() {
 
 
   const handleCustomAdd = () => {
-    const amount = parseInt(inputValue);
-    if (!amount || amount <= 0) return;
+    const amount = parseInt(inputValue, 10);
+    if (isNaN(amount) || amount <= 0 || amount > 10000) return;
     handleAddWater(amount);
     setInputValue("");
   };
 
   const pct = Math.min((current / goal) * 100, 100);
   return (
-    <div
-      data-tour="water-tracker"
-      className="hover-card"
-      style={{
-        background: C.card,
-        borderRadius: 14,
-        padding: "11px 14px",
-        border: `1px solid ${C.border}`,
-        width: "90%",
-        margin: "0 auto",
-      }}
-    >
+    <div style={{ padding: "12px 22px 24px", animation: "fadeUp 0.4s ease 0.7s both" }}>
       <div
+        data-tour="water-tracker"
+        className="hover-card"
         style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 10,
-          marginBottom: 8,
+          background: C.card,
+          borderRadius: 18,
+          padding: "16px",
+          border: `1px solid ${C.border}`,
         }}
       >
-        <div style={{ animation: "float 3s ease infinite", flexShrink: 0 }}>
-          <IconDrop size={22} color={C.blue} />
-        </div>
-        <div style={{ flex: 1 }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginBottom: 5,
-            }}
-          >
-            <Mono size={8} color={C.mutedLight}>
-              Water
-            </Mono>
-            <Mono size={8} color={C.blue}>
-              {current}ml / {goal}ml
-            </Mono>
-          </div>
-          <AnimBar pct={pct} color={C.blue} delay={0} />
-        </div>
-      </div>
-
-      <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
-        {[250, 400].map((amount) => (
-          <div
-            key={amount}
-            onClick={() => handleAddWater(amount)}
-            className="hover-btn press"
-            style={{
-              flex: 1,
-              background: C.blueDim,
-              border: `1px solid ${C.blue}40`,
-              borderRadius: 9,
-              padding: "7px 0",
-              textAlign: "center",
-              cursor: "pointer",
-            }}
-          >
-            <span
-              style={{
-                fontFamily: F.mono,
-                fontSize: 9,
-                fontWeight: 700,
-                color: C.blue,
-              }}
-            >
-              +{amount}ml
-            </span>
-          </div>
-        ))}
-
         <div
           style={{
-            flex: 1,
             display: "flex",
-            background: C.blueDim,
-            border: `1px solid ${C.blue}40`,
-            borderRadius: 9,
-            overflow: "hidden",
+            alignItems: "center",
+            gap: 12,
+            marginBottom: 12,
           }}
         >
-          <input
-            type="number"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleCustomAdd()}
-            placeholder="ml"
-            style={{
-              flex: 1,
-              background: "transparent",
-              border: "none",
-              outline: "none",
-              padding: "7px 8px",
-              fontFamily: F.mono,
-              fontSize: 9,
-              fontWeight: 700,
-              color: C.blue,
-              width: 0,
-            }}
-          />
           <div
-            onClick={handleCustomAdd}
-            className="press"
             style={{
-              padding: "7px 10px",
-              background: `${C.blue}30`,
+              width: 38,
+              height: 38,
+              borderRadius: 12,
+              background: alpha(C.blue, 12),
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              cursor: "pointer",
-              borderLeft: `1px solid ${C.blue}40`,
+              flexShrink: 0,
             }}
           >
-            <span
+            <IconDrop size={20} color={C.blue} />
+          </div>
+          <div>
+            <div style={{ fontFamily: F.head, fontSize: 15, fontWeight: 800, color: C.text }}>
+              Water Intake
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 2 }}>
+              <span style={{ fontFamily: F.mono, fontSize: 12, fontWeight: 800, color: C.blue }}>
+                {current.toLocaleString()}
+              </span>
+              <span style={{ fontFamily: F.mono, fontSize: 10, color: C.muted }}>
+                / {goal.toLocaleString()} ml
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div style={{ marginBottom: 14 }}>
+          <AnimBar pct={pct} color={C.blue} height={6} delay={0} />
+        </div>
+
+        <div style={{ display: "flex", gap: 8 }}>
+          {[
+            { label: "+250ml", amount: 250 },
+            { label: "+500ml", amount: 500 },
+          ].map(({ label, amount }) => (
+            <div
+              key={amount}
+              onClick={() => handleAddWater(amount)}
+              className="hover-btn press"
               style={{
-                fontFamily: F.mono,
-                fontSize: 10,
-                fontWeight: 700,
-                color: C.blue,
+                flex: 1,
+                background: alpha(C.blue, 10),
+                border: `1px solid ${alpha(C.blue, 22)}`,
+                borderRadius: 10,
+                padding: "9px 0",
+                textAlign: "center",
+                cursor: "pointer",
               }}
             >
-              +
-            </span>
+              <span
+                style={{
+                  fontFamily: F.mono,
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: C.blue,
+                }}
+              >
+                {label}
+              </span>
+            </div>
+          ))}
+
+          <div
+            style={{
+              flex: 1.2,
+              display: "flex",
+              background: C.panel,
+              border: `1px solid ${C.border}`,
+              borderRadius: 10,
+              overflow: "hidden",
+            }}
+          >
+            <input
+              type="number"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleCustomAdd()}
+              placeholder="+ Custom"
+              style={{
+                flex: 1,
+                background: "transparent",
+                border: "none",
+                outline: "none",
+                padding: "0 10px",
+                fontFamily: F.mono,
+                fontSize: 11,
+                fontWeight: 700,
+                color: C.blue,
+                width: 0,
+              }}
+            />
+            <div
+              onClick={handleCustomAdd}
+              className="hover-btn press"
+              style={{
+                padding: "0 12px",
+                background: alpha(C.blue, 18),
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                borderLeft: `1px solid ${alpha(C.blue, 25)}`,
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: F.mono,
+                  fontSize: 12,
+                  fontWeight: 800,
+                  color: C.blue,
+                }}
+              >
+                +
+              </span>
+            </div>
           </div>
         </div>
       </div>

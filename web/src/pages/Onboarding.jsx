@@ -205,6 +205,7 @@ export default function OnboardingPage() {
     weight: "",
     weight_unit: "kg",
     height: "",
+    height_unit: "cm",
     activity_level: "moderate",
     goal: "maintain",
   });
@@ -212,6 +213,36 @@ export default function OnboardingPage() {
   const set = (key, val) => {
     setForm((prev) => ({ ...prev, [key]: val }));
     if (errors[key]) setErrors((prev) => ({ ...prev, [key]: null }));
+  };
+
+  const handleWeightUnitChange = (newUnit) => {
+    if (newUnit === form.weight_unit) return;
+    setForm((prev) => {
+      let newWeight = prev.weight;
+      if (prev.weight && !isNaN(Number(prev.weight)) && Number(prev.weight) > 0) {
+        const num = Number(prev.weight);
+        newWeight = newUnit === "lbs"
+          ? String(Math.round((num / 0.453592) * 10) / 10)
+          : String(Math.round((num * 0.453592) * 10) / 10);
+      }
+      return { ...prev, weight_unit: newUnit, weight: newWeight };
+    });
+    if (errors.weight) setErrors((prev) => ({ ...prev, weight: null }));
+  };
+
+  const handleHeightUnitChange = (newUnit) => {
+    if (newUnit === form.height_unit) return;
+    setForm((prev) => {
+      let newHeight = prev.height;
+      if (prev.height && !isNaN(Number(prev.height)) && Number(prev.height) > 0) {
+        const num = Number(prev.height);
+        newHeight = newUnit === "ft"
+          ? String(Math.round((num / 30.48) * 10) / 10)
+          : String(Math.round(num * 30.48));
+      }
+      return { ...prev, height_unit: newUnit, height: newHeight };
+    });
+    if (errors.height) setErrors((prev) => ({ ...prev, height: null }));
   };
 
   const currentStep = STEPS[step];
@@ -223,7 +254,8 @@ export default function OnboardingPage() {
 
   if (form.weight && form.height && form.age && form.sex) {
     const weightKg = form.weight_unit === "lbs" ? Number(form.weight) * 0.453592 : Number(form.weight);
-    let bmr = (10 * weightKg) + (6.25 * Number(form.height)) - (5 * Number(form.age));
+    const heightCm = form.height_unit === "ft" ? Number(form.height) * 30.48 : Number(form.height);
+    let bmr = (10 * weightKg) + (6.25 * heightCm) - (5 * Number(form.age));
     bmr += form.sex === "female" ? -161 : 5;
     
     let multiplier = 1.2;
@@ -258,11 +290,12 @@ export default function OnboardingPage() {
       const weight = Number(form.weight);
       const weightKg = form.weight_unit === "lbs" ? weight * 0.453592 : weight;
       const height = Number(form.height);
+      const heightCm = form.height_unit === "ft" ? height * 30.48 : height;
 
       if (!form.sex) e.sex = "Please select biological sex";
       if (!form.age || age < 13 || age > 120) e.age = "Must be 13-120";
       if (!form.weight || weightKg < 20 || weightKg > 300) e.weight = form.weight_unit === "lbs" ? "Must be 44-660 lbs" : "Must be 20-300kg";
-      if (!form.height || height < 100 || height > 250) e.height = "Must be 100-250cm";
+      if (!form.height || heightCm < 100 || heightCm > 250) e.height = form.height_unit === "ft" ? "Must be 3.3-8.2 ft" : "Must be 100-250cm";
     }
     return e;
   };
@@ -294,6 +327,7 @@ export default function OnboardingPage() {
           weight: Number(form.weight),
           weight_unit: form.weight_unit,
           height: Number(form.height),
+          height_unit: form.height_unit,
           sex: form.sex,
         },
         targets: {
@@ -586,10 +620,24 @@ export default function OnboardingPage() {
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
                   <div style={{ flex: 1 }}>
-                    <Chip label="kg" selected={form.weight_unit === "kg"} onSelect={() => set("weight_unit", "kg")} />
+                    <Chip label="kg" selected={form.weight_unit === "kg"} onSelect={() => handleWeightUnitChange("kg")} />
                   </div>
                   <div style={{ flex: 1 }}>
-                    <Chip label="lbs" selected={form.weight_unit === "lbs"} onSelect={() => set("weight_unit", "lbs")} />
+                    <Chip label="lbs" selected={form.weight_unit === "lbs"} onSelect={() => handleWeightUnitChange("lbs")} />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                  <Mono size={8} color={C.mutedLight}>Height Unit</Mono>
+                </div>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <div style={{ flex: 1 }}>
+                    <Chip label="cm" selected={form.height_unit === "cm"} onSelect={() => handleHeightUnitChange("cm")} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <Chip label="ft" selected={form.height_unit === "ft"} onSelect={() => handleHeightUnitChange("ft")} />
                   </div>
                 </div>
               </div>
@@ -608,7 +656,7 @@ export default function OnboardingPage() {
                 type="number"
                 value={form.weight}
                 onChange={(v) => set("weight", v)}
-                placeholder="e.g. 70"
+                placeholder={form.weight_unit === "lbs" ? "e.g. 150" : "e.g. 70"}
                 unit={form.weight_unit}
                 error={errors.weight}
               />
@@ -617,8 +665,8 @@ export default function OnboardingPage() {
                 type="number"
                 value={form.height}
                 onChange={(v) => set("height", v)}
-                placeholder="e.g. 175"
-                unit="cm"
+                placeholder={form.height_unit === "ft" ? "e.g. 5.9" : "e.g. 175"}
+                unit={form.height_unit}
                 error={errors.height}
               />
             </div>

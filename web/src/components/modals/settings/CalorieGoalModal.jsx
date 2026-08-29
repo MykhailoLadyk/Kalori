@@ -57,9 +57,10 @@ export default function CalorieGoalModal({ handleClose }) {
     
     if (user?.settings && user.age) {
        const weightKg = user.settings.weight_unit === "lbs" ? user.settings.weight * 0.453592 : user.settings.weight;
+       const heightCm = user.settings.height_unit === "ft" ? user.settings.height * 30.48 : user.settings.height;
        const { calories, water } = calculateTargets({
          weight: weightKg,
-         height: user.settings.height,
+         height: heightCm,
          age: user.age,
          activity_level: newForm.activity_level,
          goal: newForm.goal
@@ -106,7 +107,10 @@ export default function CalorieGoalModal({ handleClose }) {
           activity_level: form.activity_level,
         },
       });
-      addNotification({ type: "success", name: "Goals saved successfully!" });
+      addNotification({
+        type: "success",
+        name: "Goals updated",
+      });
       handleClose();
     } finally {
       setLoading(false);

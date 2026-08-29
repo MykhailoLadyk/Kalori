@@ -54,14 +54,22 @@ export default function ManualMealPage() {
   const validate = () => {
     const newErrors = {};
     if (!form.name.trim()) newErrors.name = "Name is required";
-    if (form.calories === "") newErrors.calories = "Calories are required";
-    if (form.protein === "") newErrors.protein = "Protein is required";
-    if (form.carbs === "") newErrors.carbs = "Carbs are required";
-    if (form.fat === "") newErrors.fat = "Fat is required";
-    if (form.calories < 0) newErrors.calories = "Cannot be negative";
-    if (form.protein < 0) newErrors.protein = "Cannot be negative";
-    if (form.carbs < 0) newErrors.carbs = "Cannot be negative";
-    if (form.fat < 0) newErrors.fat = "Cannot be negative";
+    if (form.name.trim().length > 100) newErrors.name = "Max 100 characters";
+
+    const fields = [
+      { key: "calories", label: "Calories", max: 20000 },
+      { key: "protein", label: "Protein", max: 5000 },
+      { key: "carbs", label: "Carbs", max: 5000 },
+      { key: "fat", label: "Fat", max: 5000 },
+    ];
+    fields.forEach(({ key, label, max }) => {
+      const val = form[key];
+      const n = Number(val);
+      if (val === "" || val == null) newErrors[key] = `${label} is required`;
+      else if (isNaN(n)) newErrors[key] = "Must be a number";
+      else if (n < 0) newErrors[key] = "Cannot be negative";
+      else if (n > max) newErrors[key] = `Max ${max}`;
+    });
     return newErrors;
   };
 

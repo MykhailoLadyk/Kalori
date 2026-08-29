@@ -6,10 +6,12 @@ import { useStats } from "../../../hooks/useStats";
 import { logWeight } from "../../../services/weightService";
 import { calcMacros, calculateTargets } from "../../../lib/macroCalc";
 import { getTodayDateString } from "../../../lib/dateUtils";
+import { useNotifications } from "../../../context/NotificationContext";
 
 export function WeightLogModal({ handleClose, initialDate }) {
   const { user, updateUser } = useUser();
   const { refreshStats } = useStats();
+  const { addNotification } = useNotifications();
 
   const userUnit = user?.settings?.weight_unit || "kg";
   const [weight, setWeight] = useState(user?.settings?.weight || "");
@@ -18,37 +20,58 @@ export function WeightLogModal({ handleClose, initialDate }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const handleUnitChange = (newUnit) => {
+    if (newUnit === unit) return;
+    if (weight && !isNaN(Number(weight)) && Number(weight) > 0) {
+      const num = Number(weight);
+      const converted = newUnit === "lbs"
+        ? Math.round((num / 0.453592) * 10) / 10
+        : Math.round((num * 0.453592) * 10) / 10;
+      setWeight(String(converted));
+    }
+    setUnit(newUnit);
+  };
+
   const handleSubmit = async () => {
-    if (!weight || Number(weight) <= 0) {
-      setError("Please enter a valid weight");
+    const numWeight = Number(weight);
+    const weightKg = unit === "lbs" ? numWeight * 0.453592 : numWeight;
+    if (!weight || isNaN(numWeight) || weightKg < 20 || weightKg > 300) {
+      setError(unit === "lbs" ? "Weight must be between 44 and 660 lbs" : "Weight must be between 20 and 300 kg");
       return;
     }
 
     try {
       setLoading(true);
       setError(null);
-      await logWeight(user.id, { weight: Number(weight), unit, date });
+      await logWeight(user.id, { weight: numWeight, unit, date });
 
-      const weightKg = unit === "lbs" ? Number(weight) * 0.453592 : Number(weight);
-      const settings = { ...user?.settings, weight: Number(weight), weight_unit: unit };
+      const settings = { ...user?.settings, weight: numWeight, weight_unit: unit };
 
       // Recompute daily targets from the new weight (mirrors BodyStatsModal).
       // Skipped when body stats are incomplete so we don't clobber targets
       // with the default 2000-kcal fallback.
       const hasBodyStats = Number(settings.height) > 0 && Number(user?.age) > 0;
       let targets = user?.targets;
+      let goalsChanged = false;
 
       if (hasBodyStats) {
         const goal = settings.weight_goal || "maintain";
+        const heightCm = settings.height_unit === "ft" ? settings.height * 30.48 : settings.height;
         const { calories, water } = calculateTargets({
           weight: weightKg,
-          height: settings.height,
+          height: heightCm,
           age: user.age,
           sex: settings.sex || "male",
           activity_level: settings.activity_level || "moderate",
           goal,
         });
-        targets = { calories, water, ...calcMacros({ weight: weightKg, calories, goal }) };
+        const macros = calcMacros({ weight: weightKg, calories, goal });
+        targets = { calories, water, ...macros };
+        goalsChanged =
+          user?.targets?.calories !== calories ||
+          user?.targets?.protein !== macros.protein ||
+          user?.targets?.carbs !== macros.carbs ||
+          user?.targets?.fat !== macros.fat;
       }
 
       // Update current weight in user settings
@@ -59,6 +82,13 @@ export function WeightLogModal({ handleClose, initialDate }) {
       if (refreshStats) {
         await refreshStats();
       }
+
+      if (goalsChanged && targets) {
+        addNotification({ type: "success", name: "Goals updated" });
+      } else {
+        addNotification({ type: "success", name: "Weight logged successfully!" });
+      }
+
       handleClose();
     } catch (err) {
       setError(err.message || "Failed to log weight");
@@ -80,7 +110,7 @@ export function WeightLogModal({ handleClose, initialDate }) {
         {["kg", "lbs"].map((u) => (
           <div
             key={u}
-            onClick={() => setUnit(u)}
+            onClick={() => handleUnitChange(u)}
             className="press"
             style={{
               flex: 1,
@@ -142,6 +172,8 @@ export function WeightLogModal({ handleClose, initialDate }) {
           <input
             type="number"
             step="0.1"
+            min={unit === "lbs" ? "44" : "20"}
+            max={unit === "lbs" ? "660" : "300"}
             value={weight}
             onChange={(e) => {
               setWeight(e.target.value);

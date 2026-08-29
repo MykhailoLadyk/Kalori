@@ -72,6 +72,16 @@ export default function DescribeAddMeal() {
     return () => clearInterval(interval);
   }, [loading, result]);
 
+  useEffect(() => {
+    if (!loading) return;
+    const handleBeforeUnload = (e) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [loading]);
+
   const handleAnalyze = async () => {
     if (!text.trim()) return;
 
@@ -127,15 +137,17 @@ export default function DescribeAddMeal() {
       <div className="flex items-center justify-between" style={{ padding: "8px 22px 16px" }}>
         <div className="flex items-center" style={{ gap: 12 }}>
           <div
-            onClick={() => navigate("/")}
-            className="press flex items-center justify-center bg-card"
+            onClick={!loading ? () => navigate("/") : undefined}
+            className={loading ? "flex items-center justify-center bg-card" : "press flex items-center justify-center bg-card"}
             style={{
               width: 36,
               height: 36,
               border: `1px solid ${C.border}`,
               borderRadius: 11,
               color: C.soft,
-              cursor: "pointer",
+              cursor: loading ? "not-allowed" : "pointer",
+              opacity: loading ? 0.35 : 1,
+              pointerEvents: loading ? "none" : "auto",
             }}
           >
             <ChevronLeft />
@@ -148,8 +160,8 @@ export default function DescribeAddMeal() {
         {/* Pro / Coin pill (Free Tier) */}
         {!isPro && (
           <div
-            onClick={() => navigate("/premium")}
-            className="press"
+            onClick={!loading ? () => navigate("/premium") : undefined}
+            className={loading ? "" : "press"}
             style={{
               background: alpha(C.gold, 12),
               border: `1px solid ${alpha(C.gold, 30)}`,
@@ -158,7 +170,9 @@ export default function DescribeAddMeal() {
               display: "flex",
               alignItems: "center",
               gap: 5,
-              cursor: "pointer",
+              cursor: loading ? "not-allowed" : "pointer",
+              opacity: loading ? 0.4 : 1,
+              pointerEvents: loading ? "none" : "auto",
             }}
           >
             <IconCoin size={13} color={C.gold} />

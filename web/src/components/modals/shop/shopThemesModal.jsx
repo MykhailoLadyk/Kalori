@@ -1,23 +1,20 @@
 import { useState } from "react";
 import { C, F } from "../../../lib/constants";
-import { Mono } from "../../shared/Primitives";
 import { Tag } from "../../shared/Primitives";
 import { IconCoin } from "../../shared/DuoIcon";
 import { useUser } from "../../../hooks/useUser";
 import { useGameStats } from "../../../hooks/useGameStats";
+import { useNotifications } from "../../../context/NotificationContext";
 import { supabase } from "../../../services/supabase";
 export default function ShopThemesModal({ themes = [], currentTheme, coins }) {
   const { updateUser } = useUser();
   const { refreshGameData } = useGameStats();
-  const [error, setError] = useState(null);
-  const [message, setMessage] = useState(null);
+  const { addNotification } = useNotifications();
   const [loading, setLoading] = useState(false);
 
   const onPurchase = async (themeId) => {
     if (loading) return;
     setLoading(true);
-    setError(null);
-    setMessage(null);
 
     const theme = themes.find((t) => t.id === themeId);
     if (!theme) {
@@ -25,7 +22,7 @@ export default function ShopThemesModal({ themes = [], currentTheme, coins }) {
       return;
     }
     if (coins < theme.price) {
-      setError("Not enough coins to purchase this theme.");
+      addNotification({ type: "error", name: "Not enough coins" });
       setLoading(false);
       return;
     }
@@ -40,10 +37,9 @@ export default function ShopThemesModal({ themes = [], currentTheme, coins }) {
       await updateUser({ settings: { theme: theme.id } });
       await refreshGameData();
 
-      setMessage(`Unlocked ${theme.name} theme!`);
-      setTimeout(() => setMessage(null), 3000);
+      addNotification({ type: "success", name: `Unlocked ${theme.name} theme!` });
     } catch (err) {
-      setError(err.message || "Purchase failed.");
+      addNotification({ type: "error", name: err.message || "Purchase failed." });
     } finally {
       setLoading(false);
     }
@@ -66,14 +62,6 @@ export default function ShopThemesModal({ themes = [], currentTheme, coins }) {
   return (
     <div>
       <div style={{ fontFamily: F.head, fontSize: 20, fontWeight: 900, color: C.text, marginBottom: 16 }}>Themes</div>
-
-      {(error || message) && (
-        <div style={{ marginBottom: 16, textAlign: "center", animation: "fadeIn 0.3s ease" }}>
-          <Mono size={9} color={error ? C.red : C.accent}>
-            {error || message}
-          </Mono>
-        </div>
-      )}
 
       {themes.map(({ id, name, colors, price, lock, owned }, i) => {
         const isCurrent = String(id) === String(currentTheme);

@@ -23,6 +23,7 @@ export interface RateLimitResult {
  */
 export async function checkRateLimit(
   supabase: SupabaseClient,
+  corsHeaders: Record<string, string> = {},
 ): Promise<RateLimitResult | Response> {
   const { data, error } = await supabase.rpc("check_and_increment_ai_usage_v2");
 
@@ -32,6 +33,7 @@ export async function checkRateLimit(
       "Failed to check usage quota",
       ErrorCode.INTERNAL_ERROR,
       500,
+      corsHeaders,
     );
   }
 
@@ -43,6 +45,7 @@ export async function checkRateLimit(
         "Need 50 coins to scan meals on the Free Tier",
         ErrorCode.INSUFFICIENT_COINS,
         402,
+        corsHeaders,
       );
     }
 
@@ -53,6 +56,7 @@ export async function checkRateLimit(
         ErrorCode.RATE_LIMITED,
         429,
         {
+          ...corsHeaders,
           "X-RateLimit-Limit": String(result.limit),
           "X-RateLimit-Remaining": "0",
         },
@@ -65,6 +69,7 @@ export async function checkRateLimit(
       ErrorCode.RATE_LIMITED,
       429,
       {
+        ...corsHeaders,
         "X-RateLimit-Limit": String(result.limit),
         "X-RateLimit-Remaining": "0",
       },

@@ -32,7 +32,8 @@ export async function fetchLatestWeight(userId) {
 export async function logWeight(userId, { weight, unit = "kg", date = getTodayDateString() }) {
   if (!userId) throw new Error("No authenticated user ID provided");
   const numWeight = Number(weight);
-  if (isNaN(numWeight) || numWeight <= 0) throw new Error("Invalid weight value");
+  const weightKg = unit === "lbs" ? numWeight * 0.453592 : numWeight;
+  if (isNaN(numWeight) || weightKg < 20 || weightKg > 300) throw new Error("Invalid weight value");
 
   const { data, error } = await supabase
     .from("weight_logs")

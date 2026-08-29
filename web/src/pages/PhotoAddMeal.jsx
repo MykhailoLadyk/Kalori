@@ -84,6 +84,16 @@ export default function PhotoAddMeal() {
   }, [analyzing]);
 
   useEffect(() => {
+    if (!analyzing) return;
+    const handleBeforeUnload = (e) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [analyzing]);
+
+  useEffect(() => {
     document.body.classList.add("photo-div");
 
     let active = true;
@@ -208,8 +218,8 @@ export default function PhotoAddMeal() {
     >
       {/* Floating Back Button */}
       <div
-        onClick={() => navigate("/")}
-        className="press"
+        onClick={!analyzing ? () => navigate("/") : undefined}
+        className={analyzing ? "" : "press"}
         style={{
           position: "absolute",
           top: 16,
@@ -225,7 +235,9 @@ export default function PhotoAddMeal() {
           alignItems: "center",
           justifyContent: "center",
           color: "#fff",
-          cursor: "pointer",
+          cursor: analyzing ? "not-allowed" : "pointer",
+          opacity: analyzing ? 0.35 : 1,
+          pointerEvents: analyzing ? "none" : "auto",
         }}
       >
         <ChevronLeft />
@@ -234,8 +246,8 @@ export default function PhotoAddMeal() {
       {/* Top Floating Coins Status Pill (Free Tier) */}
       {!isPro && (
         <div
-          onClick={() => navigate("/premium")}
-          className="press"
+          onClick={!analyzing ? () => navigate("/premium") : undefined}
+          className={analyzing ? "" : "press"}
           style={{
             position: "absolute",
             top: 16,
@@ -249,7 +261,9 @@ export default function PhotoAddMeal() {
             display: "flex",
             alignItems: "center",
             gap: 6,
-            cursor: "pointer",
+            cursor: analyzing ? "not-allowed" : "pointer",
+            opacity: analyzing ? 0.4 : 1,
+            pointerEvents: analyzing ? "none" : "auto",
           }}
         >
           <IconCoin size={14} color={C.gold} />
@@ -341,8 +355,8 @@ export default function PhotoAddMeal() {
           {photo ? (
             <div style={{ display: "flex", gap: 14, width: "100%" }}>
               <div
-                onClick={handleRetake}
-                className="hover-btn press"
+                onClick={!analyzing ? handleRetake : undefined}
+                className={analyzing ? "" : "hover-btn press"}
                 style={{
                   flex: 1,
                   background: C.card,
@@ -350,7 +364,9 @@ export default function PhotoAddMeal() {
                   borderRadius: 14,
                   padding: "16px",
                   textAlign: "center",
-                  cursor: "pointer",
+                  cursor: analyzing ? "not-allowed" : "pointer",
+                  opacity: analyzing ? 0.4 : 1,
+                  pointerEvents: analyzing ? "none" : "auto",
                 }}
               >
                 <span

@@ -42,7 +42,7 @@ export async function getAccessToken(): Promise<string> {
   const tokenData = await tokenRes.json();
 
   if (!tokenData.access_token) {
-    throw new Error(`Failed to get access token: ${JSON.stringify(tokenData)}`);
+    throw new Error("Failed to get access token");
   }
 
   cachedToken = tokenData.access_token;
@@ -161,9 +161,7 @@ export async function callVertexAI(
         if (response.status === 429 && attempt < maxRetries) {
           throw new Error("429");
         }
-        throw new Error(
-          `Vertex API error (${response.status}): ${JSON.stringify(result)}`,
-        );
+        throw new Error(`Vertex API error (${response.status})`);
       }
 
       return result;

@@ -4,22 +4,20 @@ import { Mono } from "../../shared/Primitives";
 import { IconShield, IconCoin } from "../../shared/DuoIcon";
 import { shieldPacks } from "../../../lib/constants";
 import { useGameStats } from "../../../hooks/useGameStats";
+import { useNotifications } from "../../../context/NotificationContext";
 import { supabase } from "../../../services/supabase";
 
 export default function ShopOtherModal() {
   const { gameData, refreshGameData } = useGameStats();
-  const [error, setError] = useState(null);
-  const [message, setMessage] = useState(null);
+  const { addNotification } = useNotifications();
   const [loading, setLoading] = useState(false);
 
   async function onPurchase(price, qty) {
     if (loading) return;
     setLoading(true);
-    setError(null);
-    setMessage(null);
     
     if (gameData.coins < price) {
-      setError("Not enough coins.");
+      addNotification({ type: "error", name: "Not enough coins" });
       setLoading(false);
       return;
     }
@@ -33,10 +31,9 @@ export default function ShopOtherModal() {
       if (rpcError) throw rpcError;
 
       await refreshGameData();
-      setMessage(`Purchased ${qty} Streak Shield(s) for ${price} coins!`);
-      setTimeout(() => setMessage(null), 3000);
+      addNotification({ type: "success", name: `Purchased ${qty} Streak Shield(s)!` });
     } catch (err) {
-      setError(err.message || "Purchase failed.");
+      addNotification({ type: "error", name: err.message || "Purchase failed." });
     } finally {
       setLoading(false);
     }
@@ -168,14 +165,6 @@ export default function ShopOtherModal() {
             </div>
           ))}
         </div>
-        
-        {(error || message) && (
-          <div style={{ marginTop: 16, textAlign: "center", animation: "fadeIn 0.3s ease" }}>
-            <Mono size={9} color={error ? C.red : C.accent}>
-              {error || message}
-            </Mono>
-          </div>
-        )}
       </div>
     </div>
   );

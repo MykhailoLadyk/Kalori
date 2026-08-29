@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { C, F, alpha } from "../../../lib/constants";
 import { Mono, Tag } from "../../../components/shared/Primitives";
@@ -106,7 +106,7 @@ const Spinner = ({ color }) => (
   </svg>
 );
 
-export function MealAddOptionSelectModal() {
+export function MealAddOptionSelectModal({ handleClose, setPreventClose }) {
   const navigate = useNavigate();
   const { isPro } = useUser();
   const { gameData, refreshGameData } = useGameStats();
@@ -119,7 +119,22 @@ export function MealAddOptionSelectModal() {
 
   const userCoins = gameData?.coins || 0;
 
+  useEffect(() => {
+    setPreventClose?.(albumLoading);
+  }, [albumLoading, setPreventClose]);
+
+  useEffect(() => {
+    if (!albumLoading) return;
+    const handleBeforeUnload = (e) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [albumLoading]);
+
   const handleOptionClick = (key, isAi) => {
+    if (albumLoading) return;
     if (isAi && !isPro && userCoins < AI_COIN_COST) {
       setShowCoinGate(true);
       return;
@@ -207,6 +222,7 @@ export function MealAddOptionSelectModal() {
               <div
                 key={fav.id}
                 onClick={() =>
+                  !albumLoading &&
                   navigate("/add-meal/confirm", {
                     state: {
                       meal: {
@@ -220,7 +236,7 @@ export function MealAddOptionSelectModal() {
                     },
                   })
                 }
-                className="hover-card press"
+                className={albumLoading ? "" : "hover-card press"}
                 style={{
                   flexShrink: 0,
                   background: C.card,
@@ -229,7 +245,9 @@ export function MealAddOptionSelectModal() {
                   padding: "10px 14px",
                   minWidth: 120,
                   maxWidth: 160,
-                  cursor: "pointer",
+                  cursor: albumLoading ? "not-allowed" : "pointer",
+                  opacity: albumLoading ? 0.4 : 1,
+                  pointerEvents: albumLoading ? "none" : "auto",
                 }}
               >
                 <div
@@ -274,6 +292,7 @@ export function MealAddOptionSelectModal() {
               <div
                 key={`recent-${idx}`}
                 onClick={() =>
+                  !albumLoading &&
                   navigate("/add-meal/confirm", {
                     state: {
                       meal: {
@@ -287,7 +306,7 @@ export function MealAddOptionSelectModal() {
                     },
                   })
                 }
-                className="hover-card press"
+                className={albumLoading ? "" : "hover-card press"}
                 style={{
                   flexShrink: 0,
                   background: C.card,
@@ -296,7 +315,9 @@ export function MealAddOptionSelectModal() {
                   padding: "10px 14px",
                   minWidth: 120,
                   maxWidth: 160,
-                  cursor: "pointer",
+                  cursor: albumLoading ? "not-allowed" : "pointer",
+                  opacity: albumLoading ? 0.4 : 1,
+                  pointerEvents: albumLoading ? "none" : "auto",
                 }}
               >
                 <div
@@ -325,8 +346,8 @@ export function MealAddOptionSelectModal() {
       {/* Upgrade Banner for Free Users */}
       {!isPro && (
         <div
-          onClick={() => navigate("/premium")}
-          className="hover-card press"
+          onClick={() => !albumLoading && navigate("/premium")}
+          className={albumLoading ? "" : "hover-card press"}
           style={{
             background: `linear-gradient(135deg, ${alpha(C.accent, 14)}, ${alpha(C.gold, 10)})`,
             border: `1px solid ${alpha(C.accent, 35)}`,
@@ -336,7 +357,9 @@ export function MealAddOptionSelectModal() {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            cursor: "pointer",
+            cursor: albumLoading ? "not-allowed" : "pointer",
+            opacity: albumLoading ? 0.4 : 1,
+            pointerEvents: albumLoading ? "none" : "auto",
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>

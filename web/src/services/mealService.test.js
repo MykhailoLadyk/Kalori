@@ -181,6 +181,32 @@ describe("addMeal", () => {
 
     await expect(addMeal("user-123", NEW_MEAL)).rejects.toThrow("Insert failed");
   });
+
+  it("sanitizes NaN, absurd values, and long names safely", async () => {
+    const chain = mockChain({ data: { id: "meal-safe" }, error: null });
+
+    await addMeal("user-123", {
+      name: "   " + "A".repeat(150) + "   ",
+      calories: "invalid_nan",
+      protein: -10,
+      carbs: 99999999,
+      fat: "45.8",
+      type: "lunch",
+      date: "2025-02-27",
+    });
+
+    expect(chain.insert).toHaveBeenCalledWith({
+      user_id: "user-123",
+      name: "A".repeat(100),
+      calories: null,
+      protein: null,
+      carbs: null,
+      fat: 46,
+      type: "lunch",
+      date: "2025-02-27",
+      amount: null,
+    });
+  });
 });
 
 // ─────────────────────────────────────────
@@ -217,6 +243,28 @@ describe("updateMeal", () => {
     mockChain({ data: null, error: { message: "Update failed" } });
 
     await expect(updateMeal("user-123", "meal-1", {})).rejects.toThrow("Update failed");
+  });
+
+  it("sanitizes updates properly", async () => {
+    const chain = mockChain({ data: { id: "meal-1" }, error: null });
+
+    await updateMeal("user-123", "meal-1", {
+      name: "  Super Meal  ",
+      calories: "invalid",
+      protein: 50,
+      carbs: -5,
+      fat: 999999,
+      amount: 500,
+    });
+
+    expect(chain.update).toHaveBeenCalledWith({
+      name: "Super Meal",
+      calories: null,
+      protein: 50,
+      carbs: null,
+      fat: null,
+      amount: 500,
+    });
   });
 });
 

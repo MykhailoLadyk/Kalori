@@ -1,11 +1,16 @@
 import { useEffect, useState, cloneElement, isValidElement } from "react";
 import { C, alpha } from "../../lib/constants";
-export function Modal({ id, close, children }) {
+export function Modal({ id, close, preventClose: propPreventClose, children }) {
   const [visible, setVisible] = useState(false);
   const [closing, setClosing] = useState(false);
+  const [preventClose, setPreventClose] = useState(false);
+
+  const isLocked = Boolean(propPreventClose || preventClose);
+
   useEffect(() => {
     if (id) {
       setClosing(false);
+      setPreventClose(false);
       requestAnimationFrame(() => setVisible(true));
     } else setVisible(false);
   }, [id]);
@@ -20,6 +25,7 @@ export function Modal({ id, close, children }) {
     };
   }, [id]);
   const handleClose = () => {
+    if (isLocked) return;
     setClosing(true);
     setTimeout(() => {
       setClosing(false);
@@ -28,7 +34,7 @@ export function Modal({ id, close, children }) {
   };
 
   const renderedChildren = isValidElement(children)
-    ? cloneElement(children, { handleClose })
+    ? cloneElement(children, { handleClose, setPreventClose, isLocked })
     : children;
 
   if (!id && !visible) return null;
@@ -36,6 +42,7 @@ export function Modal({ id, close, children }) {
     <div
       onClick={handleClose}
       style={{
+        cursor: isLocked ? "not-allowed" : "auto",
         position: "fixed",
         top: 0,
         bottom: 0,

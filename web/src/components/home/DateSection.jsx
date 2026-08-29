@@ -3,14 +3,18 @@ import { IconCalendar, IconFire } from "../../components/shared/DuoIcon";
 import { getDayName, getMonthName } from "../../lib/utils";
 import { useGameStats } from "../../hooks/useGameStats";
 import { useUser } from "../../hooks/useUser";
+import { useMeals } from "../../hooks/useMeals";
+import { getLocalYMD, getTodayDateString } from "../../lib/dateUtils";
 
 export function DateSection({ setModal, date }) {
   const day = getDayName(date);
   const month = getMonthName(date);
   const { gameData } = useGameStats();
   const { user } = useUser();
+  const { setSelectedDate } = useMeals();
   const streak = gameData?.streak || 0;
   const isActive = streak > 0;
+  const isPreviousDate = getLocalYMD(date) !== getTodayDateString();
 
   const activeFlame =
     flameColorsDefinitions.find(
@@ -30,22 +34,59 @@ export function DateSection({ setModal, date }) {
       }}
     >
       <div
-        onClick={() => setModal("datepicker")}
-        className="hover-btn press"
         style={{
           position: "absolute",
           left: 22,
-          width: 36,
-          height: 36,
-          background: C.card,
-          border: `1px solid ${C.border}`,
-          borderRadius: 11,
           display: "flex",
           alignItems: "center",
-          justifyContent: "center",
+          gap: 6,
         }}
       >
-        <IconCalendar size={18} color={C.soft} />
+        <div
+          onClick={() => setModal("datepicker")}
+          className="hover-btn press"
+          style={{
+            width: 36,
+            height: 36,
+            background: C.card,
+            border: `1px solid ${C.border}`,
+            borderRadius: 11,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <IconCalendar size={18} color={C.soft} />
+        </div>
+        {isPreviousDate && (
+          <div
+            onClick={() => setSelectedDate(new Date())}
+            className="hover-btn press"
+            style={{
+              height: 36,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: C.accentDim,
+              border: `1px solid ${C.accentMid}`,
+              borderRadius: 11,
+              padding: "0 10px",
+              cursor: "pointer",
+            }}
+          >
+            <span
+              style={{
+                fontFamily: F.mono,
+                fontSize: 8,
+                fontWeight: 700,
+                color: C.accent,
+                letterSpacing: 1,
+              }}
+            >
+              RETURN
+            </span>
+          </div>
+        )}
       </div>
       <div style={{ textAlign: "center" }}>
         <div

@@ -5,6 +5,7 @@ import { Mono, Tag } from "../components/shared/Primitives";
 import analyzeFoodDesc from "../services/analyzeFoodDesc";
 import { useUser } from "../hooks/useUser";
 import { useGameStats } from "../hooks/useGameStats";
+import { useNotifications } from "../context/NotificationContext";
 import { IconSparkles, IconCoin, IconCrown } from "../components/shared/DuoIcon";
 import { Modal } from "../components/modals/Modal";
 import InsufficientCoinsModal from "../components/modals/home/InsufficientCoinsModal";
@@ -45,7 +46,8 @@ const Spinner = ({ color = "#000", size = 16 }) => (
 export default function DescribeAddMeal() {
   const navigate = useNavigate();
   const { isPro } = useUser();
-  const { gameData, deductCoins } = useGameStats();
+  const { gameData, refreshGameData } = useGameStats();
+  const { addNotification } = useNotifications();
 
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
@@ -83,17 +85,24 @@ export default function DescribeAddMeal() {
       setError(null);
       const parsed = await analyzeFoodDesc(text);
 
-      // Deduct coins for free tier users
+      // Server already deducted coins atomically for free users
+      await refreshGameData();
       if (!isPro) {
-        await deductCoins(AI_COIN_COST, "Meal Description Scan");
+        addNotification({ type: "coins_deducted", amount: -AI_COIN_COST, name: `-${AI_COIN_COST} coins (AI Description Scan)` });
       }
 
       navigate("/add-meal/confirm", { state: { meal: parsed, description: text } });
     } catch (err) {
       if (err.code === "RATE_LIMITED") {
         setError("Daily AI limit reached. Try again tomorrow or add meals manually.");
+      } else if (err.code === "INSUFFICIENT_COINS") {
+        setShowCoinGate(true);
       } else {
-        setError("Couldn't analyze that. Try being more specific.");
+        setError(err.code === "NO_FOOD_DETECTED" ? (err.message || "Couldn't detect food in description.") : (err.message || "Couldn't analyze that. Try being more specific."));
+        await refreshGameData();
+        if (!isPro) {
+          addNotification({ type: "coins_deducted", amount: -AI_COIN_COST, name: `-${AI_COIN_COST} coins (AI Description Scan)` });
+        }
       }
     } finally {
       setLoading(false);
@@ -216,7 +225,7 @@ export default function DescribeAddMeal() {
                     ? loadingSteps[loadingStepIndex].toUpperCase()
                     : isPro
                     ? "ANALYZE MEAL"
-                    : `ANALYZE MEAL (${AI_COIN_COST} 🪙)`}
+                    : <>ANALYZE MEAL ({AI_COIN_COST} <IconCoin size={11} color="#000" />)</>}
               </span>
             </div>
 

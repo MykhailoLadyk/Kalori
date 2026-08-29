@@ -3,6 +3,7 @@ import { corsHeaders } from "./cors.ts";
 /** Standard error codes for structured client-side handling. */
 export const ErrorCode = {
   RATE_LIMITED: "RATE_LIMITED",
+  INSUFFICIENT_COINS: "INSUFFICIENT_COINS",
   UNAUTHORIZED: "UNAUTHORIZED",
   INVALID_INPUT: "INVALID_INPUT",
   AI_ERROR: "AI_ERROR",

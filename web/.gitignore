@@ -10,6 +10,8 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+migrations/
+supabase/migrations/
 *.local
 .env
 .env.local

@@ -25,6 +25,7 @@ import LogoutModal from "../components/modals/settings/LogOutModal";
 import DeleteAccountModal from "../components/modals/settings/DeleteAccountModal";
 
 import {
+  IconCoin,
   IconUser,
   IconTarget,
   IconWeight,
@@ -102,7 +103,15 @@ export default function Settings() {
             onClick={() => navigate("/premium")}
             icon={<IconCrown size={18} color={C.gold} />}
             label="Kalori Pro"
-            sub={isPro ? "PRO Active · 100 scans/day" : "Free Plan · 50 🪙 per scan"}
+            sub={
+              isPro ? (
+                "PRO Active · 100 scans/day"
+              ) : (
+                <>
+                  Free Plan · 50 <IconCoin size={11} color={C.gold} /> per scan
+                </>
+              )
+            }
             arrow
           />
           <SettingsCard
@@ -288,7 +297,7 @@ export default function Settings() {
 
       <div style={{ textAlign: "center", marginTop: 8, animation: "fadeIn 0.4s ease 0.6s both" }}>
         <Mono size={8} color={C.muted}>
-          Kalori v1.3.2
+          Kalori v1.4.0
         </Mono>
       </div>
       <Modal id={modal} close={() => setModal(null)}>

@@ -35,7 +35,6 @@ export default function ShopFlamesModal({ flames = [], currentFlame, coins }) {
     try {
       const { data, error: rpcError } = await supabase.rpc("purchase_flame_color", {
         p_flame_id: flame.id,
-        p_price: flame.price,
       });
 
       if (rpcError) throw rpcError;

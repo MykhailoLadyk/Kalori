@@ -5,6 +5,7 @@ import { Mono, Tag } from "../components/shared/Primitives";
 import analyzeFood from "../services/analyzeFood";
 import { useUser } from "../hooks/useUser";
 import { useGameStats } from "../hooks/useGameStats";
+import { useNotifications } from "../context/NotificationContext";
 import { IconSparkles, IconCoin, IconCrown } from "../components/shared/DuoIcon";
 import { Modal } from "../components/modals/Modal";
 import InsufficientCoinsModal from "../components/modals/home/InsufficientCoinsModal";
@@ -52,7 +53,8 @@ const Spinner = ({ color = "#000", size = 16 }) => (
 export default function PhotoAddMeal() {
   const navigate = useNavigate();
   const { isPro } = useUser();
-  const { gameData, deductCoins } = useGameStats();
+  const { gameData, refreshGameData } = useGameStats();
+  const { addNotification } = useNotifications();
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -160,9 +162,10 @@ export default function PhotoAddMeal() {
       const parsed = await analyzeFood(photo);
       setResult(true);
 
-      // Deduct coins for free tier users
+      // Server already deducted coins atomically for free users
+      await refreshGameData();
       if (!isPro) {
-        await deductCoins(AI_COIN_COST, "Photo Food Scan");
+        addNotification({ type: "coins_deducted", amount: -AI_COIN_COST, name: `-${AI_COIN_COST} coins (AI Photo Scan)` });
       }
 
       navigate("/add-meal/confirm", {
@@ -175,8 +178,14 @@ export default function PhotoAddMeal() {
     } catch (err) {
       if (err.code === "RATE_LIMITED") {
         setError("Daily AI limit reached. Try again tomorrow or add meals manually.");
+      } else if (err.code === "INSUFFICIENT_COINS") {
+        setShowCoinGate(true);
       } else {
-        setError("Couldn't analyze the photo. Try retaking it.");
+        setError(err.code === "NO_FOOD_DETECTED" ? (err.message || "No food detected in photo.") : "Couldn't analyze the photo. Try retaking it.");
+        await refreshGameData();
+        if (!isPro) {
+          addNotification({ type: "coins_deducted", amount: -AI_COIN_COST, name: `-${AI_COIN_COST} coins (AI Photo Scan)` });
+        }
       }
     } finally {
       setAnalyzing(false);
@@ -248,7 +257,7 @@ export default function PhotoAddMeal() {
             50 COINS
           </span>
           <span style={{ fontFamily: F.mono, fontSize: 9, color: alpha("#fff", 70) }}>
-            ({userCoins} 🪙)
+            ({userCoins} <IconCoin size={11} color={C.gold} />)
           </span>
         </div>
       )}
@@ -383,7 +392,7 @@ export default function PhotoAddMeal() {
                     ? loadingSteps[loadingStepIndex].toUpperCase()
                     : isPro
                     ? "USE PHOTO"
-                    : `USE PHOTO (${AI_COIN_COST} 🪙)`}
+                    : <>USE PHOTO ({AI_COIN_COST} <IconCoin size={11} color="#000" />)</>}
                 </span>
               </div>
             </div>

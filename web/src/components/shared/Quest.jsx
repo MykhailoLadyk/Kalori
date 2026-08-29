@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { C, F, alpha } from "../../lib/constants";
 import { Tag } from "./Primitives";
-import { IconStar } from "./DuoIcon";
+import { IconStar, IconRefresh } from "./DuoIcon";
 
 export function Quest({
   id,
@@ -110,7 +110,7 @@ export function Quest({
                 cursor: canAffordReroll && !rerolling ? "pointer" : "not-allowed",
               }}
             >
-              <span style={{ fontSize: 9, lineHeight: 1 }}>{rerolling ? "⏳" : "🔄"}</span>
+              <IconRefresh size={11} color={C.gold} />
               <span style={{ fontFamily: F.mono, fontSize: 8, fontWeight: 700, color: C.gold }}>
                 {rerollCost}
               </span>

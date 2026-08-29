@@ -35,7 +35,6 @@ export default function ShopAvatarsModal({ avatars = [], currentAvatar, coins, u
     try {
       const { data, error: rpcError } = await supabase.rpc("purchase_avatar", {
         p_avatar_id: avatar.id,
-        p_price: avatar.price,
       });
 
       if (rpcError) throw rpcError;
@@ -79,7 +78,7 @@ export default function ShopAvatarsModal({ avatars = [], currentAvatar, coins, u
       )}
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-        {avatars.map(({ id, name, emoji, type, bg, price, lock, owned }) => {
+        {avatars.map(({ id, name, type, bg, price, lock, owned, paths }) => {
           const isCurrent = String(id) === String(activeAvatarId);
           const isOwned = Boolean(owned);
           const isLocked = Boolean(lock);
@@ -123,7 +122,18 @@ export default function ShopAvatarsModal({ avatars = [], currentAvatar, coins, u
                   boxShadow: isCurrent ? `0 0 16px ${C.accentGlow}` : "none",
                 }}
               >
-                {type === "emoji" ? emoji : initial}
+                {type === "pixel" ? (
+                  <svg width={30} height={30} viewBox="0 0 256 256" fill="none">
+                    <g opacity="0.2" fill="#000">
+                      <path d={paths?.detail} />
+                    </g>
+                    <g fill="#000">
+                      <path d={paths?.main} />
+                    </g>
+                  </svg>
+                ) : (
+                  initial
+                )}
               </div>
 
               <div

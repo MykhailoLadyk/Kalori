@@ -104,7 +104,18 @@ export default function SettingsAvatarModal({ handleClose }) {
                   marginBottom: 8,
                 }}
               >
-                {avatar.type === "emoji" ? avatar.emoji : initial}
+                {avatar.type === "pixel" ? (
+                  <svg width={28} height={28} viewBox="0 0 256 256" fill="none">
+                    <g opacity="0.2" fill="#000">
+                      <path d={avatar.paths?.detail} />
+                    </g>
+                    <g fill="#000">
+                      <path d={avatar.paths?.main} />
+                    </g>
+                  </svg>
+                ) : (
+                  initial
+                )}
               </div>
 
               <div

@@ -36,7 +36,18 @@ export default function Avatar({
         ...style,
       }}
     >
-      {avatarDef.type === "emoji" ? avatarDef.emoji : initial}
+      {avatarDef.type === "pixel" ? (
+        <svg width={size * 0.6} height={size * 0.6} viewBox="0 0 256 256" fill="none">
+          <g opacity="0.2" fill="#000">
+            <path d={avatarDef.paths.detail} />
+          </g>
+          <g fill="#000">
+            <path d={avatarDef.paths.main} />
+          </g>
+        </svg>
+      ) : (
+        initial
+      )}
     </div>
   );
 }

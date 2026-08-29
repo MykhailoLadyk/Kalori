@@ -33,7 +33,6 @@ export default function ShopThemesModal({ themes = [], currentTheme, coins }) {
     try {
       const { data, error: rpcError } = await supabase.rpc("purchase_theme", {
         p_theme_id: theme.id,
-        p_price: theme.price,
       });
 
       if (rpcError) throw rpcError;

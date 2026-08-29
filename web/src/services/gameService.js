@@ -28,15 +28,7 @@ export const deductCoins = async (amount = 50) => {
     p_amount: amount,
   });
 
-  if (error) {
-    console.warn(
-      "deduct_coins RPC returned an error (or is not yet installed in Supabase). Using optimistic client balance update. Run the deduct_coins SQL function in Supabase SQL editor to enable server-side deduction.",
-      error.message
-    );
-    // Return null to let the caller apply optimistic balance update without crashing
-    return null;
-  }
-
+  if (error) throw new Error(error.message);
   return data;
 };
 

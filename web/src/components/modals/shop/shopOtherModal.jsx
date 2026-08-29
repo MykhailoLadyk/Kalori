@@ -25,9 +25,9 @@ export default function ShopOtherModal() {
     }
     
     try {
+      const parsedQty = parseInt(qty, 10);
       const { data, error: rpcError } = await supabase.rpc("purchase_shield", {
-        p_qty: parseInt(qty),
-        p_price: price,
+        p_qty: parsedQty,
       });
 
       if (rpcError) throw rpcError;

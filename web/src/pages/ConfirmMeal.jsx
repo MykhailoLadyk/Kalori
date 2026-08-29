@@ -6,6 +6,7 @@ import { IconStar, IconStarOutline, IconSparkles, IconCoin, IconCrown } from "..
 import { useFavorites } from "../hooks/useFavorites";
 import { useMeals } from "../hooks/useMeals";
 import { useGameStats } from "../hooks/useGameStats";
+import { useNotifications } from "../context/NotificationContext";
 import { useUser } from "../hooks/useUser";
 import { getLocalYMD } from "../lib/dateUtils";
 import analyzeFood from "../services/analyzeFood";
@@ -40,7 +41,8 @@ const FIELD_CONFIG = [
 
 export default function ConfirmMeal() {
   const { addMeal, selectedDate } = useMeals();
-  const { syncProgress, gameData, deductCoins } = useGameStats();
+  const { syncProgress, gameData, refreshGameData } = useGameStats();
+  const { addNotification } = useNotifications();
   const { user, isPro } = useUser();
   const navigate = useNavigate();
   const location = useLocation();
@@ -129,9 +131,10 @@ export default function ConfirmMeal() {
       }
 
       if (refined) {
-        // Deduct coins for free tier users
+        // Server already deducted coins atomically for free users
+        await refreshGameData();
         if (!isPro) {
-          await deductCoins(AI_COIN_COST, "AI Refinement");
+          addNotification({ type: "coins_deducted", amount: -AI_COIN_COST, name: `-${AI_COIN_COST} coins (AI Refinement)` });
         }
 
         setForm((prev) => ({
@@ -151,8 +154,14 @@ export default function ConfirmMeal() {
     } catch (err) {
       if (err.code === "RATE_LIMITED") {
         setRefineError("Daily AI limit reached.");
+      } else if (err.code === "INSUFFICIENT_COINS") {
+        setShowCoinGate(true);
       } else {
-        setRefineError("Couldn't refine estimate. Try again.");
+        setRefineError(err.code === "NO_FOOD_DETECTED" ? (err.message || "Couldn't refine food in image.") : (err.message || "Couldn't refine estimate. Try again."));
+        await refreshGameData();
+        if (!isPro) {
+          addNotification({ type: "coins_deducted", amount: -AI_COIN_COST, name: `-${AI_COIN_COST} coins (AI Refinement)` });
+        }
       }
     } finally {
       setRefining(false);
@@ -565,7 +574,7 @@ export default function ConfirmMeal() {
                     ? "UPDATING ESTIMATE..."
                     : isPro
                     ? "REFINE ESTIMATE WITH AI"
-                    : `REFINE ESTIMATE WITH AI · ${AI_COIN_COST} 🪙`}
+                    : <>REFINE ESTIMATE WITH AI · {AI_COIN_COST} <IconCoin size={11} color={C.accent} /></>}
                 </span>
               </div>
             )}

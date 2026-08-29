@@ -1,6 +1,15 @@
 import { useState } from "react";
 import { C, F, alpha } from "../../lib/constants";
-import { IconPencil, IconTrash, IconStar, IconStarOutline } from "../shared/DuoIcon";
+import {
+  IconPencil,
+  IconTrash,
+  IconStar,
+  IconStarOutline,
+  IconMealBreakfast,
+  IconMealLunch,
+  IconMealDinner,
+  IconMealSnacks,
+} from "../shared/DuoIcon";
 import { useFavorites } from "../../hooks/useFavorites";
 import { MealDeleteModal } from "../modals/home/MealDeleteModal";
 import { MealEditModal } from "../modals/home/MealEditModal";
@@ -38,134 +47,10 @@ export function MealCard({ meal, color, type }) {
               background: alpha(color, 9),
             }}
           >
-            <svg width="20" height="20" viewBox="0 0 32 32" fill="none">
-              {type === "breakfast" && (
-                <>
-                  <circle cx="16" cy="18" r="10" fill={color} opacity="0.2" />
-                  <circle
-                    cx="16"
-                    cy="18"
-                    r="10"
-                    stroke={color}
-                    strokeWidth="1.5"
-                  />
-                  <path
-                    d="M11 18C11 15.5 13 13 16 13C19 13 21 15.5 21 18"
-                    stroke={color}
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                  />
-                  <path
-                    d="M16 8L16 6M11 10L9.5 8.5M21 10L22.5 8.5"
-                    stroke={color}
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    opacity="0.5"
-                  />
-                </>
-              )}
-              {type === "lunch" && (
-                <>
-                  <rect
-                    x="5"
-                    y="20"
-                    width="22"
-                    height="4"
-                    rx="2"
-                    fill={color}
-                    opacity="0.25"
-                  />
-                  <path
-                    d="M8 20C8 14 12 10 16 10C20 10 24 14 24 20"
-                    fill={color}
-                    opacity="0.12"
-                    stroke={color}
-                    strokeWidth="1.5"
-                  />
-                  <rect
-                    x="5"
-                    y="20"
-                    width="22"
-                    height="4"
-                    rx="2"
-                    stroke={color}
-                    strokeWidth="1.5"
-                  />
-                </>
-              )}
-              {type === "dinner" && (
-                <>
-                  <path
-                    d="M7 8V24"
-                    stroke={color}
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    opacity="0.4"
-                  />
-                  <path
-                    d="M7 8C5 10 5 14 7 16"
-                    stroke={color}
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    opacity="0.4"
-                  />
-                  <path
-                    d="M12 8V13C12 16 14 17 14 17V24"
-                    stroke={color}
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                  />
-                  <path
-                    d="M12 8C10 10 10 14 12 16"
-                    stroke={color}
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                  />
-                  <circle
-                    cx="22"
-                    cy="16"
-                    r="8"
-                    fill={color}
-                    opacity="0.15"
-                    stroke={color}
-                    strokeWidth="1.5"
-                  />
-                </>
-              )}
-              {type === "snacks" && (
-                <>
-                  <path
-                    d="M12 8C12 8 10 11 10 14"
-                    stroke={color}
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                  />
-                  <path
-                    d="M20 8C20 8 22 11 22 14"
-                    stroke={color}
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                  />
-                  <path
-                    d="M10 14H22L21 24H11Z"
-                    fill={color}
-                    opacity="0.2"
-                    stroke={color}
-                    strokeWidth="1.5"
-                    strokeLinejoin="round"
-                  />
-                  <rect
-                    x="9"
-                    y="8"
-                    width="14"
-                    height="2"
-                    rx="1"
-                    fill={color}
-                    opacity="0.4"
-                  />
-                </>
-              )}
-            </svg>
+            {type === "breakfast" && <IconMealBreakfast size={20} color={color} />}
+            {type === "lunch" && <IconMealLunch size={20} color={color} />}
+            {type === "dinner" && <IconMealDinner size={20} color={color} />}
+            {type === "snacks" && <IconMealSnacks size={20} color={color} />}
           </div>
           <div className="flex-1" style={{ minWidth: 0 }}>
             <span className="font-body font-semibold text-primary flex" style={{ fontSize: 13 }}>

@@ -6,6 +6,7 @@ import analyzeFood from "../../../services/analyzeFood";
 import { useFavorites } from "../../../hooks/useFavorites";
 import { useUser } from "../../../hooks/useUser";
 import { useGameStats } from "../../../hooks/useGameStats";
+import { useNotifications } from "../../../context/NotificationContext";
 import { IconStar, IconStarOutline, IconSparkles, IconCoin, IconCrown } from "../../shared/DuoIcon";
 import InsufficientCoinsModal from "./InsufficientCoinsModal";
 import { AI_COIN_COST } from "../../../services/subscriptionService";
@@ -108,7 +109,8 @@ const Spinner = ({ color }) => (
 export function MealAddOptionSelectModal() {
   const navigate = useNavigate();
   const { isPro } = useUser();
-  const { gameData, deductCoins } = useGameStats();
+  const { gameData, refreshGameData } = useGameStats();
+  const { addNotification } = useNotifications();
   const fileInputRef = useRef(null);
   const [albumLoading, setAlbumLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -149,17 +151,24 @@ export function MealAddOptionSelectModal() {
         const photoDataUrl = reader.result;
         const parsed = await analyzeFood(photoDataUrl);
 
-        // Deduct coins for free tier
+        // Server already deducted coins atomically for free users
+        await refreshGameData();
         if (!isPro) {
-          await deductCoins(AI_COIN_COST, "Photo Album Scan");
+          addNotification({ type: "coins_deducted", amount: -AI_COIN_COST, name: `-${AI_COIN_COST} coins (Photo Album Scan)` });
         }
 
         navigate("/add-meal/confirm", { state: { meal: parsed, photoData: photoDataUrl, isAlbum: true } });
       } catch (err) {
         if (err.code === "RATE_LIMITED") {
           setError("Daily AI limit reached. Try again tomorrow.");
+        } else if (err.code === "INSUFFICIENT_COINS") {
+          setShowCoinGate(true);
         } else {
-          setError("Couldn't analyze the photo. Try again.");
+          setError(err.code === "NO_FOOD_DETECTED" ? (err.message || "No food detected in photo.") : "Couldn't analyze the photo. Try again.");
+          await refreshGameData();
+          if (!isPro) {
+            addNotification({ type: "coins_deducted", amount: -AI_COIN_COST, name: `-${AI_COIN_COST} coins (Photo Album Scan)` });
+          }
         }
       } finally {
         setAlbumLoading(false);

@@ -4,6 +4,7 @@ import { ErrorCode, jsonError } from "./errors.ts";
 export interface RateLimitResult {
   allowed: boolean;
   global_allowed?: boolean;
+  reason?: string;
   remaining: number;
   current: number;
   limit: number;
@@ -37,6 +38,14 @@ export async function checkRateLimit(
   const result = data as RateLimitResult;
 
   if (!result.allowed) {
+    if (result.reason === "insufficient_coins") {
+      return jsonError(
+        "Need 50 coins to scan meals on the Free Tier",
+        ErrorCode.INSUFFICIENT_COINS,
+        402,
+      );
+    }
+
     // If the global limit was the one that tripped
     if (result.global_allowed === false) {
       return jsonError(

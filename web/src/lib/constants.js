@@ -770,14 +770,91 @@ export const themesDefinitions = [
 ];
 
 export const avatarsDefinitions = [
-  { id: "initial", name: "Classic Initial", emoji: null, type: "initial", lvlUnlocked: 1, price: 0, bg: "linear-gradient(135deg, var(--c-accent), var(--c-pink))" },
-  { id: "spark", name: "Electric Spark", emoji: "⚡", type: "emoji", lvlUnlocked: 2, price: 100, bg: "linear-gradient(135deg, #F59E0B, #EF4444)" },
-  { id: "avocado", name: "Avocado Joy", emoji: "🥑", type: "emoji", lvlUnlocked: 3, price: 150, bg: "linear-gradient(135deg, #10B981, #059669)" },
-  { id: "tiger", name: "Fierce Tiger", emoji: "🐯", type: "emoji", lvlUnlocked: 5, price: 250, bg: "linear-gradient(135deg, #F97316, #EA580C)" },
-  { id: "royal", name: "Golden Crown", emoji: "👑", type: "emoji", lvlUnlocked: 7, price: 400, bg: "linear-gradient(135deg, #FCD34D, #D97706)" },
-  { id: "rocket", name: "Moon Rocket", emoji: "🚀", type: "emoji", lvlUnlocked: 10, price: 600, bg: "linear-gradient(135deg, #3B82F6, #8B5CF6)" },
-  { id: "diamond", name: "Crystal Gem", emoji: "💎", type: "emoji", lvlUnlocked: 15, price: 900, bg: "linear-gradient(135deg, #06B6D4, #3B82F6)" },
-  { id: "dragon", name: "Mythic Dragon", emoji: "🐉", type: "emoji", lvlUnlocked: 20, price: 1500, bg: "linear-gradient(135deg, #DC2626, #7C2D12)" },
+  { id: "initial", name: "Pixel You", type: "initial", lvlUnlocked: 1, price: 0, bg: "linear-gradient(135deg, var(--c-accent), var(--c-pink))" },
+  {
+    id: "spark",
+    name: "Bolt",
+    type: "pixel",
+    paths: {
+      main: "M 128,16 H 160 V 80 H 176 V 144 H 144 V 224 H 112 V 144 H 128 V 80 Z",
+      detail: "M 136,32 H 144 V 48 H 136 Z",
+    },
+    lvlUnlocked: 2,
+    price: 100,
+    bg: "linear-gradient(135deg, #F59E0B, #EF4444)",
+  },
+  {
+    id: "avocado",
+    name: "Pip the Slime",
+    type: "pixel",
+    paths: {
+      main: "M 112,48 H 144 V 96 H 176 V 224 H 80 V 96 H 112 Z",
+      detail: "M 96,128 H 112 V 144 H 96 Z M 144,128 H 160 V 144 H 144 Z M 104,176 H 152 V 192 H 104 Z",
+    },
+    lvlUnlocked: 3,
+    price: 150,
+    bg: "linear-gradient(135deg, #10B981, #059669)",
+  },
+  {
+    id: "tiger",
+    name: "Tiger",
+    type: "pixel",
+    paths: {
+      main: "M 80,32 H 112 V 96 H 176 V 224 H 80 V 96 H 80 Z M 144,32 H 176 V 96 H 144 Z",
+      detail: "M 80,96 H 176 V 112 H 80 Z M 96,128 H 112 V 144 H 96 Z M 144,128 H 160 V 144 H 144 Z M 120,160 H 136 V 176 H 120 Z",
+    },
+    lvlUnlocked: 5,
+    price: 250,
+    bg: "linear-gradient(135deg, #F97316, #EA580C)",
+  },
+  {
+    id: "royal",
+    name: "Crown",
+    type: "pixel",
+    paths: {
+      main: "M 48,48 H 80 V 112 H 112 V 64 H 144 V 112 H 176 V 48 H 208 V 208 H 48 Z",
+      detail: "M 48,160 H 208 V 176 H 48 Z M 120,128 H 136 V 144 H 120 Z",
+    },
+    lvlUnlocked: 7,
+    price: 400,
+    bg: "linear-gradient(135deg, #FCD34D, #D97706)",
+  },
+  {
+    id: "rocket",
+    name: "Rocket",
+    type: "pixel",
+    paths: {
+      main: "M 112,0 H 144 V 32 H 160 V 176 H 96 V 32 H 112 Z M 64,128 H 96 V 192 H 64 Z M 160,128 H 192 V 192 H 160 Z M 112,192 H 144 V 224 H 112 Z",
+      detail: "M 112,80 H 144 V 112 H 112 Z",
+    },
+    lvlUnlocked: 10,
+    price: 600,
+    bg: "linear-gradient(135deg, #3B82F6, #8B5CF6)",
+  },
+  {
+    id: "diamond",
+    name: "Gem",
+    type: "pixel",
+    paths: {
+      main: "M 112,32 H 144 V 64 H 160 V 96 H 176 V 128 H 160 V 160 H 144 V 192 H 128 V 224 H 112 V 192 H 96 V 160 H 80 V 128 H 96 V 96 H 112 V 64 Z",
+      detail: "M 112,64 H 128 V 96 H 112 Z",
+    },
+    lvlUnlocked: 15,
+    price: 900,
+    bg: "linear-gradient(135deg, #06B6D4, #3B82F6)",
+  },
+  {
+    id: "dragon",
+    name: "Dragon",
+    type: "pixel",
+    paths: {
+      main: "M 64,32 H 96 V 80 H 176 V 160 H 192 V 208 H 64 V 160 H 80 V 80 H 64 Z",
+      detail: "M 96,112 H 112 V 128 H 96 Z M 144,112 H 160 V 128 H 144 Z M 80,192 H 96 V 208 H 80 Z M 160,192 H 176 V 208 H 160 Z",
+    },
+    lvlUnlocked: 20,
+    price: 1500,
+    bg: "linear-gradient(135deg, #DC2626, #7C2D12)",
+  },
 ];
 
 export const flameColorsDefinitions = [

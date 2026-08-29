@@ -31,7 +31,8 @@ const STEPS = [
   {
     target: '[data-tour="meals-list"]',
     title: "Your Meals",
-    content: "All your logged meals appear here, grouped by Breakfast, Lunch, Dinner, and Snacks. Tap a meal to edit or favorite it.",
+    content:
+      "All your logged meals appear here, grouped by Breakfast, Lunch, Dinner, and Snacks. Tap a meal to edit or favorite it.",
     skipBeacon: true,
     blockTargetInteraction: true,
     buttons: ["back", "skip", "primary"],
@@ -47,7 +48,7 @@ const STEPS = [
   {
     target: '[data-tour="streak-badge"]',
     title: "Your Streak",
-    content: "Log meals every day to build your streak. Don't break the chain! 🔥",
+    content: "Log meals every day to build your streak. Don't break the chain!",
     skipBeacon: true,
     blockTargetInteraction: true,
     buttons: ["back", "skip", "primary"],
@@ -146,12 +147,8 @@ function useJoyrideStyles() {
       textTransform: "uppercase",
       cursor: "pointer",
     },
-    buttonClose: {
-      color: "var(--c-muted)",
-    },
-    spotlight: {
-      borderRadius: 14,
-    },
+    buttonClose: { color: "var(--c-muted)" },
+    spotlight: { borderRadius: 14 },
   };
 }
 
@@ -181,13 +178,7 @@ export default function AppTutorial() {
       options={options}
       styles={styles}
       onEvent={handleEvent}
-      locale={{
-        back: "Back",
-        close: "Got it",
-        last: "Done!",
-        next: "Next",
-        skip: "Skip tour",
-      }}
+      locale={{ back: "Back", close: "Got it", last: "Done!", next: "Next", skip: "Skip tour" }}
     />
   );
 }

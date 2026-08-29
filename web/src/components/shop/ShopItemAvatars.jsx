@@ -14,14 +14,25 @@ export default function ShopItemAvatars({ avatars = [] }) {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: av.type === "emoji" ? 18 : 14,
+            fontSize: 14,
             fontFamily: F.head,
             fontWeight: 900,
             color: "#000",
             border: `1px solid ${C.border}`,
           }}
         >
-          {av.type === "emoji" ? av.emoji : "U"}
+          {av.type === "pixel" ? (
+            <svg width={20} height={20} viewBox="0 0 256 256" fill="none">
+              <g opacity="0.2" fill="#000">
+                <path d={av.paths?.detail} />
+              </g>
+              <g fill="#000">
+                <path d={av.paths?.main} />
+              </g>
+            </svg>
+          ) : (
+            "U"
+          )}
         </div>
       ))}
     </div>

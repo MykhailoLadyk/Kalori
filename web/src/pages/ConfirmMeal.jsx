@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { C, F, alpha } from "../lib/constants";
 import { Mono } from "../components/shared/Primitives";
 import { IconStar, IconStarOutline, IconSparkles, IconCoin, IconCrown } from "../components/shared/DuoIcon";
@@ -32,20 +33,21 @@ const ChevronLeft = () => (
 
 const MEAL_TYPES = ["breakfast", "lunch", "dinner", "snacks"];
 
-const FIELD_CONFIG = [
-  { key: "calories", label: "Calories", unit: "kcal", color: C.accent },
-  { key: "protein", label: "Protein", unit: "g", color: C.blue },
-  { key: "carbs", label: "Carbs", unit: "g", color: C.gold },
-  { key: "fat", label: "Fat", unit: "g", color: C.pink },
-];
-
 export default function ConfirmMeal() {
+  const { t } = useTranslation();
   const { addMeal, selectedDate } = useMeals();
   const { syncProgress, gameData, refreshGameData } = useGameStats();
   const { addNotification } = useNotifications();
   const { user, isPro } = useUser();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const FIELD_CONFIG = [
+    { key: "calories", label: t("meal.calories"), unit: "kcal", color: C.accent },
+    { key: "protein", label: t("meal.protein"), unit: "g", color: C.blue },
+    { key: "carbs", label: t("meal.carbs"), unit: "g", color: C.gold },
+    { key: "fat", label: t("meal.fat"), unit: "g", color: C.pink },
+  ];
 
   const userCoins = gameData?.coins || 0;
   const [showCoinGate, setShowCoinGate] = useState(false);
@@ -256,7 +258,7 @@ export default function ConfirmMeal() {
           <ChevronLeft />
         </div>
         <div className="font-head font-black text-primary" style={{ fontSize: 18 }}>
-          Confirm Meal
+          {t("meal.confirmMeal")}
         </div>
       </div>
 
@@ -285,7 +287,7 @@ export default function ConfirmMeal() {
                 }}
               >
                 <span className="font-mono font-bold" style={{ fontSize: 9, color: "#fff" }}>
-                  RETAKE
+                  {t("meal.retake")}
                 </span>
               </div>
             )}
@@ -293,12 +295,12 @@ export default function ConfirmMeal() {
         )}
 
         <div className="font-body text-soft" style={{ fontSize: 13, marginBottom: 14 }}>
-          Review and adjust before adding to your log.
+          {t("meal.reviewAndAdjust")}
         </div>
 
         <div style={{ marginBottom: 16 }}>
           <Mono size={8} color={C.mutedLight}>
-            Meal Type
+            {t("meal.mealType")}
           </Mono>
           <div className="flex" style={{ gap: 6, marginTop: 8 }}>
             {MEAL_TYPES.map((type) => (
@@ -318,7 +320,7 @@ export default function ConfirmMeal() {
                   className="font-mono font-bold"
                   style={{ fontSize: 8, color: form.type === type ? "#000" : C.muted }}
                 >
-                  {type.toUpperCase()}
+                  {t(`home.${type}`).toUpperCase()}
                 </span>
               </div>
             ))}
@@ -328,7 +330,7 @@ export default function ConfirmMeal() {
         <div style={{ marginBottom: 14 }}>
           <div className="flex justify-between" style={{ marginBottom: 5 }}>
             <Mono size={8} color={C.mutedLight}>
-              Name
+              {t("meal.name")}
             </Mono>
             {errors.name && (
               <Mono size={8} color={C.red}>
@@ -341,7 +343,7 @@ export default function ConfirmMeal() {
               type="text"
               value={form.name}
               onChange={(e) => handleChange("name", e.target.value)}
-              placeholder="e.g. Chicken & Rice"
+              placeholder={t("meal.namePlaceholder")}
               maxLength={50}
               className="w-full bg-card input-field"
               style={{
@@ -393,7 +395,7 @@ export default function ConfirmMeal() {
           style={{ border: `1px solid ${C.border}`, borderRadius: 16, padding: "16px", marginBottom: 14 }}
         >
           <Mono size={8} color={C.mutedLight}>
-            Calories
+            {t("meal.calories")}
           </Mono>
           <div className="flex items-center justify-center" style={{ gap: 6, marginTop: 6 }}>
             <input
@@ -477,7 +479,7 @@ export default function ConfirmMeal() {
           >
             <div className="flex items-center justify-between">
               <Mono size={8} color={C.mutedLight}>
-                AI INSIGHTS & REFINEMENT
+                {t("meal.aiInsights")}
               </Mono>
               {confidence && (
                 <span
@@ -509,7 +511,7 @@ export default function ConfirmMeal() {
                     }`,
                   }}
                 >
-                  {confidence} Confidence
+                  {t("meal.confidence", { level: confidence })}
                 </span>
               )}
             </div>
@@ -564,7 +566,7 @@ export default function ConfirmMeal() {
                 type="text"
                 value={customClarification}
                 onChange={(e) => setCustomClarification(e.target.value)}
-                placeholder="Clarify ingredients, portion, or preparation..."
+                placeholder={t("meal.clarifyPlaceholder")}
                 className="w-full bg-card input-field"
                 style={{
                   border: `1px solid ${C.border}`,
@@ -594,10 +596,10 @@ export default function ConfirmMeal() {
                 <IconSparkles size={14} color={C.accent} />
                 <span className="font-mono font-bold" style={{ fontSize: 10, color: C.accent }}>
                   {refining
-                    ? "UPDATING ESTIMATE..."
+                    ? t("meal.updatingEstimate")
                     : isPro
-                    ? "REFINE ESTIMATE WITH AI"
-                    : <>REFINE ESTIMATE WITH AI · {AI_COIN_COST} <IconCoin size={11} color={C.accent} /></>}
+                    ? t("meal.refineEstimate")
+                    : <>{t("meal.refineEstimate")} · {AI_COIN_COST} <IconCoin size={11} color={C.accent} /></>}
                 </span>
               </div>
             )}
@@ -627,7 +629,7 @@ export default function ConfirmMeal() {
             }}
           >
             <span className="font-mono font-bold" style={{ fontSize: 10, color: C.soft }}>
-              CANCEL
+              {t("common.cancel")}
             </span>
           </div>
           <div
@@ -643,7 +645,7 @@ export default function ConfirmMeal() {
             }}
           >
             <span className="font-mono font-bold" style={{ fontSize: 11, color: isBusy ? C.accent : "#000" }}>
-              {loading ? "SAVING..." : refining ? "REFINING..." : "ADD MEAL"}
+              {loading ? t("meal.saving") : refining ? t("meal.refining") : t("meal.addMeal")}
             </span>
           </div>
         </div>

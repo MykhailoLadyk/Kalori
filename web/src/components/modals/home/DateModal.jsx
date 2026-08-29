@@ -1,9 +1,12 @@
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { C, F } from "../../../lib/constants";
 import { Mono } from "../../shared/Primitives";
-import { useState } from "react";
-import { getNumberOfDaysInMonth, getMonthName } from "../../../lib/utils";
+import { getNumberOfDaysInMonth } from "../../../lib/utils";
 import { useMeals } from "../../../hooks/useMeals";
+
 export function DateModal({ handleClose, date, setDate }) {
+  const { t, i18n } = useTranslation();
   const [localDate, setLocalDate] = useState(date.getDate());
   const [localMonth, setLocalMonth] = useState(date.getMonth());
   const [selectedMonth, setSelectedMonth] = useState(date.getMonth());
@@ -25,6 +28,16 @@ export function DateModal({ handleClose, date, setDate }) {
 
   const selectedCandidate = new Date(currentYear, selectedMonth, localDate);
   const isSelectedFuture = selectedCandidate > todayStart;
+
+  const monthName = new Date(currentYear, localMonth, 1).toLocaleDateString(
+    i18n.language?.startsWith("pl") ? "pl-PL" : "en-US",
+    { month: "long" }
+  );
+  const capitalizedMonth = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+  const dayInitials = i18n.language?.startsWith("pl")
+    ? ["P", "W", "Ś", "C", "P", "S", "N"]
+    : ["M", "T", "W", "T", "F", "S", "S"];
+
   return (
     <div>
       <div
@@ -65,7 +78,7 @@ export function DateModal({ handleClose, date, setDate }) {
             </svg>
           </div>
           <span style={{ textAlign: "center" }}>
-            {getMonthName(localMonth)} {currentYear}
+            {capitalizedMonth} {currentYear}
           </span>
           <div
             onClick={() => {
@@ -99,7 +112,7 @@ export function DateModal({ handleClose, date, setDate }) {
           alignContent: "start",
         }}
       >
-        {["M", "T", "W", "T", "F", "S", "S"].map((d, i) => (
+        {dayInitials.map((d, i) => (
           <div key={i} style={{ textAlign: "center" }}>
             <Mono size={8} color={C.muted}>
               {d}
@@ -189,7 +202,7 @@ export function DateModal({ handleClose, date, setDate }) {
           pointerEvents: isSelectedFuture ? "none" : "auto",
         }}
       >
-        Confirm
+        {t("common.confirm")}
       </div>
     </div>
   );

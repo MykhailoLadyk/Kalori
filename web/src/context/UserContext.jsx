@@ -2,6 +2,7 @@ import { createContext, useState, useEffect, useMemo, useCallback } from "react"
 import { fetchUser, updateUser } from "../services/userService";
 import { fetchUserSubscription, isProUser } from "../services/subscriptionService";
 import { supabase } from "../services/supabase";
+import i18n from "../lib/i18n";
 
 export const UserContext = createContext(null);
 
@@ -68,6 +69,14 @@ export function UserProvider({ children }) {
       authListener.subscription.unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    if (user?.settings?.language && (user.settings.language === "en" || user.settings.language === "pl")) {
+      if (i18n.language !== user.settings.language) {
+        i18n.changeLanguage(user.settings.language);
+      }
+    }
+  }, [user?.settings?.language]);
 
 
   const refreshSubscription = useCallback(async () => {

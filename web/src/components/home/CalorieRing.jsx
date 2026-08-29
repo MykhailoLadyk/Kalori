@@ -1,10 +1,12 @@
 import { C, F } from "../../lib/constants";
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import CountUp from "../shared/CountUp";
 import { Mono } from "../shared/Primitives";
 import { useUser } from "../../hooks/useUser";
 import { useMeals } from "../../hooks/useMeals";
 export function CalorieRing() {
+  const { t } = useTranslation();
   const { user } = useUser();
   const { meals } = useMeals();
   const goal = Number(user?.targets?.calories || 0);
@@ -141,7 +143,7 @@ export function CalorieRing() {
           <CountUp to={Number(displayValue)} duration={1200} delay={400} />
         </div>
         <Mono size={9} color={isSeverelyOver ? C.redSoft : C.mutedLight}>
-          {isOver ? "KCAL OVER" : "KCAL REMAINING"}
+          {isOver ? t("home.caloriesOver") : t("home.caloriesRemaining")}
         </Mono>
         <div
           style={{
@@ -153,11 +155,11 @@ export function CalorieRing() {
           }}
         >
           <Mono size={8} color={C.soft}>
-            {consumed} eaten
+            {consumed} {t("home.eaten").toLowerCase()}
           </Mono>
           <span style={{ color: C.muted }}>·</span>
           <Mono size={8} color={C.soft}>
-            {goal} goal
+            {goal} {t("home.goal").toLowerCase()}
           </Mono>
         </div>
       </div>

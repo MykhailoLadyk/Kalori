@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { C, F, alpha } from "../lib/constants";
 import { Mono } from "../components/shared/Primitives";
 import { useMeals } from "../hooks/useMeals";
@@ -23,21 +24,22 @@ const ChevronLeft = () => (
 
 const MEAL_TYPES = ["breakfast", "lunch", "dinner", "snacks"];
 
-const FIELD_CONFIG = [
-  { key: "name", label: "Name", type: "text", placeholder: "e.g. Chicken & Rice" },
-  { key: "calories", label: "Calories", type: "number", placeholder: "kcal" },
-  { key: "protein", label: "Protein", type: "number", placeholder: "g" },
-  { key: "carbs", label: "Carbs", type: "number", placeholder: "g" },
-  { key: "fat", label: "Fat", type: "number", placeholder: "g" },
-];
-
 export default function ManualMealPage() {
+  const { t } = useTranslation();
   const { syncProgress } = useGameStats();
   const { addMeal, selectedDate } = useMeals();
   const { user } = useUser();
   const navigate = useNavigate();
   const location = useLocation();
   const meal = location.state?.meal;
+
+  const fieldConfig = [
+    { key: "name", label: t("addMeal.mealName"), type: "text", placeholder: t("addMeal.mealNamePlaceholder") },
+    { key: "calories", label: t("addMeal.calories"), type: "number", placeholder: t("common.kcal") },
+    { key: "protein", label: t("addMeal.protein"), type: "number", placeholder: t("common.grams") },
+    { key: "carbs", label: t("addMeal.carbs"), type: "number", placeholder: t("common.grams") },
+    { key: "fat", label: t("addMeal.fat"), type: "number", placeholder: t("common.grams") },
+  ];
 
   const [form, setForm] = useState({
     name: meal?.name ?? "",
@@ -138,13 +140,13 @@ export default function ManualMealPage() {
         >
           <ChevronLeft />
         </div>
-        <div style={{ fontFamily: F.head, fontSize: 18, fontWeight: 900, color: C.text }}>Add Meal</div>
+        <div style={{ fontFamily: F.head, fontSize: 18, fontWeight: 900, color: C.text }}>{t("home.addMeal")}</div>
       </div>
 
       <div style={{ padding: "0 22px 22px", flex: 1, display: "flex", flexDirection: "column" }}>
         <div style={{ marginBottom: 16 }}>
           <Mono size={8} color={C.mutedLight}>
-            Meal Type
+            {t("addMeal.type")}
           </Mono>
           <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
             {MEAL_TYPES.map((type) => (
@@ -171,7 +173,7 @@ export default function ManualMealPage() {
                     color: form.type === type ? "#000" : C.muted,
                   }}
                 >
-                  {type.toUpperCase()}
+                  {t(`home.${type}`).toUpperCase()}
                 </span>
               </div>
             ))}
@@ -179,7 +181,7 @@ export default function ManualMealPage() {
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {FIELD_CONFIG.map(({ key, label, type, placeholder }) => (
+          {fieldConfig.map(({ key, label, type, placeholder }) => (
             <div key={key}>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
                 <Mono size={8} color={C.mutedLight}>
@@ -234,7 +236,7 @@ export default function ManualMealPage() {
           }}
         >
           <span style={{ fontFamily: F.mono, fontSize: 11, fontWeight: 700, color: loading ? C.accent : "#000" }}>
-            {loading ? "SAVING..." : "ADD MEAL"}
+            {loading ? t("common.saving") : t("addMeal.saveMeal")}
           </span>
         </div>
       </div>

@@ -1,75 +1,78 @@
+import { useMemo } from "react";
 import { Joyride, STATUS } from "react-joyride";
+import { useTranslation } from "react-i18next";
 import { useTutorial } from "../../hooks/useTutorial";
 import { useLocation } from "react-router-dom";
 import { alpha } from "../../lib/constants";
 
-const STEPS = [
-  {
-    target: '[data-tour="calorie-ring"]',
-    title: "Your Daily Goal",
-    content: "This ring shows how many calories you've eaten vs your daily target. Stay in the green!",
-    skipBeacon: true,
-    blockTargetInteraction: true,
-    buttons: ["skip", "primary"],
-  },
-  {
-    target: '[data-tour="macro-bars"]',
-    title: "Macro Breakdown",
-    content: "Track your protein, carbs, and fat intake against your goals here.",
-    skipBeacon: true,
-    blockTargetInteraction: true,
-    buttons: ["back", "skip", "primary"],
-  },
-  {
-    target: '[data-tour="add-meal-btn"]',
-    title: "Log a Meal",
-    content: "Tap here to log what you eat. You can describe it, snap a photo, or enter macros manually.",
-    skipBeacon: true,
-    blockTargetInteraction: true,
-    buttons: ["back", "skip", "primary"],
-  },
-  {
-    target: '[data-tour="meals-list"]',
-    title: "Your Meals",
-    content:
-      "All your logged meals appear here, grouped by Breakfast, Lunch, Dinner, and Snacks. Tap a meal to edit or favorite it.",
-    skipBeacon: true,
-    blockTargetInteraction: true,
-    buttons: ["back", "skip", "primary"],
-  },
-  {
-    target: '[data-tour="water-tracker"]',
-    title: "Water Tracker",
-    content: "Track your hydration! Use the quick-add buttons or enter a custom amount.",
-    skipBeacon: true,
-    blockTargetInteraction: true,
-    buttons: ["back", "skip", "primary"],
-  },
-  {
-    target: '[data-tour="streak-badge"]',
-    title: "Your Streak",
-    content: "Log meals every day to build your streak. Don't break the chain!",
-    skipBeacon: true,
-    blockTargetInteraction: true,
-    buttons: ["back", "skip", "primary"],
-  },
-  {
-    target: '[data-tour="nav-game"]',
-    title: "Level Up & Quests",
-    content: "Earn XP by logging meals, hit milestones, and complete daily quests for coins.",
-    skipBeacon: true,
-    blockTargetInteraction: true,
-    buttons: ["back", "skip", "primary"],
-  },
-  {
-    target: '[data-tour="nav-shop"]',
-    title: "The Shop",
-    content: "Spend your coins on avatars, streak flames, themes, and power-ups.",
-    skipBeacon: true,
-    blockTargetInteraction: true,
-    buttons: ["back", "primary"],
-  },
-];
+function getSteps(t) {
+  return [
+    {
+      target: '[data-tour="calorie-ring"]',
+      title: t("tutorial.calorieRingTitle"),
+      content: t("tutorial.calorieRingContent"),
+      skipBeacon: true,
+      blockTargetInteraction: true,
+      buttons: ["skip", "primary"],
+    },
+    {
+      target: '[data-tour="macro-bars"]',
+      title: t("tutorial.macroBarsTitle"),
+      content: t("tutorial.macroBarsContent"),
+      skipBeacon: true,
+      blockTargetInteraction: true,
+      buttons: ["back", "skip", "primary"],
+    },
+    {
+      target: '[data-tour="add-meal-btn"]',
+      title: t("tutorial.addMealBtnTitle"),
+      content: t("tutorial.addMealBtnContent"),
+      skipBeacon: true,
+      blockTargetInteraction: true,
+      buttons: ["back", "skip", "primary"],
+    },
+    {
+      target: '[data-tour="meals-list"]',
+      title: t("tutorial.mealsListTitle"),
+      content: t("tutorial.mealsListContent"),
+      skipBeacon: true,
+      blockTargetInteraction: true,
+      buttons: ["back", "skip", "primary"],
+    },
+    {
+      target: '[data-tour="water-tracker"]',
+      title: t("tutorial.waterTrackerTitle"),
+      content: t("tutorial.waterTrackerContent"),
+      skipBeacon: true,
+      blockTargetInteraction: true,
+      buttons: ["back", "skip", "primary"],
+    },
+    {
+      target: '[data-tour="streak-badge"]',
+      title: t("tutorial.streakBadgeTitle"),
+      content: t("tutorial.streakBadgeContent"),
+      skipBeacon: true,
+      blockTargetInteraction: true,
+      buttons: ["back", "skip", "primary"],
+    },
+    {
+      target: '[data-tour="nav-game"]',
+      title: t("tutorial.navGameTitle"),
+      content: t("tutorial.navGameContent"),
+      skipBeacon: true,
+      blockTargetInteraction: true,
+      buttons: ["back", "skip", "primary"],
+    },
+    {
+      target: '[data-tour="nav-shop"]',
+      title: t("tutorial.navShopTitle"),
+      content: t("tutorial.navShopContent"),
+      skipBeacon: true,
+      blockTargetInteraction: true,
+      buttons: ["back", "primary"],
+    },
+  ];
+}
 
 function useJoyrideOptions() {
   return {
@@ -153,10 +156,13 @@ function useJoyrideStyles() {
 }
 
 export default function AppTutorial() {
+  const { t } = useTranslation();
   const { isTutorialActive, tutorialKey, endTutorial } = useTutorial();
   const location = useLocation();
   const options = useJoyrideOptions();
   const styles = useJoyrideStyles();
+
+  const steps = useMemo(() => getSteps(t), [t]);
 
   const handleEvent = (data) => {
     const { status, type } = data;
@@ -170,15 +176,21 @@ export default function AppTutorial() {
 
   return (
     <Joyride
-      key={tutorialKey}
-      steps={STEPS}
+      key={`${tutorialKey}-${t("tutorial.done")}`}
+      steps={steps}
       run={isTutorialActive}
       continuous
       scrollToFirstStep
       options={options}
       styles={styles}
       onEvent={handleEvent}
-      locale={{ back: "Back", close: "Got it", last: "Done!", next: "Next", skip: "Skip tour" }}
+      locale={{
+        back: t("tutorial.back"),
+        close: t("tutorial.close"),
+        last: t("tutorial.done"),
+        next: t("tutorial.next"),
+        skip: t("tutorial.skip"),
+      }}
     />
   );
 }

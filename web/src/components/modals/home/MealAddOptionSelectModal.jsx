@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { C, F, alpha } from "../../../lib/constants";
 import { Mono, Tag } from "../../../components/shared/Primitives";
 import analyzeFood from "../../../services/analyzeFood";
@@ -108,6 +109,7 @@ const Spinner = ({ color }) => (
 
 export function MealAddOptionSelectModal({ handleClose, setPreventClose }) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { isPro } = useUser();
   const { gameData, refreshGameData } = useGameStats();
   const { addNotification } = useNotifications();
@@ -203,10 +205,7 @@ export function MealAddOptionSelectModal({ handleClose, setPreventClose }) {
       <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} style={{ display: "none" }} />
 
       <div style={{ marginBottom: 20 }}>
-        <div style={{ fontFamily: F.head, fontSize: 20, fontWeight: 900, color: C.text }}>Add Meal</div>
-        <div style={{ fontFamily: F.body, fontSize: 13, color: C.soft, marginTop: 4 }}>
-          How would you like to log it?
-        </div>
+        <div style={{ fontFamily: F.head, fontSize: 20, fontWeight: 900, color: C.text }}>{t("home.addMeal")}</div>
       </div>
 
       {favorites.length > 0 && (
@@ -214,7 +213,7 @@ export function MealAddOptionSelectModal({ handleClose, setPreventClose }) {
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
             <IconStar size={12} color={C.gold} />
             <Mono size={8} color={C.gold}>
-              Favorites
+              {t("meal.favorites")}
             </Mono>
           </div>
           <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 4, scrollbarWidth: "none" }}>
@@ -276,7 +275,7 @@ export function MealAddOptionSelectModal({ handleClose, setPreventClose }) {
       {recentMeals.length > 0 && (
         <div style={{ marginBottom: 16 }}>
           <Mono size={8} color={C.mutedLight}>
-            Recently Added
+            {t("meal.recentlyAdded")}
           </Mono>
           <div
             style={{
@@ -366,15 +365,15 @@ export function MealAddOptionSelectModal({ handleClose, setPreventClose }) {
             <IconSparkles size={16} color={C.accent} />
             <div>
               <div style={{ fontFamily: F.head, fontSize: 12, fontWeight: 800, color: C.text }}>
-                Upgrade to Kalori Pro
+                {t("pro.upgradeToPro")}
               </div>
               <Mono size={7} color={C.soft}>
-                High-limit AI meal scanning with 0 coin cost
+                {t("pro.upgradeSub")}
               </Mono>
             </div>
           </div>
           <span style={{ fontFamily: F.mono, fontSize: 9, fontWeight: 800, color: C.accent }}>
-            VIEW PRO ›
+            {t("pro.viewPro")}
           </span>
         </div>
       )}
@@ -424,7 +423,15 @@ export function MealAddOptionSelectModal({ handleClose, setPreventClose }) {
               <div style={{ flex: 1 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 3 }}>
                   <span style={{ fontFamily: F.body, fontSize: 14, fontWeight: 700, color: C.text }}>
-                    {label}
+                    {key === "photo"
+                      ? t("addMeal.optionsPhoto")
+                      : key === "describe"
+                      ? t("addMeal.optionsDescribe")
+                      : key === "album"
+                      ? t("addMeal.optionsAlbum")
+                      : key === "manual"
+                      ? t("addMeal.optionsManual")
+                      : label}
                   </span>
                   {isAi && !isPro && (
                     <div
@@ -446,7 +453,15 @@ export function MealAddOptionSelectModal({ handleClose, setPreventClose }) {
                   )}
                 </div>
                 <Mono size={8} color={C.muted}>
-                  {sub}
+                  {key === "photo"
+                    ? t("addMeal.optionsPhotoSub")
+                    : key === "describe"
+                    ? t("addMeal.optionsDescribeSub")
+                    : key === "album"
+                    ? t("addMeal.optionsAlbumSub")
+                    : key === "manual"
+                    ? t("addMeal.optionsManualSub")
+                    : sub}
                 </Mono>
               </div>
 

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useGameStats } from "../hooks/useGameStats";
 import { useUser } from "../hooks/useUser";
 import {
@@ -34,6 +35,7 @@ import ShopOtherModal from "../components/modals/shop/shopOtherModal";
 import ChestsModal from "../components/modals/shop/chestsModal";
 
 export default function Shop() {
+  const { t } = useTranslation();
   const [modal, setModal] = useState(null);
   const { gameData, shopItems } = useGameStats();
   const { user } = useUser();
@@ -103,44 +105,35 @@ export default function Shop() {
   const sections = [
     {
       id: "avatars",
-      label: "Avatars",
+      label: t("shop.avatars"),
       Icon: IconUser,
       color: C.accent,
       preview: <ShopItemAvatars avatars={avatars} />,
     },
     {
       id: "flames",
-      label: "Streak Flames",
+      label: t("shop.streakFlames"),
       Icon: IconFire,
       color: C.orange,
       preview: <ShopItemFlames flames={flameColors} />,
     },
     {
       id: "themes",
-      label: "Themes",
+      label: t("shop.themes"),
       Icon: IconPalette,
       color: C.pink,
       preview: <ShopItemThemes previewColors={themes.map((t) => t.colors)} />,
     },
     {
       id: "upgrades",
-      label: "Perma Upgrades",
+      label: t("shop.upgrades"),
       Icon: IconArrowUp,
       color: C.accent,
       preview: <ShopItemUpgrades upgrades={upgrades} />,
     },
-    // {
-    //   id: "chests",
-    //   label: "Chests",
-    //   Icon: IconTrophy,
-    //   desc: "Unlock random rewards",
-    //   count: `${chests.length} types`,
-    //   color: C.gold,
-    //   preview: <ShopItemChests colors={[C.blue, C.pink, C.gold]} />,
-    // },
     {
       id: "other",
-      label: "Other",
+      label: t("shop.other"),
       Icon: IconShield,
       color: C.orange,
       preview: <ShopItemOther />,

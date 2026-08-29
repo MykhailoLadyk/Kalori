@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { C, F } from "../lib/constants";
 import { useMeals } from "../hooks/useMeals";
@@ -16,6 +17,7 @@ import { DateSection } from "../components/home/DateSection";
 import { Meals } from "../components/home/Meals";
 
 export default function Home() {
+  const { t } = useTranslation();
   const [modal, setModal] = useState(null);
   const { selectedDate, setSelectedDate } = useMeals();
   const modals = {
@@ -40,7 +42,7 @@ export default function Home() {
             animation: "fadeUp 0.4s ease 0.64s both",
           }}
         >
-          <SectionLabel>Today's Meals</SectionLabel>
+          <SectionLabel>{t("home.todaysMeals")}</SectionLabel>
 
           <div
             data-tour="add-meal-btn"
@@ -59,7 +61,7 @@ export default function Home() {
           >
             <span style={{ fontFamily: F.mono, fontSize: 14, fontWeight: 300, color: C.accent, lineHeight: 1 }}>+</span>
             <span style={{ fontFamily: F.mono, fontSize: 8, fontWeight: 700, color: C.accent, letterSpacing: 1 }}>
-              ADD MEAL
+              {t("home.addMeal")}
             </span>
           </div>
         </div>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { C, F } from "../../../lib/constants";
 import { Mono } from "../../../components/shared/Primitives";
 import { useUser } from "../../../hooks/useUser";
@@ -6,6 +7,7 @@ import { calculateTargets, calcMacros } from "../../../lib/macroCalc";
 import { useNotifications } from "../../../context/NotificationContext";
 
 export default function BodyStatsModal({ handleClose }) {
+  const { t } = useTranslation();
   const { user, updateUser } = useUser();
   const { addNotification } = useNotifications();
 
@@ -106,26 +108,30 @@ export default function BodyStatsModal({ handleClose }) {
       });
 
       const goalsChanged =
-        user?.targets?.calories !== calories ||
-        user?.targets?.protein !== macros.protein ||
-        user?.targets?.carbs !== macros.carbs ||
-        user?.targets?.fat !== macros.fat;
+        user?.settings?.weight_goal !== form.goal ||
+        user?.settings?.activity_level !== form.activity_level ||
+        Number(user?.settings?.weight) !== weight ||
+        Number(user?.settings?.height) !== height ||
+        Number(user?.age) !== age;
 
       await updateUser({
-        settings: {
-          weight: Number(form.weight),
-          weight_unit: form.weight_unit,
-          height: Number(form.height),
-          height_unit: form.height_unit,
-          weight_goal: form.goal,
-          activity_level: form.activity_level,
-          sex: form.sex,
-        },
         age: Number(form.age),
+        settings: {
+          ...user.settings,
+          weight: form.weight ? Number(form.weight) : undefined,
+          weight_unit: form.weight_unit,
+          height: form.height ? Number(form.height) : undefined,
+          height_unit: form.height_unit,
+          sex: form.sex,
+          activity_level: form.activity_level,
+          weight_goal: form.goal,
+        },
         targets: {
           calories,
           water,
-          ...macros,
+          protein: macros.protein,
+          carbs: macros.carbs,
+          fat: macros.fat,
         },
       });
       if (goalsChanged) {
@@ -150,11 +156,11 @@ export default function BodyStatsModal({ handleClose }) {
           marginBottom: 20,
         }}
       >
-        Body Stats
+        {t("settings.bodyMeasurements")}
       </div>
 
       <div style={{ marginBottom: 16 }}>
-        <Mono size={8} color={C.mutedLight}>Biological Sex</Mono>
+        <Mono size={8} color={C.mutedLight}>{t("onboarding.stepSex")}</Mono>
         <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
           {["male", "female"].map((s) => (
             <div
@@ -175,7 +181,7 @@ export default function BodyStatsModal({ handleClose }) {
                 textTransform: "capitalize",
               }}
             >
-              {s}
+              {s === "male" ? t("onboarding.sexMale") : t("onboarding.sexFemale")}
             </div>
           ))}
         </div>
@@ -247,13 +253,13 @@ export default function BodyStatsModal({ handleClose }) {
         {[
           {
             key: "weight",
-            label: "Weight",
+            label: t("settings.weight"),
             unit: form.weight_unit,
             placeholder: form.weight_unit === "lbs" ? "e.g. 150" : "e.g. 70",
           },
           {
             key: "height",
-            label: "Height",
+            label: t("settings.height"),
             unit: form.height_unit,
             placeholder: form.height_unit === "ft" ? "e.g. 5.9" : "e.g. 175",
           },
@@ -335,7 +341,7 @@ export default function BodyStatsModal({ handleClose }) {
             color: loading ? C.accent : "#000",
           }}
         >
-          {loading ? "SAVING..." : "SAVE STATS"}
+          {loading ? t("settings.saving") : t("settings.saveChanges")}
         </span>
       </div>
     </div>

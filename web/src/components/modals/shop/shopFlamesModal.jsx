@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { C, F, alpha } from "../../../lib/constants";
 import { Tag } from "../../shared/Primitives";
 import { IconCoin, IconFire } from "../../shared/DuoIcon";
@@ -8,6 +9,7 @@ import { useNotifications } from "../../../context/NotificationContext";
 import { supabase } from "../../../services/supabase";
 
 export default function ShopFlamesModal({ flames = [], currentFlame, coins }) {
+  const { t } = useTranslation();
   const { user, updateUser, refreshUser } = useUser();
   const { refreshGameData } = useGameStats();
   const { addNotification } = useNotifications();
@@ -25,7 +27,7 @@ export default function ShopFlamesModal({ flames = [], currentFlame, coins }) {
       return;
     }
     if (coins < flame.price) {
-      addNotification({ type: "error", name: "Not enough coins" });
+      addNotification({ type: "error", name: t("notifs.notEnoughCoins") });
       setLoading(false);
       return;
     }
@@ -40,9 +42,9 @@ export default function ShopFlamesModal({ flames = [], currentFlame, coins }) {
       await refreshUser();
       await refreshGameData();
 
-      addNotification({ type: "success", name: `Unlocked ${flame.name}!` });
+      addNotification({ type: "success", name: t("notifs.unlockedItem", { name: flame.name }) });
     } catch (err) {
-      addNotification({ type: "error", name: err.message || "Purchase failed." });
+      addNotification({ type: "error", name: err.message || t("notifs.purchaseFailed") });
     } finally {
       setLoading(false);
     }
@@ -63,7 +65,7 @@ export default function ShopFlamesModal({ flames = [], currentFlame, coins }) {
   return (
     <div>
       <div style={{ fontFamily: F.head, fontSize: 20, fontWeight: 900, color: C.text, marginBottom: 16 }}>
-        Streak Flame Colors
+        {t("shop.streakFlameColors")}
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -111,15 +113,15 @@ export default function ShopFlamesModal({ flames = [], currentFlame, coins }) {
                   <div style={{ fontFamily: F.body, fontSize: 14, fontWeight: 700, color: C.text }}>
                     {name}
                   </div>
-                  {lock && <Tag color={C.gold}>{lock} required</Tag>}
+                  {lock && <Tag color={C.gold}>{t("shop.lvlRequired", { lock })}</Tag>}
                 </div>
               </div>
 
               <div>
                 {isCurrent ? (
-                  <Tag color={color}>Active</Tag>
+                  <Tag color={color}>{t("shop.active")}</Tag>
                 ) : isOwned ? (
-                  <Tag color={C.blue}>Owned</Tag>
+                  <Tag color={C.blue}>{t("shop.owned")}</Tag>
                 ) : (
                   <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
                     <IconCoin size={14} color={C.gold} />

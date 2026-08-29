@@ -169,6 +169,7 @@ describe("addMeal", () => {
       fat: 7,
       type: "snacks",
       date: "2025-02-27",
+      amount: null,
     });
   });
 

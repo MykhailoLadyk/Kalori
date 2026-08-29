@@ -1,29 +1,31 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { C, F, alpha } from "../../../lib/constants";
 import { Mono } from "../../../components/shared/Primitives";
 import { useUser } from "../../../hooks/useUser";
 
-const SYSTEMS = [
-  {
-    key: "metric",
-    label: "Metric",
-    sub: "kg, cm, ml",
-    units: { weight: "kg", height: "cm", liquid: "ml" },
-  },
-  {
-    key: "imperial",
-    label: "Imperial",
-    sub: "lbs, ft, fl oz",
-    units: { weight: "lbs", height: "ft", liquid: "fl oz" },
-  },
-];
-
 export default function MeasurementsModal({ handleClose }) {
+  const { t } = useTranslation();
   const { user, updateUser } = useUser();
   const [selected, setSelected] = useState(
     user?.settings?.measurement_system || "metric",
   );
   const [loading, setLoading] = useState(false);
+
+  const SYSTEMS = [
+    {
+      key: "metric",
+      label: t("onboarding.systemMetric") || "Metric",
+      sub: "kg, cm, ml",
+      units: { weight: "kg", height: "cm", liquid: "ml" },
+    },
+    {
+      key: "imperial",
+      label: t("onboarding.systemImperial") || "Imperial",
+      sub: "lbs, ft, fl oz",
+      units: { weight: "lbs", height: "ft", liquid: "fl oz" },
+    },
+  ];
 
   const handleSave = async () => {
     try {
@@ -80,7 +82,7 @@ export default function MeasurementsModal({ handleClose }) {
           marginBottom: 20,
         }}
       >
-        Measurements
+        {t("settings.measurementSystem")}
       </div>
 
       <div
@@ -176,7 +178,7 @@ export default function MeasurementsModal({ handleClose }) {
             color: loading ? C.accent : "#000",
           }}
         >
-          {loading ? "SAVING..." : "SAVE"}
+          {loading ? t("settings.saving") : t("settings.saveSystem")}
         </span>
       </div>
     </div>

@@ -1,7 +1,9 @@
+import { useTranslation } from "react-i18next";
 import { C, F } from "../../lib/constants";
 import { IconTrophy } from "../shared/DuoIcon";
 
 export default function Achievements({ achievements, onViewAll }) {
+  const { t } = useTranslation();
   const preview = achievements.slice(0, 5);
 
   return (
@@ -23,7 +25,7 @@ export default function Achievements({ achievements, onViewAll }) {
             textTransform: "uppercase",
           }}
         >
-          Achievements
+          {t("game.achievements")}
         </div>
         <div
           onClick={onViewAll}
@@ -38,7 +40,7 @@ export default function Achievements({ achievements, onViewAll }) {
             color: "#000",
           }}
         >
-          View all →
+          {t("game.viewAll")}
         </div>
       </div>
 

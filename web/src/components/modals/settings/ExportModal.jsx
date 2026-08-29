@@ -1,18 +1,20 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { C, F } from "../../../lib/constants";
 import { Mono } from "../../../components/shared/Primitives";
 import { IconCheck } from "../../../components/shared/DuoIcon";
 
-const EXPORT_OPTIONS = [
-  { key: "meals", label: "Meal Logs", sub: "All logged meals with macros" },
-  { key: "stats", label: "Statistics", sub: "Weekly and monthly summaries" },
-  { key: "profile", label: "Profile Data", sub: "Your account and body stats" },
-];
-
 export default function ExportModal({ handleClose }) {
+  const { t } = useTranslation();
   const [selected, setSelected] = useState(["meals"]);
   const [exporting, setExporting] = useState(false);
   const [done, setDone] = useState(false);
+
+  const EXPORT_OPTIONS = [
+    { key: "meals", label: t("settings.mealLogs"), sub: "All logged meals with macros" },
+    { key: "stats", label: t("settings.statistics"), sub: "Weekly and monthly summaries" },
+    { key: "profile", label: t("settings.profileData"), sub: "Your account and body stats" },
+  ];
 
   const toggle = (key) => {
     setSelected((prev) =>
@@ -39,7 +41,7 @@ export default function ExportModal({ handleClose }) {
           marginBottom: 8,
         }}
       >
-        Export My Data
+        {t("settings.exportMyData")}
       </div>
       <div
         style={{
@@ -49,7 +51,7 @@ export default function ExportModal({ handleClose }) {
           marginBottom: 20,
         }}
       >
-        Choose what to export. Data is downloaded as CSV.
+        {t("settings.exportDesc")}
       </div>
 
       <div
@@ -138,7 +140,7 @@ export default function ExportModal({ handleClose }) {
               color: C.accent,
             }}
           >
-            <IconCheck size={14} /> EXPORT READY
+            <IconCheck size={14} /> {t("settings.downloaded")}
           </span>
         </div>
       ) : (
@@ -162,7 +164,7 @@ export default function ExportModal({ handleClose }) {
               color: exporting ? C.accent : "#000",
             }}
           >
-            {exporting ? "EXPORTING..." : "EXPORT DATA"}
+            {exporting ? t("settings.exporting") : t("settings.exportButton")}
           </span>
         </div>
       )}

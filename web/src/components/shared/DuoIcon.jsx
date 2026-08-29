@@ -443,3 +443,71 @@ export const QuestFireIcon = ({ color }) => (
     </g>
   </svg>
 );
+
+// ══════════════════════════════════════════════════
+// COUNTRY / LANGUAGE FLAG ICONS (SVG)
+// ══════════════════════════════════════════════════
+
+// Flag: United Kingdom (English)
+export const IconFlagUK = ({ size = 20, width, height, className = "" }) => {
+  const w = width || Math.round(size * 1.33);
+  const h = height || size;
+  return (
+    <svg
+      width={w}
+      height={h}
+      viewBox="0 0 60 45"
+      className={className}
+      style={{
+        borderRadius: 4,
+        overflow: "hidden",
+        flexShrink: 0,
+        display: "inline-block",
+        verticalAlign: "middle",
+        boxShadow: "0 0 0 1px rgba(255,255,255,0.12)",
+      }}
+    >
+      <clipPath id="uk-flag-clip">
+        <rect width="60" height="45" rx="4" />
+      </clipPath>
+      <g clipPath="url(#uk-flag-clip)">
+        <rect width="60" height="45" fill="#012169" />
+        <path d="M0 0 L60 45 M60 0 L0 45" stroke="#FFFFFF" strokeWidth="7" />
+        <path d="M0 0 L30 22.5 M60 0 L30 22.5 M60 45 L30 22.5 M0 45 L30 22.5" stroke="#C8102E" strokeWidth="4" />
+        <path d="M30 0 V45 M0 22.5 H60" stroke="#FFFFFF" strokeWidth="12" />
+        <path d="M30 0 V45 M0 22.5 H60" stroke="#C8102E" strokeWidth="7" />
+      </g>
+    </svg>
+  );
+};
+
+// Flag: Poland (Polski)
+export const IconFlagPoland = ({ size = 20, width, height, className = "" }) => {
+  const w = width || Math.round(size * 1.33);
+  const h = height || size;
+  return (
+    <svg
+      width={w}
+      height={h}
+      viewBox="0 0 60 45"
+      className={className}
+      style={{
+        borderRadius: 4,
+        overflow: "hidden",
+        flexShrink: 0,
+        display: "inline-block",
+        verticalAlign: "middle",
+        boxShadow: "0 0 0 1px rgba(255,255,255,0.12)",
+      }}
+    >
+      <clipPath id="pl-flag-clip">
+        <rect width="60" height="45" rx="4" />
+      </clipPath>
+      <g clipPath="url(#pl-flag-clip)">
+        <rect width="60" height="22.5" fill="#FFFFFF" />
+        <rect y="22.5" width="60" height="22.5" fill="#DC143C" />
+      </g>
+    </svg>
+  );
+};
+

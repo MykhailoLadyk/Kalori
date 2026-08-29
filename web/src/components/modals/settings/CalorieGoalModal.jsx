@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { C, F } from "../../../lib/constants";
 import { Mono } from "../../../components/shared/Primitives";
 import { useUser } from "../../../hooks/useUser";
@@ -6,20 +7,21 @@ import { calcMacros, calculateTargets } from "../../../lib/macroCalc";
 import { useNotifications } from "../../../context/NotificationContext";
 
 export default function CalorieGoalModal({ handleClose }) {
+  const { t } = useTranslation();
   const { user, updateUser } = useUser();
   const { addNotification } = useNotifications();
 
   const GOALS = [
-    { key: "lose", label: "Lose weight" },
-    { key: "maintain", label: "Maintain" },
-    { key: "gain", label: "Gain muscle" },
+    { key: "lose", label: t("onboarding.goalLose") },
+    { key: "maintain", label: t("onboarding.goalMaintain") },
+    { key: "gain", label: t("onboarding.goalGain") },
   ];
   const ACTIVITY_LEVELS = [
-    { key: "sedentary", label: "Sedentary", sub: "Little or no exercise" },
-    { key: "light", label: "Light", sub: "1-3 days/week" },
-    { key: "moderate", label: "Moderate", sub: "3-5 days/week" },
-    { key: "active", label: "Active", sub: "6-7 days/week" },
-    { key: "very_active", label: "Very Active", sub: "Twice a day" },
+    { key: "sedentary", label: t("onboarding.activitySedentary"), sub: t("onboarding.activitySedentarySub") },
+    { key: "light", label: t("onboarding.activityLight"), sub: t("onboarding.activityLightSub") },
+    { key: "moderate", label: t("onboarding.activityModerate"), sub: t("onboarding.activityModerateSub") },
+    { key: "active", label: t("onboarding.activityActive"), sub: t("onboarding.activityActiveSub") },
+    { key: "very_active", label: t("onboarding.activityVeryActive"), sub: t("onboarding.activityVeryActiveSub") },
   ];
 
   const [calorieGoal, setCalorieGoal] = useState(user?.targets?.calories || 2000);
@@ -127,7 +129,7 @@ export default function CalorieGoalModal({ handleClose }) {
         {/* goal */}
         <div style={{ marginBottom: 16 }}>
           <div className="font-head font-black text-primary" style={{ fontSize: 20, marginBottom: 24 }}>
-            Weight Goals
+            {t("settings.goalsTargets")}
           </div>
           <div className="flex" style={{ gap: 6, marginTop: 8 }}>
             {GOALS.map(({ key, label }) => (
@@ -152,7 +154,7 @@ export default function CalorieGoalModal({ handleClose }) {
           </div>
         </div>
         <div className="font-head font-black text-primary" style={{ fontSize: 20, marginBottom: 24 }}>
-          Activity Level
+          {t("onboarding.stepActivity")}
         </div>
       </div>
       {/* activity level */}
@@ -202,10 +204,10 @@ export default function CalorieGoalModal({ handleClose }) {
 
         <div>
           <div className="font-head font-black text-primary" style={{ fontSize: 20, marginBottom: 24, marginTop: 18 }}>
-            Daily Targets
+            {t("settings.calorieGoal")}
           </div>
           <Mono size={8} color={C.mutedLight}>
-            Calorie Target
+            {t("meal.calories")}
           </Mono>
           <div
             className="flex items-center overflow-hidden bg-card"
@@ -261,7 +263,7 @@ export default function CalorieGoalModal({ handleClose }) {
         {/* ── Water goal ── */}
         <div>
           <Mono size={8} color={C.mutedLight}>
-            Water Target
+            {t("home.water")}
           </Mono>
           <div
             style={{
@@ -338,7 +340,7 @@ export default function CalorieGoalModal({ handleClose }) {
             style={{ padding: "14px", fontSize: 14 }}
           >
             <div>
-              <span className="font-semibold">Daily Macros Breakdown</span>
+              <span className="font-semibold">{t("stats.macroSplit")}</span>
               <div className="flex" style={{ gap: 8, marginTop: 4 }}>
                  <Mono size={9} color={C.muted}>P: {macroGoals.protein}g</Mono>
                  <Mono size={9} color={C.muted}>C: {macroGoals.carbs}g</Mono>
@@ -349,9 +351,9 @@ export default function CalorieGoalModal({ handleClose }) {
           </summary>
           <div className="flex flex-col" style={{ padding: "0 14px 14px 14px", gap: 8 }}>
              {[
-               { key: "protein", label: "Protein" },
-               { key: "carbs", label: "Carbs" },
-               { key: "fat", label: "Fat" },
+               { key: "protein", label: t("meal.protein") },
+               { key: "carbs", label: t("meal.carbs") },
+               { key: "fat", label: t("meal.fat") },
              ].map(({ key, label }) => (
                <div key={key} className="flex justify-between items-center">
                  <Mono size={10} color={C.text}>{label}</Mono>
@@ -380,7 +382,7 @@ export default function CalorieGoalModal({ handleClose }) {
         }}
       >
         <span className="font-mono font-bold" style={{ fontSize: 11, color: loading ? C.accent : "#000" }}>
-          {loading ? "SAVING..." : "SAVE GOALS"}
+          {loading ? t("settings.saving") : t("settings.saveChanges")}
         </span>
       </div>
     </>

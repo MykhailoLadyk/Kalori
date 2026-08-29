@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { C, F, alpha } from "../../../lib/constants";
 import { Mono } from "../../shared/Primitives";
 import { useUser } from "../../../hooks/useUser";
@@ -9,6 +10,7 @@ import { getTodayDateString } from "../../../lib/dateUtils";
 import { useNotifications } from "../../../context/NotificationContext";
 
 export function WeightLogModal({ handleClose, initialDate }) {
+  const { t } = useTranslation();
   const { user, updateUser } = useUser();
   const { refreshStats } = useStats();
   const { addNotification } = useNotifications();
@@ -36,7 +38,7 @@ export function WeightLogModal({ handleClose, initialDate }) {
     const numWeight = Number(weight);
     const weightKg = unit === "lbs" ? numWeight * 0.453592 : numWeight;
     if (!weight || isNaN(numWeight) || weightKg < 20 || weightKg > 300) {
-      setError(unit === "lbs" ? "Weight must be between 44 and 660 lbs" : "Weight must be between 20 and 300 kg");
+      setError(unit === "lbs" ? t("onboarding.errorWeightLbs") : t("onboarding.errorWeightKg"));
       return;
     }
 
@@ -47,9 +49,6 @@ export function WeightLogModal({ handleClose, initialDate }) {
 
       const settings = { ...user?.settings, weight: numWeight, weight_unit: unit };
 
-      // Recompute daily targets from the new weight (mirrors BodyStatsModal).
-      // Skipped when body stats are incomplete so we don't clobber targets
-      // with the default 2000-kcal fallback.
       const hasBodyStats = Number(settings.height) > 0 && Number(user?.age) > 0;
       let targets = user?.targets;
       let goalsChanged = false;
@@ -84,9 +83,9 @@ export function WeightLogModal({ handleClose, initialDate }) {
       }
 
       if (goalsChanged && targets) {
-        addNotification({ type: "success", name: "Goals updated" });
+        addNotification({ type: "success", name: t("stats.goalsUpdated") });
       } else {
-        addNotification({ type: "success", name: "Weight logged successfully!" });
+        addNotification({ type: "success", name: t("stats.weightLoggedSuccess") });
       }
 
       handleClose();
@@ -100,10 +99,10 @@ export function WeightLogModal({ handleClose, initialDate }) {
   return (
     <div>
       <div style={{ fontFamily: F.head, fontSize: 20, fontWeight: 900, color: C.text, marginBottom: 6 }}>
-        Log Weight
+        {t("stats.logWeightTitle")}
       </div>
       <div style={{ fontFamily: F.body, fontSize: 13, color: C.soft, marginBottom: 18 }}>
-        Record your weigh-in to track progress over time.
+        {t("stats.logWeightSubtitle")}
       </div>
 
       <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
@@ -134,7 +133,7 @@ export function WeightLogModal({ handleClose, initialDate }) {
 
       <div style={{ marginBottom: 14 }}>
         <Mono size={8} color={C.mutedLight}>
-          Date
+          {t("stats.date")}
         </Mono>
         <input
           type="date"
@@ -156,7 +155,7 @@ export function WeightLogModal({ handleClose, initialDate }) {
 
       <div style={{ marginBottom: 16 }}>
         <Mono size={8} color={C.mutedLight}>
-          Weight ({unit})
+          {t("stats.weight")} ({unit})
         </Mono>
         <div
           style={{
@@ -217,7 +216,7 @@ export function WeightLogModal({ handleClose, initialDate }) {
         }}
       >
         <span className="font-mono font-bold" style={{ fontSize: 11, color: loading ? C.accent : "#000" }}>
-          {loading ? "SAVING..." : "SAVE WEIGHT"}
+          {loading ? t("common.saving") : t("stats.saveWeight")}
         </span>
       </div>
     </div>

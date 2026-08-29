@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import { Mono } from "../components/shared/Primitives";
 import { C, F } from "../lib/constants";
@@ -43,11 +44,14 @@ import {
   IconTrash,
   IconCrown,
   IconStar,
+  IconFlagUK,
+  IconFlagPoland,
 } from "../components/shared/DuoIcon";
 import { Tag } from "../components/shared/Primitives";
 
 export default function Settings() {
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
   const { user, isPro } = useUser();
   const { startTutorial } = useTutorial();
   const { gameData } = useGameStats();
@@ -57,7 +61,7 @@ export default function Settings() {
     profile: <ProfileModal handleClose={() => setModal(null)} />,
     calorieGoal: <CalorieGoalModal handleClose={() => setModal(null)} />,
     bodyStats: <BodyStatsModal handleClose={() => setModal(null)} />,
-    // language: <LanguageModal handleClose={() => setModal(null)} />,
+    language: <LanguageModal handleClose={() => setModal(null)} />,
     timezone: <TimezoneModal handleClose={() => setModal(null)} />,
     measurements: <MeasurementsModal handleClose={() => setModal(null)} />,
     export: <ExportModal handleClose={() => setModal(null)} />,
@@ -97,18 +101,18 @@ export default function Settings() {
       </div>
 
       <div style={{ marginBottom: 16 }}>
-        <SectionLabel>Account</SectionLabel>
+        <SectionLabel>{t("settings.account")}</SectionLabel>
         <div style={{ background: C.card, borderRadius: 16, border: `1px solid ${C.border}`, overflow: "hidden" }}>
           <SettingsCard
             onClick={() => navigate("/premium")}
             icon={<IconCrown size={18} color={C.gold} />}
-            label="Kalori Pro"
+            label={t("settings.kaloriPro")}
             sub={
               isPro ? (
-                "PRO Active · 100 scans/day"
+                t("settings.proActive")
               ) : (
                 <>
-                  Free Plan · 50 <IconCoin size={11} color={C.gold} /> per scan
+                  {t("settings.freePlanCoins", { coins: "" })} <IconCoin size={11} color={C.gold} />
                 </>
               )
             }
@@ -118,7 +122,7 @@ export default function Settings() {
               setModal("profile");
             }}
             icon={<IconUser size={18} color={C.soft} />}
-            label="Profile Settings"
+            label={t("settings.profileSettings")}
             withTopBorder
           />
           <SettingsCard
@@ -126,7 +130,7 @@ export default function Settings() {
               setModal("calorieGoal");
             }}
             icon={<IconTarget size={18} color={C.soft} />}
-            label="Goals & Targets"
+            label={t("settings.goalsTargets")}
             withTopBorder
           />
           <SettingsCard
@@ -134,51 +138,42 @@ export default function Settings() {
               setModal("bodyStats");
             }}
             icon={<IconWeight size={18} color={C.soft} />}
-            label="Body Stats"
+            label={t("settings.bodyStats")}
             withTopBorder
           />
         </div>
       </div>
 
       <div style={{ marginBottom: 16 }}>
-        <SectionLabel>Preferences</SectionLabel>
+        <SectionLabel>{t("settings.preferences")}</SectionLabel>
         <div style={{ background: C.card, borderRadius: 16, border: `1px solid ${C.border}`, overflow: "hidden" }}>
-          {/* <SettingsCard
+          <SettingsCard
             onClick={() => {
               setModal("language");
             }}
             icon={<IconGlobe size={18} color={C.soft} />}
-            label="Language"
-          /> */}
-          {/* <SettingsCard
-            onClick={() => {
-              setModal("timezone");
-            }}
-            icon={<IconClock size={18} color={C.soft} />}
-            label="Timezone"
-            withTopBorder
-          /> */}
-          {/* <SettingsCard
-            onClick={() => {
-              setModal("measurements");
-            }}
-            icon={<IconRuler size={18} color={C.soft} />}
-            label="Measurements"
-            withTopBorder
-          /> */}
+            label={t("settings.language")}
+            sub={
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 6, marginTop: 2 }}>
+                {i18n.language?.startsWith("pl") ? <IconFlagPoland size={11} /> : <IconFlagUK size={11} />}
+                <span>{i18n.language?.startsWith("pl") ? "Polski" : "English"}</span>
+              </span>
+            }
+          />
           <SettingsCard
             onClick={() => {
               setModal("avatar");
             }}
             icon={<IconUser size={18} color={C.soft} />}
-            label="Avatar"
+            label={t("settings.avatar")}
+            withTopBorder
           />
           <SettingsCard
             onClick={() => {
               setModal("flame");
             }}
             icon={<IconFire size={18} color={C.soft} />}
-            label="Streak Flame"
+            label={t("settings.streakFlame")}
             withTopBorder
           />
           <SettingsCard
@@ -186,50 +181,14 @@ export default function Settings() {
               setModal("theme");
             }}
             icon={<IconPalette size={18} color={C.soft} />}
-            label="Theme"
+            label={t("settings.theme")}
             withTopBorder
           />
         </div>
       </div>
 
-      {/* <div style={{ marginBottom: 16 }}>
-        <SectionLabel>Notifications</SectionLabel>
-        <div
-          style={{
-            background: C.card,
-            borderRadius: 16,
-            border: `1px solid ${C.border}`,
-            overflow: "hidden",
-          }}
-        >
-          <SettingsCard
-            icon={<IconBell size={18} color={C.soft} />}
-            label="Meal Reminders"
-            sub="08:00, 13:00, 19:00"
-            toggle={toggles.meal}
-            onToggle={() => toggle("meal")}
-          />
-          <SettingsCard
-            icon={<IconDrop size={18} color={C.soft} />}
-            label="Water Reminders"
-            sub="Every 2 hours"
-            toggle={toggles.water}
-            onToggle={() => toggle("water")}
-            withTopBorder
-          />
-          <SettingsCard
-            icon={<IconFire size={18} color={C.soft} />}
-            label="Streak Alerts"
-            sub="If you haven't logged by 8pm"
-            toggle={toggles.streak}
-            onToggle={() => toggle("streak")}
-            withTopBorder
-          />
-        </div>
-      </div> */}
-
       <div style={{ marginBottom: 16 }}>
-        <SectionLabel>App</SectionLabel>
+        <SectionLabel>{t("settings.app")}</SectionLabel>
         <div style={{ background: C.card, borderRadius: 16, border: `1px solid ${C.border}`, overflow: "hidden" }}>
           <SettingsCard
             onClick={() => {
@@ -237,27 +196,19 @@ export default function Settings() {
               navigate("/");
             }}
             icon={<IconStar size={18} color={C.soft} />}
-            label="Replay Tutorial"
-            sub="Walk through the app again"
+            label={t("settings.replayTutorial")}
+            sub={t("settings.replayTutorialSub")}
           />
           <SettingsCard
             onClick={() => navigate("/privacy")}
             icon={<IconLock size={18} color={C.soft} />}
-            label="Privacy Policy"
+            label={t("settings.privacyPolicy")}
             withTopBorder
           />
-          {/* <SettingsCard
-            onClick={() => {
-              setModal("export");
-            }}
-            icon={<IconExport size={18} color={C.soft} />}
-            label="Export My Data"
-            withTopBorder
-          /> */}
           <SettingsCard
             onClick={() => navigate("/terms")}
             icon={<IconCalendar size={18} color={C.soft} />}
-            label="Terms of Service"
+            label={t("settings.termsOfService")}
             withTopBorder
           />
           <SettingsCard
@@ -265,7 +216,7 @@ export default function Settings() {
               setModal("logout");
             }}
             icon={<IconSignOut size={18} color={C.red} />}
-            label="Log Out"
+            label={t("settings.logOut")}
             danger
             withTopBorder
           />
@@ -274,7 +225,7 @@ export default function Settings() {
               setModal("deleteAccount");
             }}
             icon={<IconTrash size={18} color={C.red} />}
-            label="Delete Account"
+            label={t("settings.deleteAccount")}
             danger
             withTopBorder
           />
@@ -283,7 +234,7 @@ export default function Settings() {
 
       <div style={{ textAlign: "center", marginTop: 8, animation: "fadeIn 0.4s ease 0.6s both" }}>
         <Mono size={8} color={C.muted}>
-          Kalori v1.4.1
+          Kalori v1.4.2
         </Mono>
       </div>
       <Modal id={modal} close={() => setModal(null)}>

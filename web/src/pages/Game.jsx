@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   C,
   F,
@@ -16,6 +17,7 @@ import { StreakBanner } from "../components/game/StreakBanner";
 import { useGameStats } from "../hooks/useGameStats";
 
 export default function Game() {
+  const { t } = useTranslation();
   const [modal, setModal] = useState(null);
 
   const {
@@ -52,10 +54,13 @@ export default function Game() {
     const max = achievement.max ?? 1;
     const progress = Math.min(userAchievement?.progress ?? 0, max);
     const done = progress >= max;
+    const localizedName = t(`achievements_data.${achievement.id}.name`, achievement.name);
+    const localizedDesc = t(`achievements_data.${achievement.id}.desc`, achievement.description);
     return {
       ...achievement,
       ...(userAchievement || {}),
-      desc: achievement.description,
+      name: localizedName,
+      desc: localizedDesc,
       progress,
       max,
       done,
@@ -89,7 +94,7 @@ export default function Game() {
         </div>
 
         <div style={{ animation: "fadeUp 0.4s ease 0.3s both" }}>
-          <SectionLabel>Active Quests</SectionLabel>
+          <SectionLabel>{t("quests.activeQuests")}</SectionLabel>
           {level < 2 ? (
             <div
               style={{
@@ -119,12 +124,12 @@ export default function Game() {
               </div>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginBottom: 4 }}>
                 <span style={{ fontFamily: F.head, fontSize: 15, fontWeight: 800, color: C.text }}>
-                  Quests Locked
+                  {t("quests.questsLocked")}
                 </span>
                 <Tag color={C.gold}>Lv 2</Tag>
               </div>
               <Mono size={8} color={C.mutedLight}>
-                Reach Level 2 to unlock daily & weekly quests
+                {t("quests.questsLockedSub")}
               </Mono>
             </div>
           ) : (

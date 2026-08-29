@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { C, F } from "../../../lib/constants";
 import { Tag } from "../../shared/Primitives";
 import { IconCoin } from "../../shared/DuoIcon";
@@ -8,6 +9,7 @@ import { useNotifications } from "../../../context/NotificationContext";
 import { supabase } from "../../../services/supabase";
 
 export default function ShopAvatarsModal({ avatars = [], currentAvatar, coins, user }) {
+  const { t } = useTranslation();
   const { updateUser, refreshUser } = useUser();
   const { refreshGameData } = useGameStats();
   const { addNotification } = useNotifications();
@@ -25,7 +27,7 @@ export default function ShopAvatarsModal({ avatars = [], currentAvatar, coins, u
       return;
     }
     if (coins < avatar.price) {
-      addNotification({ type: "error", name: "Not enough coins" });
+      addNotification({ type: "error", name: t("notifs.notEnoughCoins") });
       setLoading(false);
       return;
     }
@@ -40,9 +42,9 @@ export default function ShopAvatarsModal({ avatars = [], currentAvatar, coins, u
       await refreshUser();
       await refreshGameData();
 
-      addNotification({ type: "success", name: `Unlocked ${avatar.name}!` });
+      addNotification({ type: "success", name: t("notifs.unlockedItem", { name: avatar.name }) });
     } catch (err) {
-      addNotification({ type: "error", name: err.message || "Purchase failed." });
+      addNotification({ type: "error", name: err.message || t("notifs.purchaseFailed") });
     } finally {
       setLoading(false);
     }
@@ -63,7 +65,7 @@ export default function ShopAvatarsModal({ avatars = [], currentAvatar, coins, u
   return (
     <div>
       <div style={{ fontFamily: F.head, fontSize: 20, fontWeight: 900, color: C.text, marginBottom: 16 }}>
-        Profile Pictures
+        {t("shop.profilePictures")}
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
@@ -142,11 +144,11 @@ export default function ShopAvatarsModal({ avatars = [], currentAvatar, coins, u
               </div>
 
               {isLocked ? (
-                <Tag color={C.gold}>{lock} required</Tag>
+                <Tag color={C.gold}>{t("shop.lvlRequired", { lock })}</Tag>
               ) : isCurrent ? (
-                <Tag color={C.accent}>Active</Tag>
+                <Tag color={C.accent}>{t("shop.active")}</Tag>
               ) : isOwned ? (
-                <Tag color={C.blue}>Owned</Tag>
+                <Tag color={C.blue}>{t("shop.owned")}</Tag>
               ) : (
                 <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
                   <IconCoin size={14} color={C.gold} />

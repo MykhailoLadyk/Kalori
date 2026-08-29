@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Quest } from "./Quest";
 import {
   QuestMealIcon,
@@ -7,13 +8,16 @@ import {
 } from "./DuoIcon";
 import { C, quests as questDefinitions } from "../../lib/constants";
 import { useGameStats } from "../../hooks/useGameStats";
+
 const QUEST_ICON_MAP = {
   meal: QuestMealIcon,
   water: QuestWaterIcon,
   protein: QuestProteinIcon,
   fire: QuestFireIcon,
 };
+
 export function QuestList() {
+  const { t } = useTranslation();
   const { quests: userQuests, gameData, rerollQuest } = useGameStats();
   const questDefinitionById = new Map(
     questDefinitions.map((quest) => [quest.id, quest]),
@@ -23,9 +27,16 @@ export function QuestList() {
     const max = quest.max ?? 1;
     const progress = Math.min(userQuest.progress ?? 0, max);
     const done = progress >= max;
+    const localizedName = t(`quests_data.${quest.id}.name`, quest.name || userQuest.name);
+    const localizedDesc = t(`quests_data.${quest.id}.desc`, quest.description || userQuest.description);
+    const localizedType = quest.type === "Daily" ? t("quests.daily") : t("quests.weekly");
+
     return {
       ...quest,
       ...userQuest,
+      name: localizedName,
+      description: localizedDesc,
+      type: localizedType,
       Icon: QUEST_ICON_MAP[quest.icon] || QUEST_ICON_MAP[userQuest.icon],
       xp: quest.reward,
       pct: max > 0 ? (progress / max) * 100 : 0,

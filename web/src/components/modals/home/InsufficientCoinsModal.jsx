@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { C, F, alpha } from "../../../lib/constants";
 import { Mono } from "../../shared/Primitives";
 import { IconCoin, IconSparkles, IconLock } from "../../shared/DuoIcon";
@@ -6,6 +7,7 @@ import { AI_COIN_COST } from "../../../services/subscriptionService";
 
 export default function InsufficientCoinsModal({ coins = 0, handleClose }) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const needed = Math.max(0, AI_COIN_COST - coins);
 
   const handleGoToPremium = () => {
@@ -39,10 +41,10 @@ export default function InsufficientCoinsModal({ coins = 0, handleClose }) {
         </div>
 
         <div style={{ fontFamily: F.head, fontSize: 20, fontWeight: 900, color: C.text }}>
-          50 Coins Required
+          {t("insufficientCoins.title", { count: AI_COIN_COST })}
         </div>
         <div style={{ fontFamily: F.body, fontSize: 13, color: C.soft, marginTop: 6, lineHeight: 1.5, maxWidth: 280 }}>
-          AI meal detection costs <strong style={{ color: C.gold }}>50 coins</strong> per scan for free tier accounts.
+          {t("insufficientCoins.subtitle", { count: AI_COIN_COST })}
         </div>
       </div>
 
@@ -59,7 +61,7 @@ export default function InsufficientCoinsModal({ coins = 0, handleClose }) {
         }}
       >
         <div style={{ textAlign: "center" }}>
-          <Mono size={8} color={C.mutedLight}>YOUR BALANCE</Mono>
+          <Mono size={8} color={C.mutedLight}>{t("insufficientCoins.yourBalance")}</Mono>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 5, marginTop: 4 }}>
             <IconCoin size={16} color={C.gold} />
             <span style={{ fontFamily: F.head, fontSize: 18, fontWeight: 900, color: C.text }}>
@@ -71,7 +73,7 @@ export default function InsufficientCoinsModal({ coins = 0, handleClose }) {
         <div style={{ width: 1, height: 32, background: C.border }} />
 
         <div style={{ textAlign: "center" }}>
-          <Mono size={8} color={C.mutedLight}>REQUIRED</Mono>
+          <Mono size={8} color={C.mutedLight}>{t("insufficientCoins.required")}</Mono>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 5, marginTop: 4 }}>
             <IconCoin size={16} color={C.gold} />
             <span style={{ fontFamily: F.head, fontSize: 18, fontWeight: 900, color: C.gold }}>
@@ -114,10 +116,10 @@ export default function InsufficientCoinsModal({ coins = 0, handleClose }) {
         </div>
         <div style={{ flex: 1 }}>
           <div style={{ fontFamily: F.head, fontSize: 14, fontWeight: 800, color: C.text }}>
-            Get Kalori Pro
+            {t("pro.getKaloriPro")}
           </div>
           <div style={{ fontFamily: F.body, fontSize: 11, color: C.soft, marginTop: 2 }}>
-            High daily limit (100 AI scans/day) with zero coin costs.
+            {t("pro.highDailyLimit")}
           </div>
         </div>
         <span style={{ color: C.accent, fontSize: 18, fontWeight: "bold" }}>›</span>
@@ -146,7 +148,7 @@ export default function InsufficientCoinsModal({ coins = 0, handleClose }) {
           }}
         >
           <IconSparkles size={16} color="#000" />
-          <span>VIEW PRO PLANS</span>
+          <span>{t("pro.viewProPlans")}</span>
         </button>
 
         <button
@@ -166,7 +168,7 @@ export default function InsufficientCoinsModal({ coins = 0, handleClose }) {
             cursor: "pointer",
           }}
         >
-          LOG MANUALLY (FREE)
+          {t("insufficientCoins.logManually")}
         </button>
       </div>
     </div>

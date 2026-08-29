@@ -1,5 +1,6 @@
 // pages/OnboardingPage.jsx
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { C, F, alpha } from "../lib/constants";
 import { Mono } from "../components/shared/Primitives";
 import { AnimBar } from "../components/shared/AnimBar";
@@ -7,13 +8,18 @@ import { useUser } from "../hooks/useUser";
 import { supabase } from "../services/supabase";
 import { useNavigate } from "react-router-dom";
 import { calcMacros } from "../lib/macroCalc";
+import { Modal } from "../components/modals/Modal";
+import LanguageModal from "../components/modals/settings/LanguageModal";
 import { 
   IconMealPlate, 
   IconLightning, 
   IconFire, 
   IconTarget, 
   IconCoin, 
-  IconParty 
+  IconParty,
+  IconGlobe,
+  IconFlagUK,
+  IconFlagPoland
 } from "../components/shared/DuoIcon";
 
 // ── Step indicator ────────────────────────────────────────────
@@ -154,49 +160,15 @@ const STEPS = [
   "done",
 ];
 
-const ACTIVITY_LEVELS = [
-  { key: "sedentary", label: "Sedentary", sub: "Desk job, little movement" },
-  { key: "light", label: "Light", sub: "Walk occasionally, 1–3x/week" },
-  { key: "moderate", label: "Moderate", sub: "Active lifestyle, 3–5x/week" },
-  { key: "active", label: "Active", sub: "Gym daily or physical job" },
-  {
-    key: "very_active",
-    label: "Very Active",
-    sub: "Athlete or twice-a-day training",
-  },
-];
-
-const GOALS = [
-  {
-    key: "lose",
-    label: "Lose weight",
-    sub: "Caloric deficit, track carefully",
-    color: C.blue,
-  },
-  {
-    key: "maintain",
-    label: "Stay healthy",
-    sub: "Balanced intake, build habits",
-    color: C.accent,
-  },
-  {
-    key: "gain",
-    label: "Build muscle",
-    sub: "Caloric surplus, hit protein goals",
-    color: C.gold,
-  },
-];
-
-const CALORIE_PRESETS = [1500, 1800, 2000, 2200, 2500];
-const WATER_PRESETS = [1.5, 2.0, 2.5, 3.0, 3.5];
-
 export default function OnboardingPage() {
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
 
   const { updateUser } = useUser();
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState({});
+  const [langModalOpen, setLangModalOpen] = useState(false);
 
   const [form, setForm] = useState({
     name: "",
@@ -209,6 +181,35 @@ export default function OnboardingPage() {
     activity_level: "moderate",
     goal: "maintain",
   });
+
+  const activityLevels = [
+    { key: "sedentary", label: t("onboarding.actSedentary"), sub: t("onboarding.actSedentarySub") },
+    { key: "light", label: t("onboarding.actLight"), sub: t("onboarding.actLightSub") },
+    { key: "moderate", label: t("onboarding.actModerate"), sub: t("onboarding.actModerateSub") },
+    { key: "active", label: t("onboarding.actActive"), sub: t("onboarding.actActiveSub") },
+    { key: "very_active", label: t("onboarding.actVeryActive"), sub: t("onboarding.actVeryActiveSub") },
+  ];
+
+  const goals = [
+    {
+      key: "lose",
+      label: t("onboarding.goalLose"),
+      sub: t("onboarding.goalLoseSub"),
+      color: C.blue,
+    },
+    {
+      key: "maintain",
+      label: t("onboarding.goalMaintain"),
+      sub: t("onboarding.goalMaintainSub"),
+      color: C.accent,
+    },
+    {
+      key: "gain",
+      label: t("onboarding.goalGain"),
+      sub: t("onboarding.goalGainSub"),
+      color: C.gold,
+    },
+  ];
 
   const set = (key, val) => {
     setForm((prev) => ({ ...prev, [key]: val }));
@@ -283,7 +284,7 @@ export default function OnboardingPage() {
   const validate = () => {
     const e = {};
     if (currentStep === "profile") {
-      if (!form.name.trim()) e.name = "Required";
+      if (!form.name.trim()) e.name = t("onboarding.required");
     }
     if (currentStep === "body") {
       const age = Number(form.age);
@@ -292,10 +293,10 @@ export default function OnboardingPage() {
       const height = Number(form.height);
       const heightCm = form.height_unit === "ft" ? height * 30.48 : height;
 
-      if (!form.sex) e.sex = "Please select biological sex";
-      if (!form.age || age < 13 || age > 120) e.age = "Must be 13-120";
-      if (!form.weight || weightKg < 20 || weightKg > 300) e.weight = form.weight_unit === "lbs" ? "Must be 44-660 lbs" : "Must be 20-300kg";
-      if (!form.height || heightCm < 100 || heightCm > 250) e.height = form.height_unit === "ft" ? "Must be 3.3-8.2 ft" : "Must be 100-250cm";
+      if (!form.sex) e.sex = t("onboarding.errorSex");
+      if (!form.age || age < 13 || age > 120) e.age = t("onboarding.errorAge");
+      if (!form.weight || weightKg < 20 || weightKg > 300) e.weight = form.weight_unit === "lbs" ? t("onboarding.errorWeightLbs") : t("onboarding.errorWeightKg");
+      if (!form.height || heightCm < 100 || heightCm > 250) e.height = form.height_unit === "ft" ? t("onboarding.errorHeightFt") : t("onboarding.errorHeightCm");
     }
     return e;
   };
@@ -317,6 +318,7 @@ export default function OnboardingPage() {
     try {
       setSaving(true);
 
+      const activeLang = i18n.language?.startsWith("pl") ? "pl" : "en";
       await updateUser({
         name: form.name.trim(),
         age: Number(form.age),
@@ -329,6 +331,7 @@ export default function OnboardingPage() {
           height: Number(form.height),
           height_unit: form.height_unit,
           sex: form.sex,
+          language: activeLang,
         },
         targets: {
           calories: derivedCalories,
@@ -343,6 +346,7 @@ export default function OnboardingPage() {
 
       navigate("/");
     } catch (err) {
+      console.error("Failed to save onboarding profile:", err);
     } finally {
       setSaving(false);
     }
@@ -450,7 +454,7 @@ export default function OnboardingPage() {
                 animation: "fadeUp 0.5s ease 0.4s both",
               }}
             >
-              Welcome to
+              {t("onboarding.welcomeTitle")}
               <br />
               <span style={{ color: C.accent }}>Kalori</span>
             </div>
@@ -465,8 +469,7 @@ export default function OnboardingPage() {
                 animation: "fadeUp 0.5s ease 0.5s both",
               }}
             >
-              Track your meals, hit your goals, and level up your health — one
-              day at a time.
+              {t("onboarding.welcomeSubtitle")}
             </div>
 
             <div
@@ -478,9 +481,9 @@ export default function OnboardingPage() {
               }}
             >
               {[
-                { icon: <IconMealPlate size={24} color={C.accent} />, label: "Log meals" },
-                { icon: <IconLightning size={24} color={C.accent} />, label: "Earn XP" },
-                { icon: <IconFire size={24} color={C.orange} />, label: "Build streaks" },
+                { icon: <IconMealPlate size={24} color={C.accent} />, label: t("onboarding.logMeals") },
+                { icon: <IconLightning size={24} color={C.accent} />, label: t("onboarding.earnXP") },
+                { icon: <IconFire size={24} color={C.orange} />, label: t("onboarding.buildStreaks") },
               ].map(({ icon, label }) => (
                 <div
                   key={label}
@@ -514,7 +517,7 @@ export default function OnboardingPage() {
                 marginBottom: 6,
               }}
             >
-              What's your name?
+              {t("onboarding.nameTitle")}
             </div>
             <div
               style={{
@@ -525,14 +528,14 @@ export default function OnboardingPage() {
                 lineHeight: 1.6,
               }}
             >
-              We'll use this to personalize your experience.
+              {t("onboarding.nameSubtitle")}
             </div>
 
             <Field
-              label="Your Name"
+              label={t("onboarding.nameLabel")}
               value={form.name}
               onChange={(v) => set("name", v)}
-              placeholder="e.g. Maria"
+              placeholder={t("onboarding.namePlaceholder")}
               error={errors.name}
               maxLength={50}
             />
@@ -583,7 +586,7 @@ export default function OnboardingPage() {
                 marginBottom: 6,
               }}
             >
-              Body Stats
+              {t("onboarding.bodyTitle")}
             </div>
             <div
               style={{
@@ -594,29 +597,28 @@ export default function OnboardingPage() {
                 lineHeight: 1.6,
               }}
             >
-              Used to calculate your recommended calorie goal. You can change
-              these anytime.
+              {t("onboarding.bodySubtitle")}
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <div>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                  <Mono size={8} color={C.mutedLight}>Biological Sex</Mono>
+                  <Mono size={8} color={C.mutedLight}>{t("onboarding.sexLabel")}</Mono>
                   {errors.sex && <Mono size={8} color={C.red}>{errors.sex}</Mono>}
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
                   <div style={{ flex: 1 }}>
-                    <Chip label="Male" selected={form.sex === "male"} onSelect={() => set("sex", "male")} />
+                    <Chip label={t("onboarding.male")} selected={form.sex === "male"} onSelect={() => set("sex", "male")} />
                   </div>
                   <div style={{ flex: 1 }}>
-                    <Chip label="Female" selected={form.sex === "female"} onSelect={() => set("sex", "female")} />
+                    <Chip label={t("onboarding.female")} selected={form.sex === "female"} onSelect={() => set("sex", "female")} />
                   </div>
                 </div>
               </div>
 
               <div>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                  <Mono size={8} color={C.mutedLight}>Weight Unit</Mono>
+                  <Mono size={8} color={C.mutedLight}>{t("onboarding.weightUnitLabel")}</Mono>
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
                   <div style={{ flex: 1 }}>
@@ -630,7 +632,7 @@ export default function OnboardingPage() {
 
               <div>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                  <Mono size={8} color={C.mutedLight}>Height Unit</Mono>
+                  <Mono size={8} color={C.mutedLight}>{t("onboarding.heightUnitLabel")}</Mono>
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
                   <div style={{ flex: 1 }}>
@@ -643,29 +645,29 @@ export default function OnboardingPage() {
               </div>
 
               <Field
-                label="Age"
+                label={t("onboarding.ageLabel")}
                 type="number"
                 value={form.age}
                 onChange={(v) => set("age", v)}
-                placeholder="e.g. 25"
-                unit="yrs"
+                placeholder={t("onboarding.agePlaceholder")}
+                unit={t("common.yrs")}
                 error={errors.age}
               />
               <Field
-                label="Weight"
+                label={t("onboarding.weightLabel")}
                 type="number"
                 value={form.weight}
                 onChange={(v) => set("weight", v)}
-                placeholder={form.weight_unit === "lbs" ? "e.g. 150" : "e.g. 70"}
+                placeholder={form.weight_unit === "lbs" ? t("onboarding.weightPlaceholderLbs") : t("onboarding.weightPlaceholderKg")}
                 unit={form.weight_unit}
                 error={errors.weight}
               />
               <Field
-                label="Height"
+                label={t("onboarding.heightLabel")}
                 type="number"
                 value={form.height}
                 onChange={(v) => set("height", v)}
-                placeholder={form.height_unit === "ft" ? "e.g. 5.9" : "e.g. 175"}
+                placeholder={form.height_unit === "ft" ? t("onboarding.heightPlaceholderFt") : t("onboarding.heightPlaceholderCm")}
                 unit={form.height_unit}
                 error={errors.height}
               />
@@ -686,7 +688,7 @@ export default function OnboardingPage() {
                 marginBottom: 6,
               }}
             >
-              What's your goal?
+              {t("onboarding.goalTitle")}
             </div>
             <div
               style={{
@@ -697,11 +699,11 @@ export default function OnboardingPage() {
                 lineHeight: 1.6,
               }}
             >
-              This helps us set the right calorie targets for you.
+              {t("onboarding.goalSubtitle")}
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {GOALS.map(({ key, label, sub, color }) => (
+              {goals.map(({ key, label, sub, color }) => (
                 <Chip
                   key={key}
                   label={label}
@@ -728,7 +730,7 @@ export default function OnboardingPage() {
                 marginBottom: 6,
               }}
             >
-              Activity Level
+              {t("onboarding.activityTitle")}
             </div>
             <div
               style={{
@@ -739,11 +741,11 @@ export default function OnboardingPage() {
                 lineHeight: 1.6,
               }}
             >
-              How active are you on a typical day?
+              {t("onboarding.activitySubtitle")}
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {ACTIVITY_LEVELS.map(({ key, label, sub }) => (
+              {activityLevels.map(({ key, label, sub }) => (
                 <Chip
                   key={key}
                   label={label}
@@ -769,7 +771,7 @@ export default function OnboardingPage() {
                 marginBottom: 6,
               }}
             >
-              How it works
+              {t("onboarding.howItWorksTitle")}
             </div>
             <div
               style={{
@@ -780,7 +782,7 @@ export default function OnboardingPage() {
                 lineHeight: 1.6,
               }}
             >
-              Kalori turns healthy habits into a game. Here's what to expect.
+              {t("onboarding.howItWorksSubtitle")}
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -788,26 +790,26 @@ export default function OnboardingPage() {
                 {
                   icon: <IconLightning size={24} color={C.accent} />,
                   color: C.accent,
-                  title: "Earn XP",
-                  body: "Log meals, hit your calorie goal, and drink enough water to earn XP and level up.",
+                  title: t("onboarding.gameEarnXpTitle"),
+                  body: t("onboarding.gameEarnXpBody"),
                 },
                 {
                   icon: <IconFire size={24} color={C.orange} />,
                   color: C.orange,
-                  title: "Build your streak",
-                  body: "Log at least one meal every day to grow your streak. Longer streaks multiply your XP and coins.",
+                  title: t("onboarding.gameStreakTitle"),
+                  body: t("onboarding.gameStreakBody"),
                 },
                 {
                   icon: <IconTarget size={24} color={C.blue} />,
                   color: C.blue,
-                  title: "Complete quests",
-                  body: "Daily and weekly quests give bonus XP and coins. New quests unlock as you level up.",
+                  title: t("onboarding.gameQuestsTitle"),
+                  body: t("onboarding.gameQuestsBody"),
                 },
                 {
                   icon: <IconCoin size={24} color={C.gold} />,
                   color: C.gold,
-                  title: "Spend coins",
-                  body: "Buy streak shields, XP boosters, themes, and permanent upgrades in the shop.",
+                  title: t("onboarding.gameCoinsTitle"),
+                  body: t("onboarding.gameCoinsBody"),
                 },
               ].map(({ icon, color, title, body }, i) => (
                 <div
@@ -899,9 +901,7 @@ export default function OnboardingPage() {
                 animation: "fadeUp 0.4s ease 0.2s both",
               }}
             >
-              You're all set,{" "}
-              <span style={{ color: C.accent }}>{form.name.split(" ")[0]}</span>
-              !
+              {t("onboarding.doneTitle", { name: form.name.split(" ")[0] })}
             </div>
             <div
               style={{
@@ -913,8 +913,7 @@ export default function OnboardingPage() {
                 animation: "fadeUp 0.4s ease 0.3s both",
               }}
             >
-              Your profile is ready. Start logging meals to earn your first XP
-              and build your streak.
+              {t("onboarding.doneSubtitle")}
             </div>
 
             {/* mini stats preview */}
@@ -928,18 +927,18 @@ export default function OnboardingPage() {
             >
               {[
                 {
-                  label: "Calorie Goal",
+                  label: t("onboarding.calorieGoal"),
                   value: `${derivedCalories}`,
-                  unit: "kcal",
+                  unit: t("common.kcal"),
                   color: C.accent,
                 },
                 {
-                  label: "Water Goal",
+                  label: t("onboarding.waterGoal"),
                   value: `${derivedWater}`,
-                  unit: "L",
+                  unit: t("common.liters"),
                   color: C.blue,
                 },
-                { label: "Level", value: "1", unit: "XP 0", color: C.gold },
+                { label: t("onboarding.level"), value: "1", unit: `${t("common.xp")} 0`, color: C.gold },
               ].map(({ label, value, unit, color }) => (
                 <div
                   key={label}
@@ -982,10 +981,10 @@ export default function OnboardingPage() {
 
   // ── Button label ─────────────────────────────────────────────
   const buttonLabel = () => {
-    if (currentStep === "welcome") return "GET STARTED";
+    if (currentStep === "welcome") return t("onboarding.getStarted");
     if (currentStep === "done")
-      return saving ? "SETTING UP..." : "START TRACKING";
-    return "CONTINUE";
+      return saving ? t("onboarding.settingUp") : t("onboarding.startTracking");
+    return t("common.continue");
   };
 
   const handleNext = () => {
@@ -1037,6 +1036,29 @@ export default function OnboardingPage() {
           minHeight: "80vh",
         }}
       >
+        {/* top bar with globe icon language switcher */}
+        <div style={{ display: "flex", justifyContent: "flex-end", width: "100%", marginBottom: 12 }}>
+          <div
+            onClick={() => setLangModalOpen(true)}
+            className="press hover-btn"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              background: C.card,
+              border: `1px solid ${C.border}`,
+              borderRadius: 10,
+              padding: "5px 9px",
+              cursor: "pointer",
+            }}
+          >
+            {i18n.language?.startsWith("pl") ? <IconFlagPoland size={13} /> : <IconFlagUK size={13} />}
+            <span style={{ fontFamily: F.mono, fontSize: 10, fontWeight: 700, color: C.text }}>
+              {i18n.language?.startsWith("pl") ? "PL" : "EN"}
+            </span>
+          </div>
+        </div>
+
         {/* progress bar */}
         {showDots && (
           <div style={{ marginBottom: 24, animation: "fadeIn 0.3s ease both" }}>
@@ -1054,7 +1076,7 @@ export default function OnboardingPage() {
               }}
             >
               <Mono size={7} color={C.muted}>
-                STEP {step} OF {STEPS.length - 2}
+                {t("onboarding.stepOf", { current: step, total: STEPS.length - 2 })}
               </Mono>
               <Mono size={7} color={C.accent}>
                 {Math.round(((step - 1) / (STEPS.length - 3)) * 100)}%
@@ -1138,6 +1160,10 @@ export default function OnboardingPage() {
         </div>
 
       </div>
+
+      <Modal id={langModalOpen} close={() => setLangModalOpen(false)}>
+        <LanguageModal handleClose={() => setLangModalOpen(false)} />
+      </Modal>
     </div>
   );
 }

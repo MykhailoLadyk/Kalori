@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { C, F } from "../../../lib/constants";
 import { Tag } from "../../shared/Primitives";
 import { IconCoin } from "../../shared/DuoIcon";
@@ -6,7 +7,9 @@ import { useUser } from "../../../hooks/useUser";
 import { useGameStats } from "../../../hooks/useGameStats";
 import { useNotifications } from "../../../context/NotificationContext";
 import { supabase } from "../../../services/supabase";
+
 export default function ShopThemesModal({ themes = [], currentTheme, coins }) {
+  const { t } = useTranslation();
   const { updateUser } = useUser();
   const { refreshGameData } = useGameStats();
   const { addNotification } = useNotifications();
@@ -22,7 +25,7 @@ export default function ShopThemesModal({ themes = [], currentTheme, coins }) {
       return;
     }
     if (coins < theme.price) {
-      addNotification({ type: "error", name: "Not enough coins" });
+      addNotification({ type: "error", name: t("notifs.notEnoughCoins") });
       setLoading(false);
       return;
     }
@@ -37,14 +40,13 @@ export default function ShopThemesModal({ themes = [], currentTheme, coins }) {
       await updateUser({ settings: { theme: theme.id } });
       await refreshGameData();
 
-      addNotification({ type: "success", name: `Unlocked ${theme.name} theme!` });
+      addNotification({ type: "success", name: t("notifs.unlockedTheme", { name: theme.name }) });
     } catch (err) {
-      addNotification({ type: "error", name: err.message || "Purchase failed." });
+      addNotification({ type: "error", name: err.message || t("notifs.purchaseFailed") });
     } finally {
       setLoading(false);
     }
   };
-
 
   const handleThemeClick = async (theme, isLocked, isCurrent, isOwned) => {
     if (isLocked || loading) return;
@@ -61,7 +63,9 @@ export default function ShopThemesModal({ themes = [], currentTheme, coins }) {
 
   return (
     <div>
-      <div style={{ fontFamily: F.head, fontSize: 20, fontWeight: 900, color: C.text, marginBottom: 16 }}>Themes</div>
+      <div style={{ fontFamily: F.head, fontSize: 20, fontWeight: 900, color: C.text, marginBottom: 16 }}>
+        {t("shop.themes")}
+      </div>
 
       {themes.map(({ id, name, colors, price, lock, owned }, i) => {
         const isCurrent = String(id) === String(currentTheme);
@@ -92,12 +96,12 @@ export default function ShopThemesModal({ themes = [], currentTheme, coins }) {
             >
               <div>
                 <div style={{ fontFamily: F.body, fontSize: 13, fontWeight: 600, color: C.text }}>{name}</div>
-                {lock && <Tag color={C.gold}>{lock} required</Tag>}
+                {lock && <Tag color={C.gold}>{t("shop.lvlRequired", { lock })}</Tag>}
               </div>
               {isCurrent ? (
-                <Tag color={C.accent}>Active</Tag>
+                <Tag color={C.accent}>{t("shop.active")}</Tag>
               ) : isOwned ? (
-                <Tag color={C.blue}>Owned</Tag>
+                <Tag color={C.blue}>{t("shop.owned")}</Tag>
               ) : (
                 <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
                   <IconCoin size={14} color={C.gold} />

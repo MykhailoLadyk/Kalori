@@ -1,6 +1,8 @@
 import { C, F } from "../../lib/constants";
 import { MealCard } from "./MealCard";
 import { useMeals } from "../../hooks/useMeals";
+import { useTranslation } from "react-i18next";
+
 const MEAL_TYPES = [
   { key: "breakfast", color: C.gold },
   { key: "lunch", color: C.blue },
@@ -9,6 +11,7 @@ const MEAL_TYPES = [
 ];
 
 export function Meals() {
+  const { t } = useTranslation();
   const { meals } = useMeals();
   return (
     <>
@@ -42,7 +45,7 @@ export function Meals() {
                   textTransform: "uppercase",
                 }}
               >
-                {key}
+                {t(`home.${key}`)}
               </span>
             </div>
             {items.length === 0 ? (
@@ -58,7 +61,7 @@ export function Meals() {
                   textAlign: "center",
                 }}
               >
-                Nothing logged yet
+                {t("home.noMealsLogged")}
               </div>
             ) : (
               items.map((meal, index) => (

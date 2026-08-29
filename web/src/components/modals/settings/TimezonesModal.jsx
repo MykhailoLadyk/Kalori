@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { C, F } from "../../../lib/constants";
 import { Mono } from "../../../components/shared/Primitives";
 import { useUser } from "../../../hooks/useUser";
@@ -15,6 +16,7 @@ const TIMEZONES = [
 ];
 
 export default function TimezoneModal({ handleClose }) {
+  const { t } = useTranslation();
   const { user, updateUser } = useUser();
   const [selected, setSelected] = useState(user?.settings?.timezone || "UTC+1");
   const [loading, setLoading] = useState(false);
@@ -40,7 +42,7 @@ export default function TimezoneModal({ handleClose }) {
           marginBottom: 20,
         }}
       >
-        Timezone
+        {t("settings.timezone")}
       </div>
 
       <div
@@ -116,7 +118,7 @@ export default function TimezoneModal({ handleClose }) {
             color: loading ? C.accent : "#000",
           }}
         >
-          {loading ? "SAVING..." : "SAVE TIMEZONE"}
+          {loading ? t("settings.saving") : t("settings.saveTimezone")}
         </span>
       </div>
     </div>

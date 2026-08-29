@@ -1,11 +1,13 @@
+import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { C, F, alpha, flameColorsDefinitions } from "../../../lib/constants";
 import { Tag } from "../../../components/shared/Primitives";
 import { IconFire } from "../../../components/shared/DuoIcon";
-import { useState, useEffect } from "react";
 import { useUser } from "../../../hooks/useUser";
 import { useGameStats } from "../../../hooks/useGameStats";
 
 export default function SettingsFlameModal({ handleClose }) {
+  const { t } = useTranslation();
   const { user, updateUser } = useUser();
   const { shopItems } = useGameStats();
   const flameColorsOwned = shopItems?.flameColorsOwned ?? ["orange"];
@@ -53,7 +55,7 @@ export default function SettingsFlameModal({ handleClose }) {
             color: C.text,
           }}
         >
-          Streak Flame Colors
+          {t("settings.streakFlameColors")}
         </div>
       </div>
 
@@ -112,7 +114,7 @@ export default function SettingsFlameModal({ handleClose }) {
                 </div>
               </div>
 
-              {isSelected && <Tag color={flame.color}>Selected</Tag>}
+              {isSelected && <Tag color={flame.color}>{t("shop.active") || "Active"}</Tag>}
             </div>
           );
         })}
@@ -137,7 +139,7 @@ export default function SettingsFlameModal({ handleClose }) {
             color: loading ? C.accent : "#000",
           }}
         >
-          {loading ? "APPLYING..." : "APPLY FLAME COLOR"}
+          {t("settings.applyFlame")}
         </span>
       </div>
     </div>

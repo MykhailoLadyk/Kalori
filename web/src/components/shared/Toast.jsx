@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { C, F, alpha } from "../../lib/constants";
 import { Mono } from "./Primitives";
 import {
@@ -31,6 +32,7 @@ const CONFIGS = {
 };
 
 function ToastContent({ notification }) {
+  const { t } = useTranslation();
   const { type, amount, name, level, days, xp, coins } = notification;
   const cfg = CONFIGS[type] ?? CONFIGS.info;
   const color = cfg.color;
@@ -51,12 +53,11 @@ function ToastContent({ notification }) {
       >
         <span className="flex" style={{ color }}><cfg.icon size={16} /></span>
         <span className="font-mono font-bold" style={{ fontSize: 12, color }}>
-          {name || `${isDeducted ? amount : `+${amount}`} ${type === "xp" ? "XP" : "coins"}`}
+          {name || `${isDeducted ? amount : `+${amount}`} ${type === "xp" ? "XP" : t("common.coins")}`}
         </span>
       </div>
     );
   }
-
 
   // target reached card
   if (type === "target") {
@@ -74,7 +75,7 @@ function ToastContent({ notification }) {
         <div className="flex items-center" style={{ gap: 8, marginBottom: 6 }}>
           <span className="flex" style={{ color }}><IconTarget size={16} /></span>
           <Mono size={8} color={color}>
-            Target Reached
+            {t("notifs.targetReached")}
           </Mono>
         </div>
         <div className="font-body font-semibold text-primary" style={{ fontSize: 12, marginBottom: 6 }}>
@@ -88,7 +89,7 @@ function ToastContent({ notification }) {
           )}
           {coins && (
             <Mono size={8} color={C.gold}>
-              +{coins} coins
+              +{coins} {t("common.coins").toLowerCase()}
             </Mono>
           )}
         </div>
@@ -111,12 +112,11 @@ function ToastContent({ notification }) {
       >
         <span className="flex" style={{ color }}><cfg.icon size={18} /></span>
         <span className="font-body font-semibold text-primary" style={{ fontSize: 13 }}>
-          {name || (type === "success" ? "Success" : type === "info" ? "Info" : type === "pro" ? "Kalori Pro" : "Error")}
+          {name || (type === "success" ? t("common.success") : type === "info" ? t("common.info") : type === "pro" ? "Kalori Pro" : t("common.error"))}
         </span>
       </div>
     );
   }
-
 
   // medium card for quest
   if (type === "quest") {
@@ -134,7 +134,7 @@ function ToastContent({ notification }) {
         <div className="flex items-center mb-2" style={{ gap: 8, marginBottom: 6 }}>
           <span className="flex" style={{ color }}><IconTarget size={16} /></span>
           <Mono size={8} color={color}>
-            Quest Complete
+            {t("notifs.questComplete")}
           </Mono>
         </div>
         <div className="font-body font-semibold text-primary mb-2" style={{ fontSize: 12, marginBottom: 6 }}>{name}</div>
@@ -146,7 +146,7 @@ function ToastContent({ notification }) {
           )}
           {coins && (
             <Mono size={8} color={C.gold}>
-              +{coins} coins
+              +{coins} {t("common.coins").toLowerCase()}
             </Mono>
           )}
         </div>
@@ -172,7 +172,7 @@ function ToastContent({ notification }) {
             <IconTrophy size={20} />
           </span>
           <Mono size={8} color={C.gold}>
-            Achievement Unlocked
+            {t("notifs.achievementUnlocked")}
           </Mono>
         </div>
         <div className="font-body font-bold text-primary mb-1" style={{ fontSize: 13, marginBottom: 4 }}>{name}</div>
@@ -199,13 +199,13 @@ function ToastContent({ notification }) {
         }}
       >
         <Mono size={8} color={C.mutedLight}>
-          Level Up!
+          {t("notifs.levelUp")}
         </Mono>
         <div className="flex mt-1" style={{ alignItems: "baseline", gap: 6, marginTop: 4 }}>
           <span className="font-head font-black text-accent" style={{ fontSize: 32, lineHeight: 1 }}>
             {level}
           </span>
-          <span className="font-body text-soft" style={{ fontSize: 13 }}>reached</span>
+          <span className="font-body text-soft" style={{ fontSize: 13 }}>{t("notifs.reached")}</span>
         </div>
       </div>
     );
@@ -230,10 +230,10 @@ function ToastContent({ notification }) {
           </span>
           <div>
             <Mono size={8} color={C.orange}>
-              Streak Milestone
+              {t("notifs.streakMilestone")}
             </Mono>
             <div className="font-head font-black text-primary mt-1" style={{ fontSize: 16, marginTop: 2 }}>
-              {days} days!
+              {t("notifs.streakDays", { count: days })}
             </div>
           </div>
         </div>

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { C, F, alpha } from "../lib/constants";
 import { Mono, Tag } from "../components/shared/Primitives";
 import {
@@ -34,8 +35,11 @@ const ChevronLeft = () => (
   </svg>
 );
 
+const FEATURE_KEYS = ["scans", "photo", "describe", "clarify", "shield", "badge"];
+
 export default function Premium() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { user, subscription, isPro } = useUser();
   const { addNotification } = useNotifications();
 
@@ -45,7 +49,7 @@ export default function Premium() {
   const handleSubscribeClick = () => {
     addNotification({
       type: "info",
-      name: "Unavailable at the moment",
+      name: t("pro.unavailable"),
     });
   };
 
@@ -83,7 +87,7 @@ export default function Premium() {
           <ChevronLeft />
         </div>
         <div className="font-head font-black text-primary" style={{ fontSize: 18 }}>
-          Kalori Pro
+          {t("settings.kaloriPro")}
         </div>
       </div>
 
@@ -118,7 +122,7 @@ export default function Premium() {
               textTransform: "uppercase",
             }}
           >
-            PREMIUM MEMBERSHIP
+            {t("pro.premiumMembership")}
           </span>
         </div>
 
@@ -132,7 +136,7 @@ export default function Premium() {
             lineHeight: 1.2,
           }}
         >
-          Supercharge Your Nutrition
+          {t("pro.heroTitle")}
         </h1>
         <p
           style={{
@@ -144,7 +148,7 @@ export default function Premium() {
             lineHeight: 1.5,
           }}
         >
-          Unlock high-limit AI meal scanning, smart macro insights, and zero coin friction.
+          {t("pro.heroSub")}
         </p>
       </div>
 
@@ -164,7 +168,7 @@ export default function Premium() {
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <IconCrown size={18} color={C.gold} />
               <span style={{ fontFamily: F.head, fontSize: 16, fontWeight: 800, color: C.text }}>
-                Current Subscription
+                {t("pro.currentSub")}
               </span>
             </div>
             <Tag color={subDetails.status === "active" ? C.accent : C.gold}>
@@ -174,13 +178,13 @@ export default function Premium() {
 
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <Mono size={9} color={C.muted}>Plan</Mono>
+              <Mono size={9} color={C.muted}>{t("pro.plan")}</Mono>
               <Mono size={9} color={C.text}>{subDetails.planName}</Mono>
             </div>
             {subDetails.periodEnd && (
               <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <Mono size={9} color={C.muted}>
-                  {subDetails.cancelAtPeriodEnd ? "Expires On" : "Renews On"}
+                  {subDetails.cancelAtPeriodEnd ? t("pro.expiresOn") : t("pro.renewsOn")}
                 </Mono>
                 <Mono size={9} color={C.text}>
                   {subDetails.periodEnd.toLocaleDateString(undefined, {
@@ -192,8 +196,8 @@ export default function Premium() {
               </div>
             )}
             <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <Mono size={9} color={C.muted}>Daily AI Quota</Mono>
-              <Mono size={9} color={C.accent}>100 scans / day</Mono>
+              <Mono size={9} color={C.muted}>{t("pro.dailyQuota")}</Mono>
+              <Mono size={9} color={C.accent}>{t("pro.scansPerDay", { count: 100 })}</Mono>
             </div>
           </div>
         </div>
@@ -211,12 +215,16 @@ export default function Premium() {
             marginBottom: 10,
           }}
         >
-          Select Your Plan
+          {t("pro.selectPlan")}
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {PRO_PLANS.map((plan) => {
             const isSelected = selectedPlanId === plan.id;
+            const planName = t(`pro.plans.${plan.id}.name`) || plan.name;
+            const planDesc = t(`pro.plans.${plan.id}.billingDesc`) || plan.billingDesc;
+            const planBadge = plan.badge ? (t(`pro.plans.${plan.id}.badge`) || plan.badge) : null;
+
             return (
               <div
                 key={plan.id}
@@ -235,7 +243,7 @@ export default function Premium() {
                   boxShadow: isSelected ? `0 0 20px ${alpha(C.accent, 20)}` : "none",
                 }}
               >
-                {plan.badge && (
+                {planBadge && (
                   <div
                     style={{
                       position: "absolute",
@@ -252,7 +260,7 @@ export default function Premium() {
                       boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
                     }}
                   >
-                    {plan.badge}
+                    {planBadge}
                   </div>
                 )}
 
@@ -283,7 +291,7 @@ export default function Premium() {
                           color: C.text,
                         }}
                       >
-                        {plan.name}
+                        {planName}
                       </span>
                     </div>
 
@@ -296,7 +304,7 @@ export default function Premium() {
                         marginLeft: 26,
                       }}
                     >
-                      {plan.billingDesc}
+                      {planDesc}
                     </div>
                   </div>
 
@@ -329,7 +337,7 @@ export default function Premium() {
             marginBottom: 12,
           }}
         >
-          Everything in Pro
+          {t("pro.everythingInPro")}
         </div>
 
         <div
@@ -343,33 +351,39 @@ export default function Premium() {
             gap: 14,
           }}
         >
-          {PRO_FEATURES.map((feat, idx) => (
-            <div key={idx} style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
-              <div
-                style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: 10,
-                  background: alpha(C.accent, 15),
-                  border: `1px solid ${alpha(C.accent, 30)}`,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexShrink: 0,
-                }}
-              >
-                <IconCheck size={16} color={C.accent} />
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontFamily: F.head, fontSize: 14, fontWeight: 800, color: C.text }}>
-                  {feat.title}
+          {PRO_FEATURES.map((feat, idx) => {
+            const key = FEATURE_KEYS[idx] || "scans";
+            const title = t(`pro.features.${key}.title`) || feat.title;
+            const desc = t(`pro.features.${key}.desc`) || feat.desc;
+
+            return (
+              <div key={idx} style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+                <div
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 10,
+                    background: alpha(C.accent, 15),
+                    border: `1px solid ${alpha(C.accent, 30)}`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                  }}
+                >
+                  <IconCheck size={16} color={C.accent} />
                 </div>
-                <div style={{ fontFamily: F.body, fontSize: 12, color: C.soft, marginTop: 2, lineHeight: 1.4 }}>
-                  {feat.desc}
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontFamily: F.head, fontSize: 14, fontWeight: 800, color: C.text }}>
+                    {title}
+                  </div>
+                  <div style={{ fontFamily: F.body, fontSize: 12, color: C.soft, marginTop: 2, lineHeight: 1.4 }}>
+                    {desc}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
@@ -386,11 +400,11 @@ export default function Premium() {
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
           <IconCoin size={16} color={C.gold} />
           <span style={{ fontFamily: F.head, fontSize: 13, fontWeight: 800, color: C.text }}>
-            Free Tier vs. Kalori Pro
+            {t("pro.comparisonTitle")}
           </span>
         </div>
         <div style={{ fontFamily: F.body, fontSize: 12, color: C.soft, lineHeight: 1.5 }}>
-          Free accounts can use AI food scans anytime by spending <strong style={{ color: C.gold }}>50 coins</strong> per scan. Upgrading to Pro gives you <strong style={{ color: C.accent }}>100 scans/day</strong> with 0 coin costs.
+          {t("pro.comparisonDesc")}
         </div>
       </div>
 
@@ -420,12 +434,12 @@ export default function Premium() {
           }}
         >
           <IconCrown size={18} color="#000" />
-          <span>SUBSCRIBE FOR {selectedPlan.price.toUpperCase()}</span>
+          <span>{t("pro.subscribeFor", { price: selectedPlan.price.toUpperCase() })}</span>
         </button>
 
         <div style={{ textAlign: "center", marginTop: 12 }}>
           <Mono size={8} color={C.muted}>
-            Cancel anytime in account settings · Secure recurring billing
+            {t("pro.cancelAnytime")}
           </Mono>
         </div>
       </div>

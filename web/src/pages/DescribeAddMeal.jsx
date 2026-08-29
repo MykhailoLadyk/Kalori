@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { C, F, alpha } from "../lib/constants";
 import { Mono, Tag } from "../components/shared/Primitives";
 import analyzeFoodDesc from "../services/analyzeFoodDesc";
@@ -45,6 +46,7 @@ const Spinner = ({ color = "#000", size = 16 }) => (
 
 export default function DescribeAddMeal() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { isPro } = useUser();
   const { gameData, refreshGameData } = useGameStats();
   const { addNotification } = useNotifications();
@@ -57,7 +59,12 @@ export default function DescribeAddMeal() {
 
   const userCoins = gameData?.coins || 0;
 
-  const loadingSteps = ["Reading description...", "Searching database...", "Estimating calories...", "Calculating macros..."];
+  const loadingSteps = [
+    t("addMeal.stepReading"),
+    t("addMeal.stepSearching"),
+    t("addMeal.stepEstimating"),
+    t("addMeal.stepCalculating"),
+  ];
   const [loadingStepIndex, setLoadingStepIndex] = useState(0);
   
   useEffect(() => {
@@ -153,7 +160,7 @@ export default function DescribeAddMeal() {
             <ChevronLeft />
           </div>
           <div className="font-head font-black text-primary" style={{ fontSize: 18 }}>
-            Describe Meal
+            {t("addMeal.describeTitle")}
           </div>
         </div>
 
@@ -177,7 +184,7 @@ export default function DescribeAddMeal() {
           >
             <IconCoin size={13} color={C.gold} />
             <span style={{ fontFamily: F.mono, fontSize: 8, fontWeight: 800, color: C.gold }}>
-              50 COINS ({userCoins})
+              50 {t("common.coins").toUpperCase()} ({userCoins})
             </span>
           </div>
         )}
@@ -187,15 +194,14 @@ export default function DescribeAddMeal() {
         {!result ? (
           <>
             <div className="font-body text-soft" style={{ fontSize: 13, marginBottom: 14, lineHeight: 1.6 }}>
-              Tell us what you ate in plain language. We'll estimate the
-              calories and macros.
+              {t("addMeal.describeSub")}
             </div>
 
 
             <textarea
               value={text}
               onChange={(e) => setText(e.target.value)}
-              placeholder="e.g. Grilled salmon with rice and steamed vegetables"
+              placeholder={t("addMeal.describePlaceholder")}
               className="w-full bg-card font-body text-primary"
               style={{
                 minHeight: 120,
@@ -238,8 +244,8 @@ export default function DescribeAddMeal() {
                   {loading
                     ? loadingSteps[loadingStepIndex].toUpperCase()
                     : isPro
-                    ? "ANALYZE MEAL"
-                    : <>ANALYZE MEAL ({AI_COIN_COST} <IconCoin size={11} color="#000" />)</>}
+                    ? t("addMeal.analyzeMeal")
+                    : <>{t("addMeal.analyzeMeal")} ({AI_COIN_COST} <IconCoin size={11} color="#000" />)</>}
               </span>
             </div>
 
@@ -247,7 +253,7 @@ export default function DescribeAddMeal() {
         ) : (
           <>
             <div className="font-body text-soft" style={{ fontSize: 13, marginBottom: 14 }}>
-              Here's what we found — adjust if needed before saving.
+              {t("addMeal.describeSub")}
             </div>
 
             <div
@@ -264,17 +270,17 @@ export default function DescribeAddMeal() {
               </div>
               <div className="flex justify-between" style={{ marginBottom: 12 }}>
                 <Mono size={9} color={C.mutedLight}>
-                  Calories
+                  {t("addMeal.calories")}
                 </Mono>
                 <span className="font-head font-black text-accent" style={{ fontSize: 18 }}>
-                  {result.calories} kcal
+                  {result.calories} {t("common.kcal")}
                 </span>
               </div>
               <div className="flex" style={{ gap: 8 }}>
                 {[
-                  { l: "Protein", v: result.protein, col: C.blue },
-                  { l: "Carbs", v: result.carbs, col: C.gold },
-                  { l: "Fat", v: result.fat, col: C.pink },
+                  { l: t("addMeal.protein"), v: result.protein, col: C.blue },
+                  { l: t("addMeal.carbs"), v: result.carbs, col: C.gold },
+                  { l: t("addMeal.fat"), v: result.fat, col: C.pink },
                 ].map(({ l, v, col }) => (
                   <div
                     key={l}
@@ -290,7 +296,7 @@ export default function DescribeAddMeal() {
                       {l}
                     </Mono>
                     <div className="font-head text-primary font-extrabold" style={{ fontSize: 14, marginTop: 2 }}>
-                      {v}g
+                      {v}{t("common.grams")}
                     </div>
                   </div>
                 ))}
@@ -310,7 +316,7 @@ export default function DescribeAddMeal() {
                 }}
               >
                 <span className="font-mono font-bold" style={{ fontSize: 10, color: C.soft }}>
-                  EDIT
+                  {t("common.edit")}
                 </span>
               </div>
               <div
@@ -327,7 +333,7 @@ export default function DescribeAddMeal() {
               >
                 {loading && <Spinner color={C.accent} size={14} />}
                 <span className="font-mono font-bold" style={{ fontSize: 11, color: loading ? C.accent : "#000" }}>
-                  {loading ? "SAVING..." : "ADD MEAL"}
+                  {loading ? t("common.saving") : t("addMeal.saveMeal")}
                 </span>
               </div>
             </div>

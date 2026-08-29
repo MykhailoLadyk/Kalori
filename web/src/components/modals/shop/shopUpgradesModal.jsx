@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { C, F, alpha } from "../../../lib/constants";
 import { Tag } from "../../shared/Primitives";
 import { IconCoin, IconTarget, IconCheck, IconLock } from "../../shared/DuoIcon";
@@ -8,6 +9,7 @@ import { useNotifications } from "../../../context/NotificationContext";
 import { supabase } from "../../../services/supabase";
 
 export default function ShopUpgradesModal({ upgrades = [], coins, user }) {
+  const { t } = useTranslation();
   const { refreshGameData, setQuests } = useGameStats();
   const { refreshUser } = useUser();
   const { addNotification } = useNotifications();
@@ -16,7 +18,7 @@ export default function ShopUpgradesModal({ upgrades = [], coins, user }) {
   const onPurchase = async (upgrade) => {
     if (loading || upgrade.owned || upgrade.lock) return;
     if (coins < upgrade.price) {
-      addNotification({ type: "error", name: "Not enough coins" });
+      addNotification({ type: "error", name: t("notifs.notEnoughCoins") });
       return;
     }
 
@@ -34,9 +36,9 @@ export default function ShopUpgradesModal({ upgrades = [], coins, user }) {
       }
       await refreshUser();
       await refreshGameData();
-      addNotification({ type: "success", name: `Unlocked ${upgrade.name}!` });
+      addNotification({ type: "success", name: t("notifs.unlockedItem", { name: upgrade.name }) });
     } catch (err) {
-      addNotification({ type: "error", name: err.message || "Purchase failed." });
+      addNotification({ type: "error", name: err.message || t("notifs.purchaseFailed") });
     } finally {
       setLoading(false);
     }
@@ -45,7 +47,7 @@ export default function ShopUpgradesModal({ upgrades = [], coins, user }) {
   return (
     <div>
       <div style={{ fontFamily: F.head, fontSize: 20, fontWeight: 900, color: C.text, marginBottom: 16 }}>
-        Perma Upgrades
+        {t("shop.upgrades")}
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -83,7 +85,7 @@ export default function ShopUpgradesModal({ upgrades = [], coins, user }) {
                     {upgrade.name}
                   </span>
                   {upgrade.lock && <Tag color={C.muted}>{upgrade.lock}</Tag>}
-                  {upgrade.owned && <Tag color={C.accent}>OWNED</Tag>}
+                  {upgrade.owned && <Tag color={C.accent}>{t("shop.owned")}</Tag>}
                 </div>
                 <div style={{ fontFamily: F.body, fontSize: 12, color: C.soft, lineHeight: 1.4 }}>
                   {upgrade.desc}
@@ -96,14 +98,14 @@ export default function ShopUpgradesModal({ upgrades = [], coins, user }) {
                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                   <IconCheck size={16} color={C.accent} />
                   <span style={{ fontFamily: F.mono, fontSize: 10, fontWeight: 700, color: C.accent }}>
-                    PERMANENTLY ACTIVE
+                    {t("shop.permanentlyActive")}
                   </span>
                 </div>
               ) : upgrade.lock ? (
                 <div style={{ display: "flex", alignItems: "center", gap: 6, opacity: 0.6 }}>
                   <IconLock size={14} color={C.muted} />
                   <span style={{ fontFamily: F.mono, fontSize: 10, fontWeight: 700, color: C.muted }}>
-                    UNLOCKS AT LEVEL {upgrade.lvlUnlocked}
+                    {t("shop.unlocksAtLevel", { level: upgrade.lvlUnlocked })}
                   </span>
                 </div>
               ) : (
@@ -121,7 +123,7 @@ export default function ShopUpgradesModal({ upgrades = [], coins, user }) {
                 >
                   <IconCoin size={14} color="#000" />
                   <span style={{ fontFamily: F.mono, fontSize: 11, fontWeight: 800, color: "#000" }}>
-                    {upgrade.price} COINS
+                    {t("shop.coinsCount", { price: upgrade.price })}
                   </span>
                 </div>
               )}

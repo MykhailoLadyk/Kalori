@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { C, F, alpha } from "../../lib/constants";
 import {
   IconPencil,
@@ -14,7 +15,9 @@ import { useFavorites } from "../../hooks/useFavorites";
 import { MealDeleteModal } from "../modals/home/MealDeleteModal";
 import { MealEditModal } from "../modals/home/MealEditModal";
 import { Modal } from "../modals/Modal";
+
 export function MealCard({ meal, color, type }) {
+  const { t } = useTranslation();
   const [deleteModal, setDeleteModal] = useState(null);
   const [editModal, setEditModal] = useState(null);
 
@@ -130,7 +133,7 @@ export function MealCard({ meal, color, type }) {
             >
               {mealIsFav ? <IconStar size={14} color={C.gold} /> : <IconStarOutline size={14} color={C.soft} />}
               <span className="font-mono font-bold" style={{ fontSize: 8, color: mealIsFav ? C.gold : C.soft }}>
-                {mealIsFav ? "UNFAVE" : "FAVE"}
+                {mealIsFav ? t("meal.unfave") : t("meal.fave")}
               </span>
             </div>
             <div
@@ -145,7 +148,7 @@ export function MealCard({ meal, color, type }) {
             >
               <IconPencil size={14} color={C.soft} />
               <span className="font-mono font-bold text-soft" style={{ fontSize: 8 }}>
-                EDIT
+                {t("common.edit")}
               </span>
             </div>
             <div
@@ -161,7 +164,7 @@ export function MealCard({ meal, color, type }) {
             >
               <IconTrash size={14} color={C.red} />
               <span className="font-mono font-bold text-red" style={{ fontSize: 8 }}>
-                DELETE
+                {t("common.delete")}
               </span>
             </div>
           </div>

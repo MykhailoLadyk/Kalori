@@ -1,15 +1,17 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { C, F, alpha } from "../../../lib/constants";
 import { Mono } from "../../../components/shared/Primitives";
 import { IconTrash } from "../../../components/shared/DuoIcon";
 import { supabase } from "../../../services/supabase";
 
 export default function DeleteAccountModal({ handleClose }) {
+  const { t } = useTranslation();
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const isConfirmed = confirm === "DELETE";
+  const isConfirmed = confirm === "DELETE" || confirm === "USUŃ";
 
   const handleDelete = async () => {
     try {
@@ -61,7 +63,7 @@ export default function DeleteAccountModal({ handleClose }) {
             color: C.text,
           }}
         >
-          Delete Account
+          {t("settings.deleteAccount")}
         </div>
         <div
           style={{
@@ -72,8 +74,7 @@ export default function DeleteAccountModal({ handleClose }) {
             lineHeight: 1.6,
           }}
         >
-          This will permanently delete your account and all data. This action
-          cannot be undone.
+          {t("settings.deleteAccountSub")}
         </div>
       </div>
 
@@ -88,7 +89,7 @@ export default function DeleteAccountModal({ handleClose }) {
         }}
       >
         <Mono size={8} color={C.red}>
-          What will be deleted
+          {t("settings.whatWillBeDeleted")}
         </Mono>
         <div
           style={{
@@ -99,10 +100,10 @@ export default function DeleteAccountModal({ handleClose }) {
           }}
         >
           {[
-            "All meal logs",
-            "Game progress & XP",
-            "Body stats & goals",
-            "Account & profile",
+            t("settings.deleteItemMeals"),
+            t("settings.deleteItemProgress"),
+            t("settings.deleteItemStats"),
+            t("settings.deleteItemAccount"),
           ].map((item) => (
             <div
               key={item}
@@ -128,7 +129,7 @@ export default function DeleteAccountModal({ handleClose }) {
       {/* confirmation input */}
       <div style={{ marginBottom: 16 }}>
         <Mono size={8} color={C.mutedLight}>
-          Type DELETE to confirm
+          {t("settings.typeDeleteToConfirm")}
         </Mono>
         <input
           value={confirm}
@@ -182,7 +183,7 @@ export default function DeleteAccountModal({ handleClose }) {
               color: C.soft,
             }}
           >
-            CANCEL
+            {t("common.cancel")}
           </span>
         </div>
         <div
@@ -208,7 +209,7 @@ export default function DeleteAccountModal({ handleClose }) {
               color: C.red,
             }}
           >
-            {loading ? "DELETING..." : "DELETE"}
+            {loading ? t("settings.deleting") : t("common.delete")}
           </span>
         </div>
       </div>

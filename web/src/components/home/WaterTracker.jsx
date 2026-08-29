@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { C, F, alpha } from "../../lib/constants";
 import { AnimBar } from "../shared/AnimBar";
 import { IconDrop } from "../shared/DuoIcon";
@@ -7,6 +8,7 @@ import { useUser } from "../../hooks/useUser";
 import { useGameStats } from "../../hooks/useGameStats";
 import { getLocalYMD } from "../../lib/dateUtils";
 export function WaterTracker() {
+  const { t } = useTranslation();
   const { meals, addMeal, selectedDate } = useMeals();
   const { user } = useUser();
   const { syncProgress } = useGameStats();
@@ -68,14 +70,14 @@ export function WaterTracker() {
           </div>
           <div>
             <div style={{ fontFamily: F.head, fontSize: 15, fontWeight: 800, color: C.text }}>
-              Water Intake
+              {t("home.water")}
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 2 }}>
               <span style={{ fontFamily: F.mono, fontSize: 12, fontWeight: 800, color: C.blue }}>
                 {current.toLocaleString()}
               </span>
               <span style={{ fontFamily: F.mono, fontSize: 10, color: C.muted }}>
-                / {goal.toLocaleString()} ml
+                / {goal.toLocaleString()} {t("common.ml")}
               </span>
             </div>
           </div>
@@ -132,7 +134,7 @@ export function WaterTracker() {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleCustomAdd()}
-              placeholder="+ Custom"
+              placeholder={t("home.customWaterPlaceholder")}
               style={{
                 flex: 1,
                 background: "transparent",

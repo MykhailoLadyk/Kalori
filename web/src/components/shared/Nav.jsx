@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Outlet, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { IconHome, IconPlus, IconChartLine, IconGamepad, IconShoppingBag, IconGear } from "../shared/DuoIcon";
 import { MealAddOptionSelectModal } from "../modals/home/MealAddOptionSelectModal";
 import { Modal } from "../modals/Modal";
@@ -8,6 +9,7 @@ import { C, F } from "../../lib/constants";
 export default function Nav() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
 
   const [popped, setPopped] = useState(null);
   const [modal, setModal] = useState(null);
@@ -18,10 +20,10 @@ export default function Nav() {
   const activeTab = isHome ? "home" : currentPath.substring(1);
 
   const tabs = [
-    { id: "stats", label: "Stats", Icon: IconChartLine },
-    { id: "game", label: "Level", Icon: IconGamepad },
-    { id: "shop", label: "Shop", Icon: IconShoppingBag },
-    { id: "settings", label: "Settings", Icon: IconGear },
+    { id: "stats", label: t("nav.stats"), Icon: IconChartLine },
+    { id: "game", label: t("nav.level"), Icon: IconGamepad },
+    { id: "shop", label: t("nav.shop"), Icon: IconShoppingBag },
+    { id: "settings", label: t("nav.settings"), Icon: IconGear },
   ];
 
   const handleHomeClick = () => {
@@ -78,7 +80,7 @@ export default function Nav() {
             className="font-mono font-bold"
             style={{ fontSize: 7, letterSpacing: 1, color: isHome ? C.accent : C.muted, transition: "color 0.2s" }}
           >
-            {isHome ? "ADD" : "HOME"}
+            {isHome ? t("nav.add") : t("nav.home")}
           </span>
           <div
             style={{

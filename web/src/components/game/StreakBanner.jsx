@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { C, F, alpha, flameColorsDefinitions } from "../../lib/constants";
 import { Mono } from "../shared/Primitives";
 import { IconFire, IconShield } from "../shared/DuoIcon";
@@ -5,6 +6,7 @@ import { useGameStats } from "../../hooks/useGameStats";
 import { useUser } from "../../hooks/useUser";
 
 export function StreakBanner() {
+  const { t } = useTranslation();
   const { gameData, shopItems } = useGameStats();
   const { user } = useUser();
   const streak = gameData?.streak || 0;
@@ -62,7 +64,7 @@ export function StreakBanner() {
           }}
         >
           <Mono size={8} color={textColor}>
-            Current Streak
+            {t("game.streak")}
           </Mono>
           <div
             style={{
@@ -73,7 +75,7 @@ export function StreakBanner() {
               lineHeight: 1.2,
             }}
           >
-            {streak} days
+            {t("common.day", { count: streak })}
           </div>
         </div>
         <div
@@ -99,7 +101,7 @@ export function StreakBanner() {
             </span>
           </div>
           <Mono size={7} color={C.muted}>
-            Shields
+            {t("game.streakShield")}
           </Mono>
         </div>
       </div>

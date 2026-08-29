@@ -1,6 +1,6 @@
-// pages/AuthPage.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { C, F, alpha } from "../lib/constants";
 import { Mono } from "../components/shared/Primitives";
 import { supabase } from "../services/supabase";
@@ -89,9 +89,9 @@ function AuthInput({ label, type = "text", value, onChange, placeholder, error, 
   );
 }
 
-// ── Main component ────────────────────────────────────────────
 export default function Login() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [mode, setMode] = useState("login"); // "login" | "signup" | "forgot"
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -267,8 +267,8 @@ export default function Login() {
               }}
             >
               {[
-                { id: "login", label: "Log In" },
-                { id: "signup", label: "Sign Up" },
+                { id: "login", label: t("auth.signIn") },
+                { id: "signup", label: t("auth.signUp") },
               ].map(({ id, label }) => (
                 <div
                   key={id}
@@ -299,9 +299,9 @@ export default function Login() {
           {/* forgot header */}
           {isForgot && (
             <div style={{ marginBottom: 20 }}>
-              <div style={{ fontFamily: F.head, fontSize: 18, fontWeight: 900, color: C.text }}>Forgot Password</div>
+              <div style={{ fontFamily: F.head, fontSize: 18, fontWeight: 900, color: C.text }}>{t("auth.resetPassword")}</div>
               <div style={{ fontFamily: F.body, fontSize: 13, color: C.soft, marginTop: 4 }}>
-                Enter your email and we'll send a reset link.
+                {t("auth.signInSub")}
               </div>
             </div>
           )}
@@ -349,21 +349,21 @@ export default function Login() {
           {/* fields */}
           <div className="flex flex-col gap-3" onKeyDown={handleKeyDown}>
             <AuthInput
-              label="Email"
+              label={t("auth.email")}
               type="email"
               value={email}
               onChange={setEmail}
-              placeholder="you@email.com"
+              placeholder={t("auth.emailPlaceholder")}
               error={errors.email}
               autoComplete="email"
             />
             {!isForgot && (
               <AuthInput
-                label="Password"
+                label={t("auth.password")}
                 type="password"
                 value={password}
                 onChange={setPassword}
-                placeholder={isSignup ? "Min 6 characters" : "Your password"}
+                placeholder={isSignup ? "Min 6 characters" : t("auth.passwordPlaceholder")}
                 error={errors.password}
                 autoComplete={isSignup ? "new-password" : "current-password"}
               />
@@ -378,7 +378,7 @@ export default function Login() {
                 className="press"
                 style={{ fontFamily: F.mono, fontSize: 8, color: C.mutedLight, cursor: "pointer", letterSpacing: 1 }}
               >
-                FORGOT PASSWORD?
+                {t("auth.forgotPassword").toUpperCase()}
               </span>
             </div>
           )}
@@ -399,7 +399,7 @@ export default function Login() {
             }}
           >
             <span className="font-mono font-bold" style={{ fontSize: 11, color: loading ? C.accent : "#000" }}>
-              {loading ? "PLEASE WAIT..." : isLogin ? "LOG IN" : isSignup ? "CREATE ACCOUNT" : "SEND RESET LINK"}
+              {loading ? t("common.loading") : isLogin ? t("auth.signIn") : isSignup ? t("auth.signUp") : t("auth.sendResetLink")}
             </span>
           </div>
 

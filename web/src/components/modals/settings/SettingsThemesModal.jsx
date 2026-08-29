@@ -1,6 +1,7 @@
+import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { C, F, themesDefinitions } from "../../../lib/constants";
 import { Tag } from "../../../components/shared/Primitives";
-import { useState, useEffect } from "react";
 import { useUser } from "../../../hooks/useUser";
 import { useGameStats } from "../../../hooks/useGameStats";
 
@@ -14,6 +15,7 @@ function resolveThemeId(themeSetting, ownedThemes) {
 }
 
 export default function ThemeModal({ handleClose }) {
+  const { t } = useTranslation();
   const { user, updateUser } = useUser();
   const { shopItems } = useGameStats();
   const themesOwned = shopItems?.themesOwned ?? [];
@@ -65,7 +67,7 @@ export default function ThemeModal({ handleClose }) {
             color: C.text,
           }}
         >
-          Themes
+          {t("settings.themes")}
         </div>
       </div>
 
@@ -122,26 +124,12 @@ export default function ThemeModal({ handleClose }) {
                 </div>
 
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  {isSelected && <Tag color={C.accent}>Selected</Tag>}
+                  {isSelected && <Tag color={C.accent}>{t("shop.active") || "Active"}</Tag>}
                 </div>
               </div>
             </div>
           );
         })}
-        {ownedThemes.length === 0 && (
-          <div
-            style={{
-              border: `1px solid ${C.border}`,
-              borderRadius: 14,
-              padding: "12px 14px",
-              color: C.soft,
-              fontFamily: F.body,
-              fontSize: 13,
-            }}
-          >
-            You do not own any themes yet.
-          </div>
-        )}
       </div>
 
       <div
@@ -163,7 +151,7 @@ export default function ThemeModal({ handleClose }) {
             color: loading ? C.accent : "#000",
           }}
         >
-          {loading ? "APPLYING..." : "APPLY THEME"}
+          {t("settings.applyTheme")}
         </span>
       </div>
     </div>

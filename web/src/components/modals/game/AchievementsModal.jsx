@@ -1,7 +1,10 @@
+import { useTranslation } from "react-i18next";
 import { C, F, alpha } from "../../../lib/constants";
 import { IconTrophy } from "../../../components/shared/DuoIcon";
 
 export default function AchievementsModal({ achievements, handleClose }) {
+  const { t } = useTranslation();
+
   return (
     <div style={{ padding: "10px 4px" }}>
       <div
@@ -13,7 +16,7 @@ export default function AchievementsModal({ achievements, handleClose }) {
           marginBottom: 16,
         }}
       >
-        Achievements
+        {t("game.achievements")}
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -86,7 +89,7 @@ export default function AchievementsModal({ achievements, handleClose }) {
                         letterSpacing: 1.2,
                       }}
                     >
-                      Done
+                      {t("common.done")}
                     </span>
                   )}
                 </div>

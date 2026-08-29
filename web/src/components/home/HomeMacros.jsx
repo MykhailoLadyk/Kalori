@@ -3,24 +3,27 @@ import { C } from "../../lib/constants";
 import { AnimBar } from "../shared/AnimBar";
 import { useMeals } from "../../hooks/useMeals";
 import { useUser } from "../../hooks/useUser";
+import { useTranslation } from "react-i18next";
+
 export function HomeMacros() {
+  const { t } = useTranslation();
   const { meals } = useMeals();
   const { user } = useUser();
   const macros = [
     {
-      label: "Protein",
+      label: t("home.protein"),
       val: meals.reduce((sum, meal) => sum + Number(meal.protein || 0), 0),
       max: user?.targets?.protein || 150,
       color: C.blue,
     },
     {
-      label: "Carbs",
+      label: t("home.carbs"),
       val: meals.reduce((sum, meal) => sum + Number(meal.carbs || 0), 0),
       max: user?.targets?.carbs || 50,
       color: C.gold,
     },
     {
-      label: "Fat",
+      label: t("home.fat"),
       val: meals.reduce((sum, meal) => sum + Number(meal.fat || 0), 0),
       max: user?.targets?.fat || 70,
       color: C.pink,

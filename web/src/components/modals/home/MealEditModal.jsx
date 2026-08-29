@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { C, F, alpha } from "../../../lib/constants";
 import { useMeals } from "../../../hooks/useMeals";
 import { useGameStats } from "../../../hooks/useGameStats";
@@ -7,20 +8,8 @@ import { Mono } from "../../shared/Primitives";
 
 const mealTypes = ["breakfast", "lunch", "dinner", "snacks"];
 
-const formTypes = [
-  {
-    key: "name",
-    label: "Name",
-    type: "text",
-    placeholder: "Chicken & Rice",
-  },
-  { key: "calories", label: "Calories", type: "number", placeholder: "kcal" },
-  { key: "protein", label: "Protein", type: "number", placeholder: "g" },
-  { key: "carbs", label: "Carbs", type: "number", placeholder: "g" },
-  { key: "fat", label: "Fat", type: "number", placeholder: "g" },
-];
-
 export function MealEditModal({ meal, handleClose }) {
+  const { t } = useTranslation();
   const { updateMeal, loading } = useMeals();
   const { syncProgress } = useGameStats();
   const [form, setForm] = useState({
@@ -33,6 +22,19 @@ export function MealEditModal({ meal, handleClose }) {
   });
 
   const [formErrors, setFormErrors] = useState({});
+
+  const formTypes = [
+    {
+      key: "name",
+      label: t("meal.name"),
+      type: "text",
+      placeholder: t("meal.namePlaceholder"),
+    },
+    { key: "calories", label: t("meal.calories"), type: "number", placeholder: "kcal" },
+    { key: "protein", label: t("meal.protein"), type: "number", placeholder: "g" },
+    { key: "carbs", label: t("meal.carbs"), type: "number", placeholder: "g" },
+    { key: "fat", label: t("meal.fat"), type: "number", placeholder: "g" },
+  ];
 
   const validate = () => {
     const newErrors = {};
@@ -96,13 +98,13 @@ export function MealEditModal({ meal, handleClose }) {
           marginBottom: 20,
         }}
       >
-        Edit Meal
+        {t("meal.editMeal")}
       </div>
 
       {/* meal type selector */}
       <div style={{ marginBottom: 16 }}>
         <Mono size={8} color={C.mutedLight}>
-          Meal Type
+          {t("meal.mealType")}
         </Mono>
         <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
           {mealTypes.map((type) => (
@@ -129,7 +131,7 @@ export function MealEditModal({ meal, handleClose }) {
                   color: form.type === type ? "#000" : C.muted,
                 }}
               >
-                {type.toUpperCase()}
+                {t(`home.${type}`).toUpperCase()}
               </span>
             </div>
           ))}
@@ -176,7 +178,7 @@ export function MealEditModal({ meal, handleClose }) {
               }}
               onFocus={(e) => (e.target.style.borderColor = C.accent)}
               onBlur={(e) =>
-                                (e.target.style.borderColor = formErrors[key]
+                (e.target.style.borderColor = formErrors[key]
                   ? alpha(C.red, 50)
                   : C.border)
               }
@@ -207,7 +209,7 @@ export function MealEditModal({ meal, handleClose }) {
             color: loading ? C.accent : "#000",
           }}
         >
-          {loading ? "SAVING..." : "SAVE CHANGES"}
+          {loading ? t("meal.saving") : t("meal.saveChanges")}
         </span>
       </div>
     </div>

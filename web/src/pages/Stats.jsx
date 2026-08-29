@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 
 import { C, F, alpha } from "../lib/constants";
 
@@ -13,6 +14,7 @@ import { useStats } from "../hooks/useStats";
 import { useUser } from "../hooks/useUser";
 
 export default function Stats() {
+  const { t } = useTranslation();
   const { getWeekData, getMonthData, get3MonthData, get3MonthWeeklyAverages, refreshStats } = useStats();
   const { user } = useUser();
   const [period, setPeriod] = useState("W");
@@ -50,21 +52,21 @@ export default function Stats() {
     ).length;
     const avgProtein = Math.round(periodData.reduce((s, d) => s + d.protein, 0) / periodData.length);
 
-    const periodLabel = period === "W" ? "of 7 days" : period === "M" ? "of 30 days" : "of 90 days";
+    const periodLabel = period === "W" ? t("stats.ofDays_7") : period === "M" ? t("stats.ofDays_30") : t("stats.ofDays_90");
 
     return [
-      { label: "Avg Calories", val: avgCal, suffix: "", sub: "kcal/day", color: C.accent },
+      { label: t("stats.avgCalories"), val: avgCal, suffix: "", sub: t("stats.kcalPerDay"), color: C.accent },
       {
-        label: totalDeficit >= 0 ? "Total Deficit" : "Total Surplus",
+        label: totalDeficit >= 0 ? t("stats.totalDeficit") : t("stats.totalSurplus"),
         val: Math.abs(totalDeficit),
         suffix: totalDeficit >= 0 ? "−" : "+",
-        sub: "kcal total",
+        sub: t("stats.kcalTotal"),
         color: C.blue,
       },
-      { label: "Days On Goal", val: daysOnGoal, suffix: "", sub: periodLabel, color: C.gold },
-      { label: "Protein Avg", val: avgProtein, suffix: "", sub: `g of ${targets.protein}g`, color: C.pink },
+      { label: t("stats.daysOnGoal"), val: daysOnGoal, suffix: "", sub: periodLabel, color: C.gold },
+      { label: t("stats.proteinAvg"), val: avgProtein, suffix: "", sub: t("stats.gOf", { target: targets.protein }), color: C.pink },
     ];
-  }, [periodData, targets, period]);
+  }, [periodData, targets, period, t]);
 
   // Compute macro stats
   const macroStats = useMemo(() => {
@@ -73,20 +75,20 @@ export default function Stats() {
     const avgCarbs = Math.round(periodData.reduce((s, d) => s + d.carbs, 0) / periodData.length);
     const avgFat = Math.round(periodData.reduce((s, d) => s + d.fat, 0) / periodData.length);
     return [
-      { label: "Protein", val: avgProtein, max: targets.protein, color: C.blue },
-      { label: "Carbs", val: avgCarbs, max: targets.carbs, color: C.gold },
-      { label: "Fat", val: avgFat, max: targets.fat, color: C.pink },
+      { label: t("home.protein"), val: avgProtein, max: targets.protein, color: C.blue },
+      { label: t("home.carbs"), val: avgCarbs, max: targets.carbs, color: C.gold },
+      { label: t("home.fat"), val: avgFat, max: targets.fat, color: C.pink },
     ];
-  }, [periodData, targets]);
+  }, [periodData, targets, t]);
 
   // Chart definitions — used for both bar and line charts
   const chartDefs = [
-    { label: "Calories", key: "calories", color: C.accent, goal: targets.calories, unit: "kcal" },
-    { label: "Protein", key: "protein", color: C.blue, goal: targets.protein, unit: "g" },
-    { label: "Carbs", key: "carbs", color: C.gold, goal: targets.carbs, unit: "g" },
-    { label: "Fat", key: "fat", color: C.pink, goal: targets.fat, unit: "g" },
-    { label: "Water", key: "water", color: C.blue, goal: targets.water, unit: "L" },
-    { label: "Weight", key: "weight", color: C.pink, goal: null, unit: weightUnit },
+    { label: t("home.calories"), key: "calories", color: C.accent, goal: targets.calories, unit: "kcal" },
+    { label: t("home.protein"), key: "protein", color: C.blue, goal: targets.protein, unit: "g" },
+    { label: t("home.carbs"), key: "carbs", color: C.gold, goal: targets.carbs, unit: "g" },
+    { label: t("home.fat"), key: "fat", color: C.pink, goal: targets.fat, unit: "g" },
+    { label: t("home.water"), key: "water", color: C.blue, goal: targets.water, unit: "L" },
+    { label: t("settings.weight"), key: "weight", color: C.pink, goal: null, unit: weightUnit },
   ];
 
   // Determine max for bar charts
@@ -110,7 +112,7 @@ export default function Stats() {
         >
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <div style={{ fontFamily: F.head, fontSize: 22, fontWeight: 900, color: C.text }}>
-              Stats
+              {t("stats.title")}
             </div>
             <div
               onClick={() => setModal("weight")}
@@ -125,7 +127,7 @@ export default function Stats() {
             >
               <span style={{ fontFamily: F.mono, fontSize: 10, fontWeight: 700, color: C.pink, lineHeight: 1 }}>+</span>
               <span style={{ fontFamily: F.mono, fontSize: 8, fontWeight: 700, color: C.pink, letterSpacing: 0.5 }}>
-                LOG WEIGHT
+                {t("stats.logWeight")}
               </span>
             </div>
           </div>
@@ -235,7 +237,7 @@ export default function Stats() {
           }}
         >
           <Mono size={9} color={C.mutedLight}>
-            Macro Split (avg)
+            {t("stats.macroSplitAvg")}
           </Mono>
           <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 10 }}>
             {macroStats.map(({ label, val, max, color }, i) => (

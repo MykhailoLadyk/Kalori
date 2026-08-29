@@ -1,10 +1,12 @@
+import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { C, F, avatarsDefinitions } from "../../../lib/constants";
 import { Tag } from "../../../components/shared/Primitives";
-import { useState, useEffect } from "react";
 import { useUser } from "../../../hooks/useUser";
 import { useGameStats } from "../../../hooks/useGameStats";
 
 export default function SettingsAvatarModal({ handleClose }) {
+  const { t } = useTranslation();
   const { user, updateUser } = useUser();
   const { shopItems } = useGameStats();
   const avatarsOwned = shopItems?.avatarsOwned ?? ["initial"];
@@ -53,7 +55,7 @@ export default function SettingsAvatarModal({ handleClose }) {
             color: C.text,
           }}
         >
-          Profile Pictures
+          {t("settings.profilePictures")}
         </div>
       </div>
 
@@ -130,7 +132,7 @@ export default function SettingsAvatarModal({ handleClose }) {
                 {avatar.name}
               </div>
 
-              {isSelected && <Tag color={C.accent}>Selected</Tag>}
+              {isSelected && <Tag color={C.accent}>{t("shop.active") || "Active"}</Tag>}
             </div>
           );
         })}
@@ -155,7 +157,7 @@ export default function SettingsAvatarModal({ handleClose }) {
             color: loading ? C.accent : "#000",
           }}
         >
-          {loading ? "APPLYING..." : "APPLY AVATAR"}
+          {t("settings.applyAvatar")}
         </span>
       </div>
     </div>

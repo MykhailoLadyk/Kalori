@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { C, F } from "../../../lib/constants";
 import { Mono } from "../../../components/shared/Primitives";
 import { useUser } from "../../../hooks/useUser";
@@ -7,6 +8,7 @@ import { useNotifications } from "../../../context/NotificationContext";
 import Avatar from "../../../components/shared/Avatar";
 
 export default function ProfileModal({ handleClose }) {
+  const { t } = useTranslation();
   const { user, updateUser } = useUser();
   const { addNotification } = useNotifications();
 
@@ -60,7 +62,7 @@ export default function ProfileModal({ handleClose }) {
           marginBottom: 20,
         }}
       >
-        Profile Settings
+        {t("settings.profileSettings")}
       </div>
 
       {/* avatar */}
@@ -78,9 +80,9 @@ export default function ProfileModal({ handleClose }) {
       {/* fields */}
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {[
-          { key: "name", label: "Name", type: "text" },
+          { key: "name", label: t("meal.name"), type: "text" },
           { key: "email", label: "Email", type: "email" },
-          { key: "age", label: "Age", type: "number" },
+          { key: "age", label: t("onboarding.stepAge"), type: "number" },
         ].map(({ key, label, type }) => (
           <div key={key}>
             <Mono size={8} color={C.mutedLight}>
@@ -132,7 +134,7 @@ export default function ProfileModal({ handleClose }) {
             color: loading ? C.accent : "#000",
           }}
         >
-          {loading ? "SAVING..." : "SAVE CHANGES"}
+          {loading ? t("settings.saving") : t("settings.saveChanges")}
         </span>
       </div>
     </div>

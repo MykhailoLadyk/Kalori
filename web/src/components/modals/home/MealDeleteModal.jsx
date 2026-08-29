@@ -1,9 +1,10 @@
-// modals/home/MealDeleteModal.jsx
+import { useTranslation } from "react-i18next";
 import { C, F, alpha } from "../../../lib/constants";
 import { IconTrash } from "../../shared/DuoIcon";
 import { useMeals } from "../../../hooks/useMeals";
 
 export function MealDeleteModal({ meal, handleClose }) {
+  const { t } = useTranslation();
   const { deleteMeal } = useMeals();
 
   const handleDelete = async () => {
@@ -42,7 +43,7 @@ export function MealDeleteModal({ meal, handleClose }) {
             color: C.text,
           }}
         >
-          Delete Meal
+          {t("meal.deleteMeal")}
         </div>
         <div
           style={{
@@ -52,7 +53,7 @@ export function MealDeleteModal({ meal, handleClose }) {
             marginTop: 6,
           }}
         >
-          Are you sure you want to delete
+          {t("meal.deleteConfirm")}
         </div>
         <div
           style={{
@@ -73,7 +74,7 @@ export function MealDeleteModal({ meal, handleClose }) {
             marginTop: 6,
           }}
         >
-          This action cannot be undone.
+          {t("meal.deleteUndone")}
         </div>
       </div>
 
@@ -133,7 +134,7 @@ export function MealDeleteModal({ meal, handleClose }) {
             cursor: "pointer",
           }}
         >
-          CANCEL
+          {t("common.cancel")}
         </div>
         <div
           onClick={() => {
@@ -155,7 +156,7 @@ export function MealDeleteModal({ meal, handleClose }) {
             cursor: "pointer",
           }}
         >
-          DELETE
+          {t("common.delete")}
         </div>
       </div>
     </div>

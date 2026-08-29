@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { C, F } from "../../../lib/constants";
 import { IconSignOut } from "../../../components/shared/DuoIcon";
 import { supabase } from "../../../services/supabase";
 
 export default function LogOutModal({ handleClose }) {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
 
   const handleLogOut = async () => {
@@ -50,7 +52,7 @@ export default function LogOutModal({ handleClose }) {
             color: C.text,
           }}
         >
-          Log Out
+          {t("settings.logOut")}
         </div>
         <div
           style={{
@@ -60,7 +62,7 @@ export default function LogOutModal({ handleClose }) {
             marginTop: 6,
           }}
         >
-          You can log back in any time. Your data will be saved.
+          {t("settings.logOutSub")}
         </div>
       </div>
 
@@ -87,7 +89,7 @@ export default function LogOutModal({ handleClose }) {
               color: C.soft,
             }}
           >
-            CANCEL
+            {t("common.cancel")}
           </span>
         </div>
         <div
@@ -111,7 +113,7 @@ export default function LogOutModal({ handleClose }) {
               color: C.text,
             }}
           >
-            {loading ? "LOGGING OUT..." : "LOG OUT"}
+            {loading ? t("settings.saving") : t("settings.logOut").toUpperCase()}
           </span>
         </div>
       </div>

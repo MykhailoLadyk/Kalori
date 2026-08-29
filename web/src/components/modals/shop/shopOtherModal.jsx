@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { C, F, alpha } from "../../../lib/constants";
 import { Mono } from "../../shared/Primitives";
 import { IconShield, IconCoin } from "../../shared/DuoIcon";
@@ -8,6 +9,7 @@ import { useNotifications } from "../../../context/NotificationContext";
 import { supabase } from "../../../services/supabase";
 
 export default function ShopOtherModal() {
+  const { t } = useTranslation();
   const { gameData, refreshGameData } = useGameStats();
   const { addNotification } = useNotifications();
   const [loading, setLoading] = useState(false);
@@ -17,7 +19,7 @@ export default function ShopOtherModal() {
     setLoading(true);
     
     if (gameData.coins < price) {
-      addNotification({ type: "error", name: "Not enough coins" });
+      addNotification({ type: "error", name: t("notifs.notEnoughCoins") });
       setLoading(false);
       return;
     }
@@ -31,9 +33,9 @@ export default function ShopOtherModal() {
       if (rpcError) throw rpcError;
 
       await refreshGameData();
-      addNotification({ type: "success", name: `Purchased ${qty} Streak Shield(s)!` });
+      addNotification({ type: "success", name: t("notifs.purchasedShields", { qty }) });
     } catch (err) {
-      addNotification({ type: "error", name: err.message || "Purchase failed." });
+      addNotification({ type: "error", name: err.message || t("notifs.purchaseFailed") });
     } finally {
       setLoading(false);
     }
@@ -50,7 +52,7 @@ export default function ShopOtherModal() {
           marginBottom: 16,
         }}
       >
-        Other
+        {t("shop.other")}
       </div>
 
       <div
@@ -81,7 +83,7 @@ export default function ShopOtherModal() {
                 color: C.text,
               }}
             >
-              Streak Shield
+              {t("shop.streakShield")}
             </div>
             <div
               style={{
@@ -91,7 +93,7 @@ export default function ShopOtherModal() {
                 marginTop: 3,
               }}
             >
-              Protects your streak from 1 missed day. Activates automatically.
+              {t("shop.streakShieldSub")}
             </div>
           </div>
         </div>
@@ -104,7 +106,7 @@ export default function ShopOtherModal() {
           }}
         >
           <Mono size={8} color={C.mutedLight}>
-            How it works
+            {t("shop.howItWorks")}
           </Mono>
           <div
             style={{
@@ -114,7 +116,7 @@ export default function ShopOtherModal() {
               marginTop: 4,
             }}
           >
-            If you miss a day, a Shield activates and keeps your streak alive.
+            {t("shop.howItWorksSub")}
           </div>
         </div>
         <div style={{ display: "flex", gap: 8 }}>

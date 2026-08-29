@@ -1,25 +1,33 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { C, F } from "../../../lib/constants";
 import { useUser } from "../../../hooks/useUser";
+import { IconFlagUK, IconFlagPoland } from "../../shared/DuoIcon";
 
 const LANGUAGES = [
-  { code: "en", label: "English", flag: "🇬🇧" },
-  { code: "pl", label: "Polish", flag: "🇵🇱" },
-  { code: "de", label: "German", flag: "🇩🇪" },
-  { code: "fr", label: "French", flag: "🇫🇷" },
-  { code: "es", label: "Spanish", flag: "🇪🇸" },
-  { code: "uk", label: "Ukrainian", flag: "🇺🇦" },
+  { code: "en", label: "English", FlagIcon: IconFlagUK },
+  { code: "pl", label: "Polski", FlagIcon: IconFlagPoland },
 ];
 
 export default function LanguageModal({ handleClose }) {
+  const { i18n, t } = useTranslation();
   const { user, updateUser } = useUser();
-  const [selected, setSelected] = useState(user?.settings?.language || "en");
+  const [selected, setSelected] = useState(
+    i18n.language?.startsWith("pl") ? "pl" : "en"
+  );
   const [loading, setLoading] = useState(false);
 
   const handleSave = async () => {
     try {
       setLoading(true);
-      await updateUser({ settings: { language: selected } });
+      await i18n.changeLanguage(selected);
+      localStorage.setItem("kalori_lang", selected);
+      if (user?.userAuth) {
+        await updateUser({ settings: { language: selected } });
+      }
+      handleClose();
+    } catch (err) {
+      console.error("Failed to save language:", err);
       handleClose();
     } finally {
       setLoading(false);
@@ -37,18 +45,18 @@ export default function LanguageModal({ handleClose }) {
           marginBottom: 20,
         }}
       >
-        Language
+        {t("settings.languageModalTitle")}
       </div>
 
       <div
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: 6,
+          gap: 8,
           marginBottom: 20,
         }}
       >
-        {LANGUAGES.map(({ code, label, flag }) => (
+        {LANGUAGES.map(({ code, label, FlagIcon }) => (
           <div
             key={code}
             onClick={() => setSelected(code)}
@@ -56,16 +64,18 @@ export default function LanguageModal({ handleClose }) {
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 12,
+              gap: 14,
               background: selected === code ? C.accentDim : C.card,
               border: `1px solid ${selected === code ? C.accentMid : C.border}`,
-              borderRadius: 12,
+              borderRadius: 14,
               padding: "12px 14px",
               cursor: "pointer",
               transition: "all 0.2s",
             }}
           >
-            <span style={{ fontSize: 20 }}>{flag}</span>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <FlagIcon size={20} />
+            </div>
             <span
               style={{
                 fontFamily: F.body,
@@ -110,7 +120,7 @@ export default function LanguageModal({ handleClose }) {
             color: loading ? C.accent : "#000",
           }}
         >
-          {loading ? "SAVING..." : "SAVE LANGUAGE"}
+          {loading ? t("common.saving") : t("settings.saveLanguage")}
         </span>
       </div>
     </div>

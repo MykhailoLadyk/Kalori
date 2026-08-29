@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { C, F, alpha } from "../../lib/constants";
 import { Tag } from "./Primitives";
 import { IconStar, IconRefresh } from "./DuoIcon";
@@ -17,6 +18,7 @@ export function Quest({
   canAffordReroll = true,
   rerollCost = 20,
 }) {
+  const { t } = useTranslation();
   const [rerolling, setRerolling] = useState(false);
 
   const handleRerollClick = async (e) => {
@@ -96,7 +98,7 @@ export function Quest({
           {onReroll && (
             <div
               onClick={handleRerollClick}
-              title={`Reroll quest for ${rerollCost} coins`}
+              title={t("quests.rerollTitle", { cost: rerollCost })}
               className="press cursor-pointer hover-card"
               style={{
                 background: alpha(C.gold, rerolling ? 25 : 12),

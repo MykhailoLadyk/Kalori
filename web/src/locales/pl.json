@@ -1,0 +1,683 @@
+{
+  "nav": {
+    "home": "GŁÓWNA",
+    "add": "DODAJ",
+    "stats": "STATYSTYKI",
+    "level": "POZIOM",
+    "shop": "SKLEP",
+    "settings": "USTAWIENIA"
+  },
+  "common": {
+    "save": "ZAPISZ",
+    "saving": "ZAPISYWANIE...",
+    "cancel": "ANULUJ",
+    "edit": "EDYTUJ",
+    "delete": "USUŃ",
+    "continue": "KONTYNUUJ",
+    "back": "WSTECZ",
+    "close": "ZAMKNIJ",
+    "confirm": "POTWIERDŹ",
+    "loading": "ŁADOWANIE...",
+    "today": "Dzisiaj",
+    "yesterday": "Wczoraj",
+    "tomorrow": "Jutro",
+    "kcal": "kcal",
+    "grams": "g",
+    "liters": "L",
+    "ml": "ml",
+    "kg": "kg",
+    "lbs": "lbs",
+    "cm": "cm",
+    "ft": "ft",
+    "yrs": "lat",
+    "required": "Wymagane",
+    "error": "Błąd",
+    "success": "Sukces",
+    "info": "Informacja",
+    "done": "Ukończone",
+    "level": "Poziom",
+    "xp": "XP",
+    "coins": "Monety",
+    "coins_count_one": "{{count}} moneta",
+    "coins_count_few": "{{count}} monety",
+    "coins_count_many": "{{count}} monet",
+    "coins_count_other": "{{count}} monet",
+    "day_one": "{{count}} dzień",
+    "day_few": "{{count}} dni",
+    "day_many": "{{count}} dni",
+    "day_other": "{{count}} dni",
+    "meal_one": "{{count}} posiłek",
+    "meal_few": "{{count}} posiłki",
+    "meal_many": "{{count}} posiłków",
+    "meal_other": "{{count}} posiłków"
+  },
+  "onboarding": {
+    "stepOf": "KROK {{current}} Z {{total}}",
+    "welcomeTitle": "Witaj w",
+    "welcomeSubtitle": "Zapisuj posiłki, osiągaj swoje cele i buduj zdrowe nawyki na całe życie.",
+    "logMeals": "ŁATWE ZAPISYWANIE POSIŁKÓW",
+    "earnXP": "ZDOBYWAJ XP I POZIOMY",
+    "buildStreaks": "BUDUJ REGULARNOŚĆ",
+    "getStarted": "ROZPOCZNIJ",
+    "nameTitle": "Jak masz na imię?",
+    "nameSubtitle": "Użyjemy Twojego imienia, aby spersonalizować aplikację.",
+    "nameLabel": "TWOJE IMIĘ",
+    "namePlaceholder": "np. Michał",
+    "bodyTitle": "Parametry Ciała",
+    "bodySubtitle": "Potrzebne do obliczenia Twojego dziennego zapotrzebowania kalorycznego i makro.",
+    "sexLabel": "Płeć biologiczna",
+    "male": "Mężczyzna",
+    "female": "Kobieta",
+    "weightUnitLabel": "Jednostka wagi",
+    "heightUnitLabel": "Jednostka wzrostu",
+    "ageLabel": "Wiek",
+    "agePlaceholder": "np. 25",
+    "weightLabel": "Waga",
+    "weightPlaceholderKg": "np. 70",
+    "weightPlaceholderLbs": "np. 154",
+    "heightLabel": "Wzrost",
+    "heightPlaceholderCm": "np. 175",
+    "heightPlaceholderFt": "np. 5.9",
+    "goalTitle": "Jaki jest Twój główny cel?",
+    "goalSubtitle": "Pomoże nam to obliczyć Twój optymalny bilans kaloryczny.",
+    "goalLose": "Schudnąć",
+    "goalLoseSub": "Deficyt kaloryczny ze stałym, zdrowym tempem redukcji",
+    "goalMaintain": "Utrzymać wagę",
+    "goalMaintainSub": "Zbalansowane kalorie do zachowania obecnej sylwetki",
+    "goalGain": "Zbudować masę / Mięśnie",
+    "goalGainSub": "Nadwyżka kaloryczna z dużą ilością białka na wzrost mięśni",
+    "activityTitle": "Poziom Aktywności",
+    "activitySubtitle": "Jak aktywny jesteś w typowym tygodniu?",
+    "actSedentary": "Siedzący tryb życia",
+    "actSedentarySub": "Praca przy biurku, brak regularnych treningów",
+    "actLight": "Lekko aktywny",
+    "actLightSub": "Lekkie spacery, 1-3 treningi w tygodniu",
+    "actModerate": "Umiarkowanie aktywny",
+    "actModerateSub": "Regularne ćwiczenia lub sport 3-5 dni w tygodniu",
+    "actActive": "Bardzo aktywny",
+    "actActiveSub": "Intensywne treningi 6-7 dni w tygodniu lub praca fizyczna",
+    "dietTitle": "Rodzaj Diety",
+    "dietSubtitle": "Dopasujemy optymalny podział makroskładników.",
+    "dietBalanced": "Zbalansowana",
+    "dietBalancedSub": "50% Węglowodany · 25% Białko · 25% Tłuszcze",
+    "dietHighProtein": "Wysokobiałkowa",
+    "dietHighProteinSub": "40% Białko · 35% Węglowodany · 25% Tłuszcze",
+    "dietLowCarb": "Niskowęglowodanowa",
+    "dietLowCarbSub": "40% Tłuszcze · 35% Białko · 25% Węglowodany",
+    "dietKeto": "Ketoza",
+    "dietKetoSub": "70% Tłuszcze · 25% Białko · 5% Węglowodany",
+    "targetsTitle": "Twój Spersonalizowany Plan",
+    "targetsSubtitle": "Obliczony na podstawie Twoich danych i celów. Zawsze możesz go zmienić.",
+    "dailyCalories": "DZIENNY CEL KALORII",
+    "waterTarget": "DZIENNY CEL WODY",
+    "proteinTarget": "BIAŁKO",
+    "carbsTarget": "WĘGLOWODANY",
+    "fatTarget": "TŁUSZCZE",
+    "finish": "ZACZNIJ ŚLEDZENIE",
+    "required": "To pole jest wymagane",
+    "errorSex": "Wybierz płeć biologiczną",
+    "errorAge": "Wiek musi wynosić od 13 do 120 lat",
+    "errorWeightKg": "Waga musi wynosić od 20 do 300 kg",
+    "errorWeightLbs": "Waga musi wynosić od 44 do 660 lbs",
+    "errorHeightCm": "Wzrost musi wynosić od 100 do 250 cm",
+    "errorHeightFt": "Wzrost musi wynosić od 3.3 do 8.2 ft"
+  },
+  "home": {
+    "caloriesRemaining": "POZOSTAŁO KCAL",
+    "caloriesOver": "PONAD LIMIT KCAL",
+    "eaten": "Zjedzone",
+    "burned": "Spalone",
+    "goal": "Cel",
+    "protein": "Białko",
+    "carbs": "Węglowodany",
+    "fat": "Tłuszcze",
+    "water": "Nawodnienie",
+    "waterDrinkGoal": "Wypij {{goal}}ml wody",
+    "logWater": "DODAJ WODĘ",
+    "quickAddWater": "+{{amount}}ml",
+    "breakfast": "Śniadanie",
+    "lunch": "Obiad",
+    "dinner": "Kolacja",
+    "snacks": "Przekąski",
+    "noMealsLogged": "Brak wpisów",
+    "todaysMeals": "Dzisiejsze Posiłki",
+    "addMeal": "DODAJ POSIŁEK",
+    "editMeal": "Edytuj Posiłek",
+    "deleteMeal": "Usuń Posiłek",
+    "recentMeals": "Ostatnie Posiłki",
+    "customWaterPlaceholder": "+ Własna"
+  },
+  "meal": {
+    "confirmMeal": "Zatwierdź Posiłek",
+    "retake": "POWTÓRZ",
+    "reviewAndAdjust": "Sprawdź i dostosuj przed dodaniem do dziennika.",
+    "mealType": "Typ Posiłku",
+    "name": "Nazwa",
+    "namePlaceholder": "np. Kurczak z ryżem",
+    "calories": "Kalorie",
+    "protein": "Białko",
+    "carbs": "Węglowodany",
+    "fat": "Tłuszcze",
+    "aiInsights": "ANALIZA I DOPRECYZOWANIE AI",
+    "confidence": "Pewność: {{level}}",
+    "clarifyPlaceholder": "Doprecyzuj składniki, porcję lub sposób przygotowania...",
+    "updatingEstimate": "AKTUALIZACJA...",
+    "refineEstimate": "DOPRECYZUJ Z AI",
+    "refineEstimateCost": "DOPRECYZUJ Z AI · {{cost}}",
+    "saving": "ZAPISYWANIE...",
+    "refining": "DOPRECYZOWYWANIE...",
+    "addMeal": "DODAJ POSIŁEK",
+    "fave": "ULUBIONE",
+    "unfave": "USUŃ",
+    "editMeal": "Edytuj Posiłek",
+    "deleteMeal": "Usuń Posiłek",
+    "deleteConfirm": "Czy na pewno chcesz usunąć",
+    "deleteUndone": "Ta akcja jest nieodwracalna.",
+    "saveChanges": "ZAPISZ ZMIANY",
+    "favorites": "Ulubione",
+    "recentlyAdded": "Ostatnio Dodane"
+  },
+  "pro": {
+    "upgradeToPro": "Przejdź na Kalori Pro",
+    "upgradeSub": "Wysoki limit skanowania posiłków AI bez kosztu monet",
+    "viewPro": "ZOBACZ PRO ›",
+    "viewProPlans": "ZOBACZ PLANY PRO",
+    "getKaloriPro": "Wybierz Kalori Pro",
+    "highDailyLimit": "Wysoki limit dzienny (100 skanów AI/dzień) bez kosztu monet.",
+    "premiumMembership": "CZŁONKOSTWO PREMIUM",
+    "heroTitle": "Wznieś dietę na wyższy poziom",
+    "heroSub": "Odblokuj wysokie limity skanowania AI, inteligentne analizy i zero opłat w monetach.",
+    "currentSub": "Aktualna Subskrypcja",
+    "plan": "Plan",
+    "expiresOn": "Wygasa",
+    "renewsOn": "Odnawia się",
+    "dailyQuota": "Dzienny Limit AI",
+    "scansPerDay": "{{count}} skanów / dzień",
+    "selectPlan": "Wybierz swój plan",
+    "everythingInPro": "Wszystko w pakiecie Pro",
+    "comparisonTitle": "Wersja Darmowa vs Kalori Pro",
+    "comparisonDesc": "Konta darmowe mogą skanować posiłki za 50 monet za skan. Pakiet Pro zapewnia 100 skanów dziennie bez kosztu monet.",
+    "subscribeFor": "SUBSKRYBUJ ZA {{price}}",
+    "cancelAnytime": "Anuluj w dowolnym momencie w ustawieniach · Bezpieczne płatności cykliczne",
+    "unavailable": "Obecnie niedostępne",
+    "plans": {
+      "1month": {
+        "name": "1 Miesiąc Pro",
+        "billingDesc": "Rozliczane co miesiąc. Anuluj w każdej chwili."
+      },
+      "6months": {
+        "name": "6 Miesięcy Pro",
+        "billingDesc": "Rozliczane co 6 miesięcy ($3.33/mies.). Anuluj w każdej chwili.",
+        "badge": "OSZCZĘDŹ 33%"
+      }
+    },
+    "features": {
+      "scans": {
+        "title": "Wysoki Dzienny Limit AI",
+        "desc": "Do 100 analiz posiłków AI dziennie bez opłat w monetach"
+      },
+      "photo": {
+        "title": "Skaner Zdjęć Posiłków AI",
+        "desc": "Natychmiastowe rozpoznawanie kalorii i makroskładników ze zdjęć"
+      },
+      "describe": {
+        "title": "Opisywanie Posiłków Słowami",
+        "desc": "Wpisz co zjadłeś i otrzymaj natychmiastowe oszacowanie"
+      },
+      "clarify": {
+        "title": "Inteligentne Doprecyzowanie AI",
+        "desc": "Dopasuj składniki, wielkość porcji, oleje i dodatki"
+      },
+      "shield": {
+        "title": "Bonusowa Ochrona Serii",
+        "desc": "Dodatkowe tarcze chroniące Twoją systematyczność"
+      },
+      "badge": {
+        "title": "Ekskluzywna Odznaka Profilu Pro",
+        "desc": "Wyróżnij swój profil złotymi akcentami statusu Pro"
+      }
+    }
+  },
+  "insufficientCoins": {
+    "title": "Wymagane {{count}} monet",
+    "subtitle": "Rozpoznawanie posiłków przez AI kosztuje {{count}} monet za skan na darmowym koncie.",
+    "yourBalance": "TWOJE MONETY",
+    "required": "WYMAGANE",
+    "logManually": "DODAJ RĘCZNIE (BEZPŁATNIE)"
+  },
+  "settings": {
+    "title": "Ustawienia",
+    "account": "Konto",
+    "preferences": "Preferencje",
+    "profile": "Profil",
+    "calorieGoal": "Cele Kalorii i Makro",
+    "bodyMeasurements": "Pomiary Ciała",
+    "language": "Język",
+    "languageModalTitle": "Wybierz Język",
+    "saveLanguage": "ZAPISZ JĘZYK",
+    "avatar": "Awatar",
+    "streakFlame": "Płomień Serii",
+    "theme": "Motyw",
+    "notifications": "Powiadomienia",
+    "mealReminders": "Przypomnienia o posiłkach",
+    "waterReminders": "Przypomnienia o wodzie",
+    "streakReminders": "Przypomnienia o serii",
+    "exportData": "Eksportuj Dane",
+    "weight": "Waga",
+    "height": "Wzrost",
+    "terms": "Regulamin Usługi",
+    "privacy": "Polityka Prywatności",
+    "logOut": "Wyloguj się",
+    "deleteAccount": "Usuń Konto",
+    "appVersion": "Kalori v1.0.0",
+    "kaloriPro": "Kalori Pro",
+    "proActive": "PRO Member · Wysoki limit AI",
+    "freePlanCoins": "Plan darmowy · 50 za skan AI",
+    "profileSettings": "Ustawienia Profilu",
+    "goalsTargets": "Cele Kalorii i Makroskładników",
+    "bodyStats": "Wymiary Ciała",
+    "app": "Aplikacja",
+    "replayTutorial": "Odtwórz Samouczek",
+    "replayTutorialSub": "Interaktywny przewodnik po funkcjach",
+    "privacyPolicy": "Polityka Prywatności",
+    "termsOfService": "Regulamin Usługi",
+    "timezone": "Strefa Czasowa",
+    "measurementSystem": "Jednostki Miar",
+    "exportMyData": "Eksportuj Moje Dane",
+    "exportDesc": "Wybierz co chcesz wyeksportować. Dane zostaną pobrane jako CSV.",
+    "mealLogs": "Dziennik Posiłków",
+    "statistics": "Statystyki",
+    "profileData": "Dane Profilu",
+    "exportButton": "EKSPORTUJ DANE",
+    "exporting": "EKSPORTOWANIE...",
+    "downloaded": "POBRANO",
+    "profilePictures": "Zdjęcia Profilowe",
+    "streakFlameColors": "Kolory Płomienia Serii",
+    "themes": "Motywy",
+    "applyTheme": "ZASTOSUJ MOTYW",
+    "applyAvatar": "USTAW AWATAR",
+    "applyFlame": "USTAW PŁOMIEŃ",
+    "applied": "USTAWIONO",
+    "logOutSub": "Możesz zalogować się ponownie w każdej chwili. Twoje dane są bezpieczne.",
+    "deleteAccountSub": "To trwale usunie Twoje konto i wszystkie dane. Ta operacja jest nieodwracalna.",
+    "whatWillBeDeleted": "Co zostanie usunięte",
+    "deleteItemMeals": "Wszystkie wpisy posiłków",
+    "deleteItemProgress": "Postęp w grze i punkty XP",
+    "deleteItemStats": "Pomiary ciała i cele",
+    "deleteItemAccount": "Konto i profil",
+    "typeDeleteToConfirm": "Wpisz USUŃ lub DELETE aby potwierdzić",
+    "deleteButton": "USUŃ KONTO",
+    "deleting": "USUWANIE...",
+    "saveChanges": "ZAPISZ ZMIANY",
+    "saving": "ZAPISYWANIE...",
+    "saveTimezone": "ZAPISZ STREFĘ",
+    "saveSystem": "ZAPISZ JEDNOSTKI"
+  },
+  "stats": {
+    "title": "Statystyki",
+    "overview": "Przegląd",
+    "weightLog": "Dziennik Wagi",
+    "calorieIntake": "Spożycie Kalorii",
+    "macroSplit": "Podział Makro",
+    "macroSplitAvg": "Podział Makro (średnia)",
+    "logWeight": "DODAJ WAGĘ",
+    "avgCalories": "Średnie Kalorie",
+    "totalDeficit": "Łączny Deficyt",
+    "totalSurplus": "Łączna Nadwyżka",
+    "daysOnGoal": "Dni z Celem",
+    "proteinAvg": "Średnie Białko",
+    "kcalPerDay": "kcal/dzień",
+    "kcalTotal": "kcal łącznie",
+    "ofDays_7": "z 7 dni",
+    "ofDays_30": "z 30 dni",
+    "ofDays_90": "z 90 dni",
+    "gOf": "g z {{target}}g",
+    "logWeightTitle": "Zapisz Wagę",
+    "logWeightSubtitle": "Zapisz pomiar wagi, aby śledzić postępy w czasie.",
+    "date": "Data",
+    "weight": "Waga",
+    "saveWeight": "ZAPISZ WAGĘ",
+    "weightLoggedSuccess": "Waga zapisana pomyślnie!",
+    "goalsUpdated": "Cele zaktualizowane",
+    "days7": "7D",
+    "days30": "30D",
+    "days90": "90D",
+    "year1": "1R",
+    "all": "WSZ"
+  },
+  "game": {
+    "level": "Poziom",
+    "xp": "XP",
+    "streak": "Aktualna Seria",
+    "streakShield": "Osłony",
+    "achievements": "Osiągnięcia",
+    "viewAll": "Zobacz wszystkie →",
+    "done": "Ukończone"
+  },
+  "quests": {
+    "activeQuests": "Aktywne Zadania",
+    "questsLocked": "Zadania Zablokowane",
+    "questsLockedSub": "Osiągnij Poziom 2, aby odblokować zadania dzienne i tygodniowe",
+    "daily": "Dzienne",
+    "weekly": "Tygodniowe",
+    "rerollTitle": "Wylosuj nowe zadanie za {{cost}} monet"
+  },
+  "quests_data": {
+    "1": { "name": "Zapisz 3 posiłki dzisiaj", "desc": "Zapisz co najmniej 3 posiłki z kaloriami dzisiaj." },
+    "2": { "name": "Wypij 2.5L wody", "desc": "Zapisz co najmniej 2.5 litra wody dzisiaj." },
+    "3": { "name": "Osiągnij cel białkowy", "desc": "Osiągnij swój dzienny cel białka." },
+    "4": { "name": "Zapisz śniadanie", "desc": "Zapisz dzisiejsze śniadanie." },
+    "5": { "name": "Nie przekraczaj kalorii", "desc": "Utrzymaj kalorie poniżej dziennego celu." },
+    "7": { "name": "Zapisz 5 posiłków w tym tygodniu", "desc": "Zapisz co najmniej 5 posiłków w tym tygodniu." },
+    "8": { "name": "Pij wodę przez 7 dni", "desc": "Zapisuj wodę każdego dnia przez tydzień." },
+    "9": { "name": "Białkowa seria 5 dni", "desc": "Osiągnij cel białka przez 5 dni w tym tygodniu." },
+    "11": { "name": "Zapisz 10 posiłków", "desc": "Zapisz co najmniej 10 posiłków w tym tygodniu." },
+    "12": { "name": "Zapisz wodę 10 razy", "desc": "Zapisz wodę 10 razy w tym tygodniu." },
+    "13": { "name": "Mistrz białka 10 dni", "desc": "Osiągnij cel białka 10 razy." },
+    "18": { "name": "Mistrz nawodnienia", "desc": "Zapisz co najmniej 3 litry wody 7 razy." },
+    "19": { "name": "Regularność białkowa", "desc": "Osiągnij cel białka 5 razy." },
+    "20": { "name": "Codzienny posiłek", "desc": "Zapisz dowolny posiłek dzisiaj." },
+    "21": { "name": "Poranne nawodnienie", "desc": "Zapisz wodę przed południem." },
+    "23": { "name": "Tydzień posiłków", "desc": "Zapisuj posiłek każdego dnia przez tydzień." },
+    "24": { "name": "Tydzień wody", "desc": "Track your water intake every day for a week." },
+    "25": { "name": "Tydzień białka", "desc": "Osiągaj cel białka każdego dnia przez tydzień." },
+    "27": { "name": "Planowanie posiłków", "desc": "Zapisz 10 posiłków w tym tygodniu." },
+    "28": { "name": "Planowanie nawodnienia", "desc": "Zapisz wodę 10 razy w tym tygodniu." },
+    "29": { "name": "Planowanie białka", "desc": "Zapisz 10 wysokobiałkowych posiłków w tym tygodniu." }
+  },
+  "achievements_data": {
+    "1": { "name": "Pierwszy Posiłek", "desc": "Zapisz swój pierwszy posiłek i rozpocznij podróż." },
+    "2": { "name": "Trzy Dni z Rzędu", "desc": "Zapisuj posiłki przez 3 kolejne dni." },
+    "3": { "name": "Seria 5 Dni", "desc": "Utrzymaj serię zapisywania przez 5 dni." },
+    "4": { "name": "Tygodniowy Wojownik", "desc": "Osiągnij serię 7 dni zapisywania." },
+    "5": { "name": "Dwa Tygodnie Dyscypliny", "desc": "Utrzymaj regularność przez 14 kolejnych dni." },
+    "6": { "name": "Miesięczny Pęd", "desc": "Zapisuj codziennie cokolwiek przez 30 dni." },
+    "7": { "name": "Śledzący Kalorie", "desc": "Zapisz łącznie 25 posiłków." },
+    "8": { "name": "Planista Posiłków", "desc": "Zapisz łącznie 50 posiłków." },
+    "9": { "name": "Świadomy Makro", "desc": "Sprawdź makro w 10 różnych dniach." },
+    "10": { "name": "Dni Nawodnienia", "desc": "Zapisuj wodę w 10 różnych dniach." },
+    "12": { "name": "Zdobywca Celu", "desc": "Utrzymaj cel kaloryczny przez 7 kolejnych dni." },
+    "13": { "name": "Początkujący w Zadaniach", "desc": "Ukończ 3 zadania." },
+    "14": { "name": "Łowca Zadań", "desc": "Ukończ 5 zadań." },
+    "15": { "name": "Mistrz Zadań", "desc": "Ukończ 10 zadań." },
+    "16": { "name": "Kolekcjoner XP", "desc": "Zdobądź łącznie 1 000 XP." },
+    "17": { "name": "Nowy Poziom", "desc": "Osiągnij poziom 5." },
+    "18": { "name": "Budowniczy Nawyków", "desc": "Korzystaj z aplikacji przez 20 różnych dni." },
+    "19": { "name": "Król Regularności", "desc": "Zapisuj posiłki łącznie przez 60 dni." },
+    "20": { "name": "Legendarna Dyscyplina", "desc": "Utrzymaj 90-dniowy nawyk śledzenia." }
+  },
+  "shop": {
+    "title": "Sklep",
+    "avatars": "Awatary",
+    "profilePictures": "Zdjęcia Profilowe",
+    "streakFlames": "Płomienie Serii",
+    "streakFlameColors": "Kolory Płomienia Serii",
+    "themes": "Motywy",
+    "upgrades": "Ulepszenia Stałe",
+    "other": "Inne",
+    "streakShield": "Osłona Serii",
+    "streakShieldSub": "Chroni Twoją serię przed 1 opuszczonym dniem. Aktywuje się automatycznie.",
+    "howItWorks": "Jak to działa",
+    "howItWorksSub": "Jeśli pominiesz dzień, osłona aktywuje się i utrzyma Twoją serię.",
+    "active": "Aktywny",
+    "owned": "Posiadane",
+    "permanentlyActive": "AKTYWNE NA STAŁE",
+    "unlocksAtLevel": "ODBLOKOWUJE SIĘ NA POZIOMIE {{level}}",
+    "lvlRequired": "Wymagany {{lock}}",
+    "coinsCount": "{{price}} MONET",
+    "insufficientCoins": "Niewystarczająca liczba monet",
+    "getCoins": "Zdobądź Monety"
+  },
+  "notifs": {
+    "targetReached": "Cel Osiągnięty",
+    "questComplete": "Zadanie Ukończone",
+    "achievementUnlocked": "Osiągnięcie Odblokowane",
+    "levelUp": "Nowy Poziom!",
+    "reached": "osiągnięty",
+    "streakMilestone": "Kamień Milowy Serii",
+    "streakDays_one": "{{count}} dzień!",
+    "streakDays_few": "{{count}} dni!",
+    "streakDays_many": "{{count}} dni!",
+    "streakDays_other": "{{count}} dni!",
+    "notEnoughCoins": "Za mało monet",
+    "unlockedItem": "Odblokowano {{name}}!",
+    "unlockedTheme": "Odblokowano motyw {{name}}!",
+    "purchasedShields": "Kupiono {{qty}} osłonę/osłon serii!",
+    "purchaseFailed": "Zakup nie powiódł się."
+  },
+  "addMeal": {
+    "describeTitle": "Opis posiłku",
+    "describeSub": "Opisz własnymi słowami co zjadłeś. Nasza sztuczna inteligencja oszacuje kalorie i makroskładniki.",
+    "describePlaceholder": "np. Grillowany łosoś z ryżem i warzywami na parze",
+    "analyzeMeal": "PRZEANALIZUJ POSIŁEK",
+    "photoTitle": "Skanuj posiłek",
+    "photoSub": "Zrób zdjęcie lub prześlij grafikę swojego dania.",
+    "manualTitle": "Ręczne dodawanie posiłku",
+    "mealName": "Nazwa posiłku",
+    "mealNamePlaceholder": "np. Sałatka z kurczakiem",
+    "calories": "Kalorie",
+    "protein": "Białko",
+    "carbs": "Węglowodany",
+    "fat": "Tłuszcze",
+    "type": "Typ posiłku",
+    "time": "Godzina",
+    "saveMeal": "DODAJ POSIŁEK",
+    "confirmTitle": "Potwierdź posiłek",
+    "stepReading": "Odczytywanie opisu...",
+    "stepSearching": "Przeszukiwanie bazy...",
+    "stepEstimating": "Szacowanie kalorii...",
+    "stepCalculating": "Obliczanie makroskładników...",
+    "optionsDescribe": "Opis przez AI",
+    "optionsDescribeSub": "Wpisz lub podyktuj posiłek",
+    "optionsPhoto": "Skan ze zdjęcia",
+    "optionsPhotoSub": "Zrób zdjęcie posiłku",
+    "optionsManual": "Wpis ręczny",
+    "optionsManualSub": "Wpisz kalorie i makro samemu"
+  },
+  "auth": {
+    "welcomeBack": "Witaj ponownie",
+    "signInSub": "Zaloguj się, aby kontynuować śledzenie kalorii",
+    "createAccount": "Utwórz konto",
+    "signUpSub": "Dołącz do Kalori, aby śledzić posiłki i dbać o zdrowie",
+    "email": "E-mail",
+    "emailPlaceholder": "twoj@email.com",
+    "password": "Hasło",
+    "passwordPlaceholder": "••••••••",
+    "signIn": "ZALOGUJ SIĘ",
+    "signUp": "UTWÓRZ KONTO",
+    "forgotPassword": "Nie pamiętasz hasła?",
+    "noAccount": "Nie masz jeszcze konta?",
+    "haveAccount": "Masz już konto?",
+    "resetPassword": "Zresetuj hasło",
+    "sendResetLink": "WYŚLIJ LINK"
+  },
+  "tutorial": {
+    "skip": "Pomiń samouczek",
+    "next": "Dalej",
+    "back": "Wstecz",
+    "done": "Gotowe!",
+    "close": "Rozumiem",
+    "calorieRingTitle": "Twój Dzienny Cel",
+    "calorieRingContent": "Ten pierścień pokazuje ile kalorii zjadłeś w porównaniu z dziennym celem. Utrzymuj się w zielonej strefie!",
+    "macroBarsTitle": "Rozkład Makroskładników",
+    "macroBarsContent": "Śledź spożycie białka, węglowodanów i tłuszczów w odniesieniu do swoich celów.",
+    "addMealBtnTitle": "Dodaj Posiłek",
+    "addMealBtnContent": "Dotknij tutaj, aby dodać to co zjadłeś. Możesz opisać posiłek słowami, zrobić zdjęcie lub wpisać wartości ręcznie.",
+    "mealsListTitle": "Twoje Posiłki",
+    "mealsListContent": "Wszystkie zapisane posiłki pojawiają się tutaj, podzielone na Śniadanie, Obiad, Kolację i Przekąski. Dotknij posiłku, aby go edytować lub dodać do ulubionych.",
+    "waterTrackerTitle": "Licznik Wody",
+    "waterTrackerContent": "Dbaj o nawodnienie! Skorzystaj z przycisków szybkiego dodawania lub wpisz własną ilość.",
+    "streakBadgeTitle": "Twoja Seria Dni",
+    "streakBadgeContent": "Zapisuj posiłki każdego dnia, aby budować serię. Nie przerywaj łańcucha!",
+    "navGameTitle": "Poziomy i Zadania",
+    "navGameContent": "Zdobywaj punkty XP za dodawanie posiłków, osiągaj kamienie milowe i wykonuj codzienne zadania za monety.",
+    "navShopTitle": "Sklep",
+    "navShopContent": "Wydawaj zdobyte monety na awatary, kolory płomienia serii, motywy i ulepszenia."
+  },
+  "privacy": {
+    "title": "Polityka Prywatności",
+    "lastUpdated": "Ostatnia aktualizacja: Sierpień 2026",
+    "sections": [
+      {
+        "title": "1. Przegląd i Zobowiązanie",
+        "content": [
+          "Kalori („my”, „nas” lub „nasz”) zobowiązuje się do ochrony Twojej prywatności i danych zdrowotnych. Niniejsza Polityka Prywatności wyjaśnia, jakie informacje gromadzimy, w jaki sposób je przetwarzamy i przechowujemy oraz jakie prawa przysługują Ci w stosunku do Twoich danych.",
+          "NIE sprzedajemy, nie wynajmujemy, nie handlujemy ani nie spieniężamy Twoich danych zdrowotnych pośrednikom danych, reklamodawcom ani podmiotom trzecim."
+        ]
+      },
+      {
+        "title": "2. Informacje, które gromadzimy",
+        "content": [
+          "• Informacje o koncie: Adres e-mail i identyfikatory uwierzytelniania podczas rejestracji.",
+          "• Wpisy dietetyczne i żywieniowe: Zapisane posiłki, nazwy dań, wartości makroskładników (kalorie, białko, węglowodany, tłuszcze) oraz spożycie wody.",
+          "• Parametry ciała i cele: Cele kaloryczne, cele makro, waga ciała, wzrost, poziom aktywności oraz płeć (zgodnie z Twoimi ustawieniami).",
+          "• Postępy w grywalizacji: Serie dni, zdobyte punkty XP, postęp poziomów, przedmioty w ekwipunku (osłony, motywy) i osiągnięcia.",
+          "• Dane techniczne: Lokalna strefa czasowa, preferencje urządzenia (np. wybrany motyw) i dzienniki diagnostyczne błędów."
+        ]
+      },
+      {
+        "title": "3. W jaki sposób wykorzystujemy Twoje dane",
+        "content": [
+          "Przetwarzamy Twoje dane wyłącznie w celu:",
+          "• Zapewnienia podstawowych funkcji aplikacji (obliczanie dziennego bilansu kalorii, rozkładu makroskładników, średnich historycznych i serii dni).",
+          "• Bezpiecznej synchronizacji Twoich posiłków i postępów pomiędzy wszystkimi Twoimi urządzeniami.",
+          "• Szacowania wartości odżywczych przy korzystaniu z wprowadzania posiłków przez AI (tekst lub zdjęcie).",
+          "• Utrzymania bezpieczeństwa, integralności i stabilności naszej infrastruktury."
+        ]
+      },
+      {
+        "title": "4. Analiza tekstu i zdjęć przez AI",
+        "content": [
+          "Kiedy przesyłasz zdjęcie lub opis posiłku do oszacowania, obraz/tekst jest przetwarzany ulotnie i wyłącznie w celu rozpoznania produktów i oszacowania makroskładników.",
+          "Zdjęcia i opisy posiłków NIE są wykorzystywane do trenowania publicznych modeli uczenia maszynowego ani archiwizowane w celach reklamowych."
+        ]
+      },
+      {
+        "title": "5. Przechowywanie danych i bezpieczeństwo",
+        "content": [
+          "Twoje dane są bezpiecznie przechowywane w infrastrukturze chmurowej Supabase (PostgreSQL) z szyfrowaniem podczas przesyłania (HTTPS/TLS) oraz szyfrowaniem w spoczynku.",
+          "Stosujemy zasady zabezpieczeń na poziomie wierszy (RLS) w bazie danych, gwarantując, że wyłącznie Twoje uwierzytelnione konto może odczytywać, zapisywać lub modyfikować Twoje prywatne wpisy i statystyki."
+        ]
+      },
+      {
+        "title": "6. Udostępnianie danych podmiotom trzecim",
+        "content": [
+          "Udostępniamy dane wyłącznie zaufanym dostawcom infrastruktury niezbędnym do działania Aplikacji (np. Supabase do bazy danych i uwierzytelniania). Wszyscy dostawcy podlegają rygorystycznym zobowiązaniom w zakresie poufności i bezpieczeństwa danych.",
+          "Nie integrujemy zewnętrznych skryptów śledzących reklamy ani nie sprzedajemy danych osobowych."
+        ]
+      },
+      {
+        "title": "7. Prawa użytkownika i usuwanie danych (RODO / GDPR)",
+        "content": [
+          "Masz pełną kontrolę nad swoimi danymi osobowymi, w tym prawo do:",
+          "• Dostępu i wglądu: Przeglądania wszystkich swoich zapisanych posiłków, parametrów i postępów w aplikacji.",
+          "• Sprostowania: Edycji lub aktualizacji dowolnego wcześniejszego posiłku, celu makro lub danych profilu.",
+          "• Trwałego usunięcia: Natychmiastowego i trwałego usunięcia swojego konta i wszystkich powiązanych wpisów w bazie bezpośrednio w Ustawienia → Usuń Konto."
+        ]
+      },
+      {
+        "title": "8. Przechowywanie danych",
+        "content": [
+          "Przechowujemy Twoje dane tylko tak długo, jak długo Twoje konto pozostaje aktywne. Po usunięciu konta wszystkie powiązane rekordy w naszej bazie danych zostają natychmiast skasowane."
+        ]
+      },
+      {
+        "title": "9. Prywatność dzieci",
+        "content": [
+          "Aplikacja Kalori nie jest przeznaczona dla dzieci poniżej 13 roku życia. Nie gromadzimy świadomie danych osobowych dzieci poniżej 13 lat. W przypadku wykrycia takich danych zostaną one niezwłocznie usunięte."
+        ]
+      },
+      {
+        "title": "10. Zmiany w Polityce Prywatności",
+        "content": [
+          "Możemy od czasu do czasu aktualizować niniejszą Politykę Prywatności. Zaktualizowana wersja będzie oznaczona datą „Ostatnia aktualizacja” u góry strony."
+        ]
+      },
+      {
+        "title": "11. Kontakt",
+        "content": [
+          "W przypadku pytań dotyczących niniejszej Polityki Prywatności lub praw do danych, prosimy o kontakt pod adresem privacy@kalori.app."
+        ]
+      }
+    ]
+  },
+  "terms": {
+    "title": "Regulamin Usługi",
+    "lastUpdated": "Ostatnia aktualizacja: Sierpień 2026",
+    "sections": [
+      {
+        "title": "1. Akceptacja Warunków",
+        "content": [
+          "Uzyskując dostęp do aplikacji Kalori („Aplikacja”, „my”, „nas” lub „nasz”), pobierając ją lub korzystając z niej, wyrażasz zgodę na przestrzeganie niniejszego Regulaminu Usługi („Regulamin”). Jeśli nie zgadzasz się z niniejszym Regulaminem, nie korzystaj z Aplikacji.",
+          "Musisz mieć co najmniej 13 lat (lub ukończony minimalny wiek zgody cyfrowej w Twojej jurysdykcji), aby utworzyć konto i korzystać z Kalori."
+        ]
+      },
+      {
+        "title": "2. Zastrzeżenie Medyczne i Zdrowotne",
+        "content": [
+          "Kalori jest narzędziem informacyjnym i edukacyjnym służącym do samodzielnego śledzenia diety, makroskładników, nawodnienia i powiązanych parametrów fitness. Kalori NIE jest wyrobem medycznym, podmiotem leczniczym ani usługą diagnostyki medycznej.",
+          "Żadna treść, kalkulacja ani zalecenie w Aplikacji nie stanowi profesjonalnej porady medycznej, diagnozy klinicznej, leczenia ani recepty dietetycznej. Zawsze skonsultuj się z wykwalifikowanym lekarzem lub dietetykiem przed rozpoczęciem jakiejkolwiek diety, deficytu/nadwyżki kalorycznej lub planu treningowego.",
+          "Przyjmujesz do wiadomości, że poleganie na obliczeniach lub informacjach dostarczanych przez Aplikację odbywa się wyłącznie na Twoje własne ryzyko."
+        ]
+      },
+      {
+        "title": "3. Konta Użytkowników i Bezpieczeństwo",
+        "content": [
+          "Aby uzyskać dostęp do wybranych funkcji, musisz utworzyć konto, podając prawidłowy adres e-mail i bezpieczne hasło. Zgadzasz się podawać dokładne i aktualne informacje.",
+          "Ponosisz wyłączną odpowiedzialność za zachowanie poufności swoich danych logowania oraz za wszelkie działania podejmowane na Twoim koncie. Poinformuj nas niezwłocznie o podejrzeniu nieautoryzowanego dostępu."
+        ]
+      },
+      {
+        "title": "4. Analiza Żywności przez AI i Szacowanie Makro",
+        "content": [
+          "Kalori oferuje funkcje wspomagane sztuczną inteligencją do analizy opisów posiłków i zdjęć w celu oszacowania wartości kalorycznych i odżywczych. Wartości te są przybliżeniami automatycznymi i nie powinny być traktowane jako laboratoryjnie dokładne analizy.",
+          "Wartości odżywcze mogą się różnić w zależności od wielkości porcji, sposobu przygotowania, składników i producenta. Użytkownik jest odpowiedzialny za weryfikację i ewentualną korektę zapisywanych wartości."
+        ]
+      },
+      {
+        "title": "5. Grywalizacja i Przedmioty Wirtualne",
+        "content": [
+          "Kalori zawiera elementy grywalizacji, takie jak serie dni, osłony serii, punkty doświadczenia (XP), poziomy i wirtualne monety.",
+          "Wirtualne monety, osłony serii i motywy wizualne nie mają realnej wartości pieniężnej, nie podlegają wymianie na waluty tradycyjne i nie mogą być przekazywane poza Aplikację. Zastrzegamy sobie prawo do zarządzania wirtualnymi przedmiotami według własnego uznania."
+        ]
+      },
+      {
+        "title": "6. Dozwolony Użytek i Zachowania Zabronione",
+        "content": [
+          "Zgadzasz się nie: (a) odtwarzać kodu źródłowego, dekompilować ani podejmować prób ekstrakcji kodu Aplikacji; (b) używać botów, scraperów ani exploitów; (c) omijać zabezpieczeń i mechanizmów uwierzytelniania; ani (d) korzystać z Aplikacji w jakimkolwiek celu niezgodnym z prawem."
+        ]
+      },
+      {
+        "title": "7. Własność Intelektualna",
+        "content": [
+          "Aplikacja, w tym projekt interfejsu, identyfikacja wizualna, kod oprogramowania i dokumentacja, stanowi wyłączną własność Kalori i jej licencjodawców, chronioną prawem własności intelektualnej."
+        ]
+      },
+      {
+        "title": "8. Wyłączenie Gwarancji i Ograniczenie Odpowiedzialności",
+        "content": [
+          "Aplikacja jest dostarczana w stanie „TAK JAK JEST” („AS IS”) i „W MIARĘ DOSTĘPNOŚCI” („AS AVAILABLE”), bez jakichkolwiek gwarancji, wyraźnych lub dorozumianych, w tym gwarancji przydatności do określonego celu, nieprzerwanego działania czy bezbłędnych obliczeń.",
+          "W maksymalnym zakresie dozwolonym przez prawo Kalori i jej operatorzy nie ponoszą odpowiedzialności za jakiekolwiek szkody pośrednie, uboczne, szczególne lub wynikowe wynikające z korzystania z Aplikacji."
+        ]
+      },
+      {
+        "title": "9. Rozwiązanie Umowy",
+        "content": [
+          "Możemy zawiesić lub zamknąć Twój dostęp do Aplikacji w dowolnym momencie w przypadku naruszenia niniejszego Regulaminu. Możesz w każdej chwili usunąć swoje konto w menu Ustawienia → Usuń Konto."
+        ]
+      },
+      {
+        "title": "10. Zmiany w Regulaminie",
+        "content": [
+          "Zastrzegamy sobie prawo do zmiany niniejszego Regulaminu w dowolnym momencie. Dalsze korzystanie z Aplikacji po wprowadzeniu zmian oznacza ich akceptację."
+        ]
+      },
+      {
+        "title": "11. Kontakt",
+        "content": [
+          "W przypadku pytań dotyczących niniejszego Regulaminu Usługi, prosimy o kontakt pod adresem support@kalori.app."
+        ]
+      }
+    ]
+  }
+}

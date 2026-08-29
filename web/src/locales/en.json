@@ -1,0 +1,675 @@
+{
+  "nav": {
+    "home": "HOME",
+    "add": "ADD",
+    "stats": "STATS",
+    "level": "LEVEL",
+    "shop": "SHOP",
+    "settings": "SETTINGS"
+  },
+  "common": {
+    "save": "SAVE",
+    "saving": "SAVING...",
+    "cancel": "CANCEL",
+    "edit": "EDIT",
+    "delete": "DELETE",
+    "continue": "CONTINUE",
+    "back": "BACK",
+    "close": "CLOSE",
+    "confirm": "CONFIRM",
+    "loading": "LOADING...",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "tomorrow": "Tomorrow",
+    "kcal": "kcal",
+    "grams": "g",
+    "liters": "L",
+    "ml": "ml",
+    "kg": "kg",
+    "lbs": "lbs",
+    "cm": "cm",
+    "ft": "ft",
+    "yrs": "yrs",
+    "required": "Required",
+    "error": "Error",
+    "success": "Success",
+    "info": "Info",
+    "done": "Done",
+    "level": "Level",
+    "xp": "XP",
+    "coins": "Coins",
+    "coins_count_one": "{{count}} coin",
+    "coins_count_other": "{{count}} coins",
+    "day_one": "{{count}} day",
+    "day_other": "{{count}} days",
+    "meal_one": "{{count}} meal",
+    "meal_other": "{{count}} meals"
+  },
+  "onboarding": {
+    "stepOf": "STEP {{current}} OF {{total}}",
+    "welcomeTitle": "Welcome to",
+    "welcomeSubtitle": "Track meals, hit your targets, and build lifelong healthy habits.",
+    "logMeals": "LOG MEALS EASILY",
+    "earnXP": "EARN XP & LEVEL UP",
+    "buildStreaks": "BUILD CONSISTENCY",
+    "getStarted": "GET STARTED",
+    "nameTitle": "What's your name?",
+    "nameSubtitle": "We'll use this to personalize your experience.",
+    "nameLabel": "YOUR NAME",
+    "namePlaceholder": "e.g. Alex",
+    "bodyTitle": "Body Metrics",
+    "bodySubtitle": "Used to calculate your personalized calorie & macro targets.",
+    "sexLabel": "Biological sex",
+    "male": "Male",
+    "female": "Female",
+    "weightUnitLabel": "Weight unit",
+    "heightUnitLabel": "Height unit",
+    "ageLabel": "Age",
+    "agePlaceholder": "e.g. 25",
+    "weightLabel": "Weight",
+    "weightPlaceholderKg": "e.g. 70",
+    "weightPlaceholderLbs": "e.g. 154",
+    "heightLabel": "Height",
+    "heightPlaceholderCm": "e.g. 175",
+    "heightPlaceholderFt": "e.g. 5.9",
+    "goalTitle": "What is your main goal?",
+    "goalSubtitle": "This helps us calculate your daily caloric balance.",
+    "goalLose": "Lose Weight",
+    "goalLoseSub": "Calorie deficit with steady, sustainable progress",
+    "goalMaintain": "Maintain Weight",
+    "goalMaintainSub": "Balanced intake to sustain your current body weight",
+    "goalGain": "Build Muscle / Gain",
+    "goalGainSub": "Calorie surplus with high protein for muscle growth",
+    "activityTitle": "Activity Level",
+    "activitySubtitle": "How active are you on a typical day?",
+    "actSedentary": "Sedentary",
+    "actSedentarySub": "Desk job, little to no regular exercise",
+    "actLight": "Lightly Active",
+    "actLightSub": "Light walking, 1-3 workouts per week",
+    "actModerate": "Moderately Active",
+    "actModerateSub": "Moderate exercise or sports 3-5 days/week",
+    "actActive": "Very Active",
+    "actActiveSub": "Hard exercise 6-7 days/week or physical job",
+    "dietTitle": "Diet Type",
+    "dietSubtitle": "We'll tailor your recommended macronutrient split.",
+    "dietBalanced": "Balanced",
+    "dietBalancedSub": "50% Carbs · 25% Protein · 25% Fat",
+    "dietHighProtein": "High Protein",
+    "dietHighProteinSub": "40% Protein · 35% Carbs · 25% Fat",
+    "dietLowCarb": "Low Carb",
+    "dietLowCarbSub": "40% Fat · 35% Protein · 25% Carbs",
+    "dietKeto": "Keto",
+    "dietKetoSub": "70% Fat · 25% Protein · 5% Carbs",
+    "targetsTitle": "Your Personalized Plan",
+    "targetsSubtitle": "Calculated based on your stats and goals. You can adjust these anytime.",
+    "dailyCalories": "DAILY CALORIE TARGET",
+    "waterTarget": "DAILY WATER GOAL",
+    "proteinTarget": "PROTEIN",
+    "carbsTarget": "CARBS",
+    "fatTarget": "FAT",
+    "finish": "START TRACKING",
+    "required": "This field is required",
+    "errorSex": "Please select your biological sex",
+    "errorAge": "Age must be between 13 and 120",
+    "errorWeightKg": "Weight must be between 20 and 300 kg",
+    "errorWeightLbs": "Weight must be between 44 and 660 lbs",
+    "errorHeightCm": "Height must be between 100 and 250 cm",
+    "errorHeightFt": "Height must be between 3.3 and 8.2 ft"
+  },
+  "home": {
+    "caloriesRemaining": "KCAL REMAINING",
+    "caloriesOver": "KCAL OVER",
+    "eaten": "Eaten",
+    "burned": "Burned",
+    "goal": "Goal",
+    "protein": "Protein",
+    "carbs": "Carbs",
+    "fat": "Fat",
+    "water": "Water Intake",
+    "waterDrinkGoal": "Drink {{goal}}ml water",
+    "logWater": "LOG WATER",
+    "quickAddWater": "+{{amount}}ml",
+    "breakfast": "Breakfast",
+    "lunch": "Lunch",
+    "dinner": "Dinner",
+    "snacks": "Snacks",
+    "noMealsLogged": "Nothing logged yet",
+    "todaysMeals": "Today's Meals",
+    "addMeal": "ADD MEAL",
+    "editMeal": "Edit Meal",
+    "deleteMeal": "Delete Meal",
+    "recentMeals": "Recent Meals",
+    "customWaterPlaceholder": "+ Custom"
+  },
+  "meal": {
+    "confirmMeal": "Confirm Meal",
+    "retake": "RETAKE",
+    "reviewAndAdjust": "Review and adjust before adding to your log.",
+    "mealType": "Meal Type",
+    "name": "Name",
+    "namePlaceholder": "e.g. Chicken & Rice",
+    "calories": "Calories",
+    "protein": "Protein",
+    "carbs": "Carbs",
+    "fat": "Fat",
+    "aiInsights": "AI INSIGHTS & REFINEMENT",
+    "confidence": "{{level}} Confidence",
+    "clarifyPlaceholder": "Clarify ingredients, portion, or preparation...",
+    "updatingEstimate": "UPDATING ESTIMATE...",
+    "refineEstimate": "REFINE ESTIMATE WITH AI",
+    "refineEstimateCost": "REFINE ESTIMATE WITH AI · {{cost}}",
+    "saving": "SAVING...",
+    "refining": "REFINING...",
+    "addMeal": "ADD MEAL",
+    "fave": "FAVE",
+    "unfave": "UNFAVE",
+    "editMeal": "Edit Meal",
+    "deleteMeal": "Delete Meal",
+    "deleteConfirm": "Are you sure you want to delete",
+    "deleteUndone": "This action cannot be undone.",
+    "saveChanges": "SAVE CHANGES",
+    "favorites": "Favorites",
+    "recentlyAdded": "Recently Added"
+  },
+  "pro": {
+    "upgradeToPro": "Upgrade to Kalori Pro",
+    "upgradeSub": "High-limit AI meal scanning with 0 coin cost",
+    "viewPro": "VIEW PRO ›",
+    "viewProPlans": "VIEW PRO PLANS",
+    "getKaloriPro": "Get Kalori Pro",
+    "highDailyLimit": "High daily limit (100 AI scans/day) with zero coin costs.",
+    "premiumMembership": "PREMIUM MEMBERSHIP",
+    "heroTitle": "Supercharge Your Nutrition",
+    "heroSub": "Unlock high-limit AI meal scanning, smart macro insights, and zero coin friction.",
+    "currentSub": "Current Subscription",
+    "plan": "Plan",
+    "expiresOn": "Expires On",
+    "renewsOn": "Renews On",
+    "dailyQuota": "Daily AI Quota",
+    "scansPerDay": "{{count}} scans / day",
+    "selectPlan": "Select Your Plan",
+    "everythingInPro": "Everything in Pro",
+    "comparisonTitle": "Free Tier vs. Kalori Pro",
+    "comparisonDesc": "Free accounts can use AI food scans anytime by spending 50 coins per scan. Upgrading to Pro gives you 100 scans/day with 0 coin costs.",
+    "subscribeFor": "SUBSCRIBE FOR {{price}}",
+    "cancelAnytime": "Cancel anytime in account settings · Secure recurring billing",
+    "unavailable": "Unavailable at the moment",
+    "plans": {
+      "1month": {
+        "name": "1 Month Pro",
+        "billingDesc": "Billed monthly. Cancel anytime."
+      },
+      "6months": {
+        "name": "6 Months Pro",
+        "billingDesc": "Billed every 6 months ($3.33/mo). Cancel anytime.",
+        "badge": "SAVE 33%"
+      }
+    },
+    "features": {
+      "scans": {
+        "title": "High Daily AI Scans",
+        "desc": "Up to 100 AI meal analyses per day with 0 coin cost"
+      },
+      "photo": {
+        "title": "AI Photo Food Scanner",
+        "desc": "Instant calorie and macro breakdown from any meal photo"
+      },
+      "describe": {
+        "title": "Natural Language Logging",
+        "desc": "Describe what you ate in plain text and get instant estimates"
+      },
+      "clarify": {
+        "title": "Smart AI Clarifications",
+        "desc": "Fine-tune ingredients, portions, cooking oils, and toppings"
+      },
+      "shield": {
+        "title": "Bonus Streak Protection",
+        "desc": "Extra streak safety shields to safeguard your consistency"
+      },
+      "badge": {
+        "title": "Exclusive Pro Profile Badge",
+        "desc": "Show off your Pro status with special gold accents"
+      }
+    }
+  },
+  "insufficientCoins": {
+    "title": "{{count}} Coins Required",
+    "subtitle": "AI meal detection costs {{count}} coins per scan for free tier accounts.",
+    "yourBalance": "YOUR BALANCE",
+    "required": "REQUIRED",
+    "logManually": "LOG MANUALLY (FREE)"
+  },
+  "settings": {
+    "title": "Settings",
+    "account": "Account",
+    "preferences": "Preferences",
+    "profile": "Profile",
+    "calorieGoal": "Calorie & Macro Targets",
+    "bodyMeasurements": "Body Measurements",
+    "language": "Language",
+    "languageModalTitle": "Select Language",
+    "saveLanguage": "SAVE LANGUAGE",
+    "avatar": "Avatar",
+    "streakFlame": "Streak Flame",
+    "theme": "Theme",
+    "notifications": "Notifications",
+    "mealReminders": "Meal Reminders",
+    "waterReminders": "Water Reminders",
+    "streakReminders": "Streak Reminders",
+    "exportData": "Export Data",
+    "weight": "Weight",
+    "height": "Height",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "logOut": "Log Out",
+    "deleteAccount": "Delete Account",
+    "appVersion": "Kalori v1.0.0",
+    "kaloriPro": "Kalori Pro",
+    "proActive": "PRO Member · High Limit AI",
+    "freePlanCoins": "Free Plan · 50 per AI scan",
+    "profileSettings": "Profile Settings",
+    "goalsTargets": "Calorie & Macro Targets",
+    "bodyStats": "Body Measurements",
+    "app": "App",
+    "replayTutorial": "Replay Tutorial",
+    "replayTutorialSub": "Interactive tour of key features",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "timezone": "Timezone",
+    "measurementSystem": "Measurement System",
+    "exportMyData": "Export My Data",
+    "exportDesc": "Choose what to export. Data is downloaded as CSV.",
+    "mealLogs": "Meal Logs",
+    "statistics": "Statistics",
+    "profileData": "Profile Data",
+    "exportButton": "EXPORT DATA",
+    "exporting": "EXPORTING...",
+    "downloaded": "DOWNLOADED",
+    "profilePictures": "Profile Pictures",
+    "streakFlameColors": "Streak Flame Colors",
+    "themes": "Themes",
+    "applyTheme": "APPLY THEME",
+    "applyAvatar": "APPLY AVATAR",
+    "applyFlame": "APPLY FLAME",
+    "applied": "APPLIED",
+    "logOutSub": "You can log back in any time. Your data will be saved.",
+    "deleteAccountSub": "This will permanently delete your account and all data. This action cannot be undone.",
+    "whatWillBeDeleted": "What will be deleted",
+    "deleteItemMeals": "All meal logs",
+    "deleteItemProgress": "Game progress & XP",
+    "deleteItemStats": "Body stats & goals",
+    "deleteItemAccount": "Account & profile",
+    "typeDeleteToConfirm": "Type DELETE to confirm",
+    "deleteButton": "DELETE",
+    "deleting": "DELETING...",
+    "saveChanges": "SAVE CHANGES",
+    "saving": "SAVING...",
+    "saveTimezone": "SAVE TIMEZONE",
+    "saveSystem": "SAVE SYSTEM"
+  },
+  "stats": {
+    "title": "Stats",
+    "overview": "Overview",
+    "weightLog": "Weight Log",
+    "calorieIntake": "Calorie Intake",
+    "macroSplit": "Macro Split",
+    "macroSplitAvg": "Macro Split (avg)",
+    "logWeight": "LOG WEIGHT",
+    "avgCalories": "Avg Calories",
+    "totalDeficit": "Total Deficit",
+    "totalSurplus": "Total Surplus",
+    "daysOnGoal": "Days On Goal",
+    "proteinAvg": "Protein Avg",
+    "kcalPerDay": "kcal/day",
+    "kcalTotal": "kcal total",
+    "ofDays_7": "of 7 days",
+    "ofDays_30": "of 30 days",
+    "ofDays_90": "of 90 days",
+    "gOf": "g of {{target}}g",
+    "logWeightTitle": "Log Weight",
+    "logWeightSubtitle": "Record your weigh-in to track progress over time.",
+    "date": "Date",
+    "weight": "Weight",
+    "saveWeight": "SAVE WEIGHT",
+    "weightLoggedSuccess": "Weight logged successfully!",
+    "goalsUpdated": "Goals updated",
+    "days7": "7D",
+    "days30": "30D",
+    "days90": "90D",
+    "year1": "1Y",
+    "all": "ALL"
+  },
+  "game": {
+    "level": "Level",
+    "xp": "XP",
+    "streak": "Current Streak",
+    "streakShield": "Shields",
+    "achievements": "Achievements",
+    "viewAll": "View all →",
+    "done": "Done"
+  },
+  "quests": {
+    "activeQuests": "Active Quests",
+    "questsLocked": "Quests Locked",
+    "questsLockedSub": "Reach Level 2 to unlock daily & weekly quests",
+    "daily": "Daily",
+    "weekly": "Weekly",
+    "rerollTitle": "Reroll quest for {{cost}} coins"
+  },
+  "quests_data": {
+    "1": { "name": "Log 3 meals today", "desc": "Log at least 3 meals with calories today." },
+    "2": { "name": "Drink 2.5L water", "desc": "Track at least 2.5 liters of water today." },
+    "3": { "name": "Hit protein goal", "desc": "Reach your daily protein target." },
+    "4": { "name": "Track breakfast", "desc": "Log your breakfast for the day." },
+    "5": { "name": "Stay under calorie goal", "desc": "Keep your total calories under your daily target." },
+    "7": { "name": "Log 5 meals this week", "desc": "Log at least 5 meals over the course of the week." },
+    "8": { "name": "Drink water 7 days", "desc": "Track your water intake every day for a week." },
+    "9": { "name": "Protein streak 5 days", "desc": "Hit your protein goal 5 days this week." },
+    "11": { "name": "Log 10 meals", "desc": "Log at least 10 meals this week." },
+    "12": { "name": "Track water 10 times", "desc": "Track your water intake 10 times this week." },
+    "13": { "name": "Protein master 10 days", "desc": "Hit your protein goal 10 times." },
+    "18": { "name": "Water champion", "desc": "Track at least 3 liters of water 7 times." },
+    "19": { "name": "Protein consistency", "desc": "Hit your protein goal 5 times." },
+    "20": { "name": "Daily logger", "desc": "Log any meal today." },
+    "21": { "name": "Morning hydration", "desc": "Track water before noon today." },
+    "23": { "name": "Meal streak 7", "desc": "Log a meal every day for a week." },
+    "24": { "name": "Water streak 7", "desc": "Track your water intake every day for a week." },
+    "25": { "name": "Protein streak 7", "desc": "Hit your protein goal every day for a week." },
+    "27": { "name": "Meal planner", "desc": "Log 10 meals this week." },
+    "28": { "name": "Hydration planner", "desc": "Track water 10 times this week." },
+    "29": { "name": "Protein planner", "desc": "Log 10 protein-rich meals this week." }
+  },
+  "achievements_data": {
+    "1": { "name": "First Log", "desc": "Log your first meal and start the journey." },
+    "2": { "name": "Three in a Row", "desc": "Log meals for 3 consecutive days." },
+    "3": { "name": "Five Day Streak", "desc": "Keep your logging streak alive for 5 days." },
+    "4": { "name": "Week Warrior", "desc": "Hit a 7-day logging streak." },
+    "5": { "name": "Two Week Grind", "desc": "Stay consistent for 14 straight days." },
+    "6": { "name": "Monthly Momentum", "desc": "Log something every day for 30 days." },
+    "7": { "name": "Calorie Tracker", "desc": "Log 25 meals in total." },
+    "8": { "name": "Meal Planner", "desc": "Reach 50 total meal logs." },
+    "9": { "name": "Macro Minded", "desc": "Check your macros on 10 different days." },
+    "10": { "name": "Hydration Days", "desc": "Track your water intake on 10 different days." },
+    "12": { "name": "Goal Getter", "desc": "Stay within your calorie goal for 7 consecutive days." },
+    "13": { "name": "Quest Starter", "desc": "Complete 3 quests." },
+    "14": { "name": "Quest Hunter", "desc": "Complete 5 quests." },
+    "15": { "name": "Quest Master", "desc": "Complete 10 quests." },
+    "16": { "name": "XP Collector", "desc": "Earn 1,000 XP total." },
+    "17": { "name": "Level Up", "desc": "Reach level 5." },
+    "18": { "name": "Routine Builder", "desc": "Use the app for 20 separate days." },
+    "19": { "name": "Consistency King", "desc": "Log meals on 60 total days." },
+    "20": { "name": "Legendary Discipline", "desc": "Keep a 90-day tracking habit alive." }
+  },
+  "shop": {
+    "title": "Shop",
+    "avatars": "Avatars",
+    "profilePictures": "Profile Pictures",
+    "streakFlames": "Streak Flames",
+    "streakFlameColors": "Streak Flame Colors",
+    "themes": "Themes",
+    "upgrades": "Perma Upgrades",
+    "other": "Other",
+    "streakShield": "Streak Shield",
+    "streakShieldSub": "Protects your streak from 1 missed day. Activates automatically.",
+    "howItWorks": "How it works",
+    "howItWorksSub": "If you miss a day, a Shield activates and keeps your streak alive.",
+    "active": "Active",
+    "owned": "Owned",
+    "permanentlyActive": "PERMANENTLY ACTIVE",
+    "unlocksAtLevel": "UNLOCKS AT LEVEL {{level}}",
+    "lvlRequired": "{{lock}} required",
+    "coinsCount": "{{price}} COINS",
+    "insufficientCoins": "Insufficient Coins",
+    "getCoins": "Get Coins"
+  },
+  "notifs": {
+    "targetReached": "Target Reached",
+    "questComplete": "Quest Complete",
+    "achievementUnlocked": "Achievement Unlocked",
+    "levelUp": "Level Up!",
+    "reached": "reached",
+    "streakMilestone": "Streak Milestone",
+    "streakDays_one": "{{count}} day!",
+    "streakDays_other": "{{count}} days!",
+    "notEnoughCoins": "Not enough coins",
+    "unlockedItem": "Unlocked {{name}}!",
+    "unlockedTheme": "Unlocked {{name}} theme!",
+    "purchasedShields": "Purchased {{qty}} Streak Shield(s)!",
+    "purchaseFailed": "Purchase failed."
+  },
+  "addMeal": {
+    "describeTitle": "Describe Meal",
+    "describeSub": "Tell us what you ate in plain language. We'll estimate the calories and macros.",
+    "describePlaceholder": "e.g. Grilled salmon with rice and steamed vegetables",
+    "analyzeMeal": "ANALYZE MEAL",
+    "photoTitle": "Scan Meal",
+    "photoSub": "Take a photo or upload an image of your meal.",
+    "manualTitle": "Manual Add Meal",
+    "mealName": "Meal Name",
+    "mealNamePlaceholder": "e.g. Chicken salad",
+    "calories": "Calories",
+    "protein": "Protein",
+    "carbs": "Carbs",
+    "fat": "Fat",
+    "type": "Meal Type",
+    "time": "Time",
+    "saveMeal": "ADD MEAL",
+    "confirmTitle": "Confirm Meal",
+    "stepReading": "Reading description...",
+    "stepSearching": "Searching database...",
+    "stepEstimating": "Estimating calories...",
+    "stepCalculating": "Calculating macros...",
+    "optionsDescribe": "Describe with AI",
+    "optionsDescribeSub": "Type or dictate what you ate",
+    "optionsPhoto": "Photo Scan",
+    "optionsPhotoSub": "Snap a photo of your meal",
+    "optionsManual": "Manual Entry",
+    "optionsManualSub": "Enter calories & macros yourself"
+  },
+  "auth": {
+    "welcomeBack": "Welcome Back",
+    "signInSub": "Sign in to continue tracking your calories",
+    "createAccount": "Create Account",
+    "signUpSub": "Join Kalori to track meals and level up your health",
+    "email": "Email",
+    "emailPlaceholder": "you@example.com",
+    "password": "Password",
+    "passwordPlaceholder": "••••••••",
+    "signIn": "SIGN IN",
+    "signUp": "CREATE ACCOUNT",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Already have an account?",
+    "resetPassword": "Reset Password",
+    "sendResetLink": "SEND RESET LINK"
+  },
+  "tutorial": {
+    "skip": "Skip tour",
+    "next": "Next",
+    "back": "Back",
+    "done": "Done!",
+    "close": "Got it",
+    "calorieRingTitle": "Your Daily Goal",
+    "calorieRingContent": "This ring shows how many calories you've eaten vs your daily target. Stay in the green!",
+    "macroBarsTitle": "Macro Breakdown",
+    "macroBarsContent": "Track your protein, carbs, and fat intake against your goals here.",
+    "addMealBtnTitle": "Log a Meal",
+    "addMealBtnContent": "Tap here to log what you eat. You can describe it, snap a photo, or enter macros manually.",
+    "mealsListTitle": "Your Meals",
+    "mealsListContent": "All your logged meals appear here, grouped by Breakfast, Lunch, Dinner, and Snacks. Tap a meal to edit or favorite it.",
+    "waterTrackerTitle": "Water Tracker",
+    "waterTrackerContent": "Track your hydration! Use the quick-add buttons or enter a custom amount.",
+    "streakBadgeTitle": "Your Streak",
+    "streakBadgeContent": "Log meals every day to build your streak. Don't break the chain!",
+    "navGameTitle": "Level Up & Quests",
+    "navGameContent": "Earn XP by logging meals, hit milestones, and complete daily quests for coins.",
+    "navShopTitle": "The Shop",
+    "navShopContent": "Spend your coins on avatars, streak flames, themes, and power-ups."
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last updated: August 2026",
+    "sections": [
+      {
+        "title": "1. Overview & Commitment",
+        "content": [
+          "Kalori (\"we\", \"us\", or \"our\") is committed to safeguarding your personal privacy and health data. This Privacy Policy explains what information we collect, how we process and store it, and the rights you retain over your data.",
+          "We do NOT sell, rent, trade, or monetize your personal health data to data brokers, advertisers, or third parties."
+        ]
+      },
+      {
+        "title": "2. Information We Collect",
+        "content": [
+          "• Account Information: Email address and authentication identifiers when you register.",
+          "• Dietary & Nutritional Logs: Meal entries, meal names, custom macro inputs (calories, protein, carbs, fats), and water intake.",
+          "• Body Metrics & Targets: Calorie targets, target macros, body weight, height, activity level, and gender (as configured by you).",
+          "• Gamification Progress: Streaks, earned XP, level progression, inventory items (shields, themes), and quest achievements.",
+          "• Technical Data: Local timezone, device preferences (e.g. selected theme), and error diagnostic logs."
+        ]
+      },
+      {
+        "title": "3. How We Use Your Information",
+        "content": [
+          "We process your data exclusively to:",
+          "• Provide core application features (calculating daily caloric balance, macro splits, historical averages, and streaks).",
+          "• Synchronize your meal and gamification history securely across your devices.",
+          "• Estimate nutritional breakdown when you use AI-assisted text or photo food logging.",
+          "• Maintain the security, integrity, and performance of our infrastructure."
+        ]
+      },
+      {
+        "title": "4. AI Image & Text Analysis",
+        "content": [
+          "When you submit a meal photograph or text description for estimation, the image/text is processed ephemerally solely to identify food items and estimate macros.",
+          "Images and personal food descriptions are NOT used to train public machine learning models and are not permanently archived for advertising purposes."
+        ]
+      },
+      {
+        "title": "5. Data Storage & Security",
+        "content": [
+          "Your data is stored in cloud infrastructure powered by Supabase (PostgreSQL) with encryption in transit (HTTPS/TLS) and encryption at rest.",
+          "We utilize Row-Level Security (RLS) policies at the database layer to ensure that only your authenticated account can read, write, or modify your personal logs and statistics."
+        ]
+      },
+      {
+        "title": "6. Data Sharing & Third Parties",
+        "content": [
+          "We only share data with essential infrastructure service providers necessary to operate the Application (e.g., Supabase for database hosting and authentication). All providers are subject to strict data confidentiality and security obligations.",
+          "We do not integrate third-party advertising trackers or sell personal data."
+        ]
+      },
+      {
+        "title": "7. User Rights & Data Deletion (GDPR / CCPA)",
+        "content": [
+          "You have full control over your personal data, including the right to:",
+          "• Access & Review: View all your logged meals, metrics, and progress in the app.",
+          "• Rectification: Edit or update any past meal, macro target, or profile attribute.",
+          "• Permanent Erasure: Instantly and permanently delete your account and all associated database records directly within Settings → Delete Account."
+        ]
+      },
+      {
+        "title": "8. Data Retention",
+        "content": [
+          "We retain your data only for as long as your account remains active. When you delete your account, all associated records in our database are deleted immediately."
+        ]
+      },
+      {
+        "title": "9. Children's Privacy",
+        "content": [
+          "Kalori is not intended for children under 13 years of age. We do not knowingly collect personal information from children under 13. If we discover that a child under 13 has provided personal data, we will delete it immediately."
+        ]
+      },
+      {
+        "title": "10. Updates to this Policy",
+        "content": [
+          "We may update this Privacy Policy from time to time. The updated version will be indicated by the \"Last updated\" date at the top of this page."
+        ]
+      },
+      {
+        "title": "11. Contact Us",
+        "content": [
+          "For questions regarding this Privacy Policy or your personal data rights, contact us at privacy@kalori.app."
+        ]
+      }
+    ]
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "lastUpdated": "Last updated: August 2026",
+    "sections": [
+      {
+        "title": "1. Acceptance of Terms",
+        "content": [
+          "By accessing, downloading, or using Kalori (\"the Application\", \"we\", \"us\", or \"our\"), you agree to be bound by these Terms of Service (\"Terms\"). If you do not agree to these Terms, do not use the Application.",
+          "You must be at least 13 years old (or the applicable minimum age of digital consent in your jurisdiction) to create an account and use Kalori."
+        ]
+      },
+      {
+        "title": "2. Medical & Health Disclaimer",
+        "content": [
+          "Kalori is an informational and educational self-tracking tool designed to assist users in logging dietary intake, macronutrients, water consumption, and related fitness metrics. Kalori is NOT a medical device, healthcare provider, or medical diagnostic service.",
+          "No content, calculation, or recommendation provided within the Application constitutes professional medical advice, clinical diagnosis, treatment, or nutritional prescription. Always consult a qualified physician or registered dietitian before starting any diet, caloric deficit/surplus, or fitness routine.",
+          "You acknowledge that any reliance on calculations or information provided through the Application is strictly at your own risk."
+        ]
+      },
+      {
+        "title": "3. User Accounts & Security",
+        "content": [
+          "To access certain features, you must create an account with a valid email address and secure password. You agree to provide accurate, complete, and updated information.",
+          "You are solely responsible for maintaining the confidentiality of your login credentials and for all activities that occur under your account. Notify us immediately if you suspect unauthorized access."
+        ]
+      },
+      {
+        "title": "4. AI Food Analysis & Macro Estimation",
+        "content": [
+          "Kalori provides AI-assisted features for analyzing food descriptions and photos to estimate caloric and nutritional values. These figures are automated approximations and should not be relied upon as clinically accurate nutritional analyses.",
+          "Nutritional content may vary based on portion sizes, preparation methods, ingredients, and brand differences. You are responsible for reviewing and adjusting logged values as necessary."
+        ]
+      },
+      {
+        "title": "5. Gamification & Virtual Items",
+        "content": [
+          "Kalori includes gamification elements such as streaks, streak shields, experience points (XP), levels, and virtual coins.",
+          "Virtual coins, streak shields, and customizable themes have no real-world monetary value, cannot be redeemed for legal currency, and cannot be transferred outside the Application. We reserve the right to manage, regulate, modify, or eliminate virtual items at our sole discretion."
+        ]
+      },
+      {
+        "title": "6. Acceptable Use & Prohibited Conduct",
+        "content": [
+          "You agree not to: (a) reverse engineer, decompile, or attempt to extract source code from the Application; (b) use automated bots, scrapers, or exploits; (c) attempt to bypass authentication or security controls; or (d) use the Application for any unlawful or abusive purpose."
+        ]
+      },
+      {
+        "title": "7. Intellectual Property",
+        "content": [
+          "The Application, including its interface design, branding, visual identity, software code, and documentation, is the exclusive property of Kalori and its licensors, protected by intellectual property laws."
+        ]
+      },
+      {
+        "title": "8. Disclaimer of Warranties & Limitation of Liability",
+        "content": [
+          "The Application is provided on an \"AS IS\" and \"AS AVAILABLE\" basis without warranties of any kind, either express or implied, including fitness for a particular purpose, uninterrupted operation, or error-free calculations.",
+          "To the maximum extent permitted by law, Kalori and its operators shall not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of health data, profits, or goodwill arising out of your use of the Application."
+        ]
+      },
+      {
+        "title": "9. Termination",
+        "content": [
+          "We may suspend or terminate your access to the Application at any time, with or without notice, if you breach these Terms. You may terminate your account at any time via Settings → Delete Account."
+        ]
+      },
+      {
+        "title": "10. Changes to Terms",
+        "content": [
+          "We reserve the right to modify these Terms at any time. Material updates will be reflected with a revised \"Last Updated\" date. Continued use of the Application following updates constitutes acceptance of the new Terms."
+        ]
+      },
+      {
+        "title": "11. Contact",
+        "content": [
+          "If you have questions regarding these Terms of Service, please contact us at support@kalori.app."
+        ]
+      }
+    ]
+  }
+}

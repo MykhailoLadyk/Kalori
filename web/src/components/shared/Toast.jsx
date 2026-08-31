@@ -33,9 +33,30 @@ const CONFIGS = {
 
 function ToastContent({ notification }) {
   const { t } = useTranslation();
-  const { type, amount, name, level, days, xp, coins } = notification;
+  const { type, amount, name, level, days, xp, coins, id } = notification;
   const cfg = CONFIGS[type] ?? CONFIGS.info;
   const color = cfg.color;
+
+  const formatTargetName = (n) => {
+    if (!n) return n;
+    const lower = n.toLowerCase();
+    if (lower.includes("calorie") || lower.includes("kalorii")) return t("onboarding.dailyCalories");
+    if (lower.includes("water") || lower.includes("wody")) return t("onboarding.waterTarget");
+    if (lower.includes("protein") || lower.includes("białk")) return t("onboarding.proteinTarget");
+    if (lower.includes("carb") || lower.includes("węglowodan")) return t("onboarding.carbsTarget");
+    if (lower.includes("fat") || lower.includes("tłuszcz")) return t("onboarding.fatTarget");
+    return n;
+  };
+
+  const formatGenericToast = (n) => {
+    if (!n) return n;
+    if (n === "Goals updated") return t("stats.goalsUpdated");
+    if (n === "Weight logged successfully!") return t("stats.weightLoggedSuccess");
+    if (n === "User already registered") return t("auth.errorUserAlreadyRegistered");
+    if (n === "Invalid login credentials") return t("auth.errorInvalidCredentials");
+    if (n.includes("at least 6 characters")) return t("auth.errorPasswordLength");
+    return t(n, { defaultValue: n });
+  };
 
   // small pill for XP and coins
   if (type === "xp" || type === "coins" || type === "coins_deducted") {
@@ -61,6 +82,7 @@ function ToastContent({ notification }) {
 
   // target reached card
   if (type === "target") {
+    const targetDisplayName = formatTargetName(name);
     return (
       <div
         className="bg-panel"
@@ -79,7 +101,7 @@ function ToastContent({ notification }) {
           </Mono>
         </div>
         <div className="font-body font-semibold text-primary" style={{ fontSize: 12, marginBottom: 6 }}>
-          {name}
+          {targetDisplayName}
         </div>
         <div className="flex" style={{ gap: 8 }}>
           {xp && (
@@ -99,6 +121,7 @@ function ToastContent({ notification }) {
 
   // success / error / info / pro generic toast
   if (type === "success" || type === "error" || type === "info" || type === "pro") {
+    const message = formatGenericToast(name);
     return (
       <div
         className="flex items-center bg-panel"
@@ -112,7 +135,7 @@ function ToastContent({ notification }) {
       >
         <span className="flex" style={{ color }}><cfg.icon size={18} /></span>
         <span className="font-body font-semibold text-primary" style={{ fontSize: 13 }}>
-          {name || (type === "success" ? t("common.success") : type === "info" ? t("common.info") : type === "pro" ? "Kalori Pro" : t("common.error"))}
+          {message || (type === "success" ? t("common.success") : type === "info" ? t("common.info") : type === "pro" ? "Kalori Pro" : t("common.error"))}
         </span>
       </div>
     );
@@ -120,6 +143,7 @@ function ToastContent({ notification }) {
 
   // medium card for quest
   if (type === "quest") {
+    const questName = id ? t("quests_data." + id + ".name", { defaultValue: name }) : name;
     return (
       <div
         className="bg-panel"
@@ -137,7 +161,7 @@ function ToastContent({ notification }) {
             {t("notifs.questComplete")}
           </Mono>
         </div>
-        <div className="font-body font-semibold text-primary mb-2" style={{ fontSize: 12, marginBottom: 6 }}>{name}</div>
+        <div className="font-body font-semibold text-primary mb-2" style={{ fontSize: 12, marginBottom: 6 }}>{questName}</div>
         <div className="flex" style={{ gap: 8 }}>
           {xp && (
             <Mono size={8} color={C.accent}>
@@ -156,6 +180,7 @@ function ToastContent({ notification }) {
 
   // larger card for achievement
   if (type === "achievement") {
+    const achievementName = id ? t("achievements_data." + id + ".name", { defaultValue: name }) : name;
     return (
       <div
         className="bg-panel"
@@ -175,7 +200,7 @@ function ToastContent({ notification }) {
             {t("notifs.achievementUnlocked")}
           </Mono>
         </div>
-        <div className="font-body font-bold text-primary mb-1" style={{ fontSize: 13, marginBottom: 4 }}>{name}</div>
+        <div className="font-body font-bold text-primary mb-1" style={{ fontSize: 13, marginBottom: 4 }}>{achievementName}</div>
         {xp && (
           <Mono size={8} color={C.accent}>
             +{xp} XP

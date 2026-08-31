@@ -15,13 +15,13 @@ export default function MeasurementsModal({ handleClose }) {
   const SYSTEMS = [
     {
       key: "metric",
-      label: t("onboarding.systemMetric") || "Metric",
+      label: t("settings.metric"),
       sub: "kg, cm, ml",
       units: { weight: "kg", height: "cm", liquid: "ml" },
     },
     {
       key: "imperial",
-      label: t("onboarding.systemImperial") || "Imperial",
+      label: t("settings.imperial"),
       sub: "lbs, ft, fl oz",
       units: { weight: "lbs", height: "ft", liquid: "fl oz" },
     },

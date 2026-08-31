@@ -10,10 +10,12 @@ export default function StatsMacroSplit({ label, val, max: m, color, i }) {
       >
         <div
           style={{
-            width: 46,
+            width: 90,
+            flexShrink: 0,
             fontFamily: F.body,
             fontSize: 12,
             color: C.soft,
+            whiteSpace: "nowrap",
           }}
         >
           {label}

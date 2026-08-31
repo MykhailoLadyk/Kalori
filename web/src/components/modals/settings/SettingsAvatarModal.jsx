@@ -129,7 +129,7 @@ export default function SettingsAvatarModal({ handleClose }) {
                   marginBottom: 6,
                 }}
               >
-                {avatar.name}
+                {t("shop_items.avatars." + avatar.id + ".name", { defaultValue: avatar.name })}
               </div>
 
               {isSelected && <Tag color={C.accent}>{t("shop.active") || "Active"}</Tag>}

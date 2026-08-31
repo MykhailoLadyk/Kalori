@@ -115,13 +115,28 @@ export default function Login() {
     setMode(m);
   };
 
+  const formatAuthError = (msg) => {
+    if (!msg) return null;
+    const lower = msg.toLowerCase();
+    if (lower.includes("already registered") || lower.includes("already exists")) {
+      return t("auth.errorUserAlreadyRegistered");
+    }
+    if (lower.includes("invalid login credentials") || lower.includes("invalid credentials")) {
+      return t("auth.errorInvalidCredentials");
+    }
+    if (lower.includes("at least 6 characters") || lower.includes("password should be at least")) {
+      return t("auth.errorPasswordLength");
+    }
+    return msg;
+  };
+
   // ── Validation ───────────────────────────────────────────────
   const validate = () => {
     const e = {};
-    if (!email.trim()) e.email = "Required";
-    else if (!/\S+@\S+\.\S+/.test(email)) e.email = "Invalid email";
-    if (!isForgot && !password) e.password = "Required";
-    else if (!isForgot && password.length < 6) e.password = "Min 6 characters";
+    if (!email.trim()) e.email = t("auth.required");
+    else if (!/\S+@\S+\.\S+/.test(email)) e.email = t("auth.invalidEmail");
+    if (!isForgot && !password) e.password = t("auth.required");
+    else if (!isForgot && password.length < 6) e.password = t("auth.minPassword");
     return e;
   };
 
@@ -153,7 +168,7 @@ export default function Login() {
         // If email confirmation is disabled, data.session will exist and the auth listener handles the rest.
         // If it's enabled, data.session will be null.
         if (!data.session) {
-          setMessage("Check your email to confirm your account.");
+          setMessage(t("auth.checkEmailConfirmation"));
         }
       }
 
@@ -162,10 +177,10 @@ export default function Login() {
           redirectTo: `${window.location.origin}/reset-password`,
         });
         if (error) throw error;
-        setMessage("Password reset link sent — check your email.");
+        setMessage(t("auth.passwordResetSent"));
       }
     } catch (err) {
-      setAuthError(err.message);
+      setAuthError(formatAuthError(err.message));
     } finally {
       setLoading(false);
     }
@@ -183,7 +198,7 @@ export default function Login() {
       });
       if (error) throw error;
     } catch (err) {
-      setAuthError(err.message);
+      setAuthError(formatAuthError(err.message));
       setLoading(false);
     }
   };
@@ -238,9 +253,9 @@ export default function Login() {
             Kalori
           </div>
           <Mono size={8} color={C.muted} style={{ marginTop: 4, animation: "fadeUp 0.4s ease 0.15s both" }}>
-            {isLogin && "TRACK · LEVEL UP · IMPROVE"}
-            {isSignup && "START YOUR JOURNEY"}
-            {isForgot && "RECOVER YOUR ACCOUNT"}
+            {isLogin && t("auth.taglineLogin")}
+            {isSignup && t("auth.taglineSignup")}
+            {isForgot && t("auth.taglineForgot")}
           </Mono>
         </div>
 
@@ -363,7 +378,7 @@ export default function Login() {
                 type="password"
                 value={password}
                 onChange={setPassword}
-                placeholder={isSignup ? "Min 6 characters" : t("auth.passwordPlaceholder")}
+                placeholder={isSignup ? t("auth.minPassword") : t("auth.passwordPlaceholder")}
                 error={errors.password}
                 autoComplete={isSignup ? "new-password" : "current-password"}
               />
@@ -409,7 +424,7 @@ export default function Login() {
               <div className="flex items-center" style={{ gap: 12, margin: "20px 0 18px" }}>
                 <div style={{ flex: 1, height: 1, background: C.border }} />
                 <Mono size={8} color={C.muted}>
-                  OR
+                  {t("auth.or")}
                 </Mono>
                 <div style={{ flex: 1, height: 1, background: C.border }} />
               </div>
@@ -428,7 +443,7 @@ export default function Login() {
               >
                 <GoogleIcon />
                 <span style={{ fontFamily: F.body, fontSize: 13, fontWeight: 600, color: C.text }}>
-                  Continue with Google
+                  {t("auth.continueWithGoogle")}
                 </span>
               </div>
             </>
@@ -443,7 +458,7 @@ export default function Login() {
               className="press"
               style={{ fontFamily: F.mono, fontSize: 8, color: C.mutedLight, cursor: "pointer", letterSpacing: 1 }}
             >
-              ← BACK TO LOG IN
+              {t("auth.backToLogin")}
             </span>
           </div>
         )}
@@ -454,10 +469,11 @@ export default function Login() {
             style={{ textAlign: "center", marginTop: 16, padding: "0 8px", animation: "fadeIn 0.3s ease 0.3s both" }}
           >
             <span style={{ fontFamily: F.body, fontSize: 11, color: C.muted }}>
-              By signing up you agree to our{" "}
-              <span onClick={() => navigate("/terms")} style={{ color: C.mutedLight, textDecoration: "underline", cursor: "pointer" }}>Terms</span> and{" "}
+              {t("auth.termsNotice")}{" "}
+              <span onClick={() => navigate("/terms")} style={{ color: C.mutedLight, textDecoration: "underline", cursor: "pointer" }}>{t("settings.terms")}</span>{" "}
+              {t("auth.and")}{" "}
               <span onClick={() => navigate("/privacy")} style={{ color: C.mutedLight, textDecoration: "underline", cursor: "pointer" }}>
-                Privacy Policy
+                {t("settings.privacy")}
               </span>
             </span>
           </div>

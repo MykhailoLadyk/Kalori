@@ -42,7 +42,12 @@ export default function ShopFlamesModal({ flames = [], currentFlame, coins }) {
       await refreshUser();
       await refreshGameData();
 
-      addNotification({ type: "success", name: t("notifs.unlockedItem", { name: flame.name }) });
+      addNotification({
+        type: "success",
+        name: t("notifs.unlockedItem", {
+          name: t("shop_items.flames." + flame.id + ".name", { defaultValue: flame.name }),
+        }),
+      });
     } catch (err) {
       addNotification({ type: "error", name: err.message || t("notifs.purchaseFailed") });
     } finally {
@@ -73,6 +78,7 @@ export default function ShopFlamesModal({ flames = [], currentFlame, coins }) {
           const isCurrent = String(id) === String(activeFlameId);
           const isOwned = Boolean(owned);
           const isLocked = Boolean(lock);
+          const displayName = t("shop_items.flames." + id + ".name", { defaultValue: name });
 
           return (
             <div
@@ -111,7 +117,7 @@ export default function ShopFlamesModal({ flames = [], currentFlame, coins }) {
                 </div>
                 <div>
                   <div style={{ fontFamily: F.body, fontSize: 14, fontWeight: 700, color: C.text }}>
-                    {name}
+                    {displayName}
                   </div>
                   {lock && <Tag color={C.gold}>{t("shop.lvlRequired", { lock })}</Tag>}
                 </div>

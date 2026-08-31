@@ -42,7 +42,12 @@ export default function ShopAvatarsModal({ avatars = [], currentAvatar, coins, u
       await refreshUser();
       await refreshGameData();
 
-      addNotification({ type: "success", name: t("notifs.unlockedItem", { name: avatar.name }) });
+      addNotification({
+        type: "success",
+        name: t("notifs.unlockedItem", {
+          name: t("shop_items.avatars." + avatar.id + ".name", { defaultValue: avatar.name }),
+        }),
+      });
     } catch (err) {
       addNotification({ type: "error", name: err.message || t("notifs.purchaseFailed") });
     } finally {
@@ -75,6 +80,7 @@ export default function ShopAvatarsModal({ avatars = [], currentAvatar, coins, u
           const isLocked = Boolean(lock);
           const userName = user?.name || "User";
           const initial = userName[0]?.toUpperCase() ?? "?";
+          const displayName = t("shop_items.avatars." + id + ".name", { defaultValue: name });
 
           return (
             <div
@@ -140,7 +146,7 @@ export default function ShopAvatarsModal({ avatars = [], currentAvatar, coins, u
                   width: "100%",
                 }}
               >
-                {name}
+                {displayName}
               </div>
 
               {isLocked ? (

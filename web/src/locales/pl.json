@@ -96,6 +96,8 @@
     "actModerateSub": "Regularne ćwiczenia lub sport 3-5 dni w tygodniu",
     "actActive": "Bardzo aktywny",
     "actActiveSub": "Intensywne treningi 6-7 dni w tygodniu lub praca fizyczna",
+    "actVeryActive": "Dwa razy dziennie / Sportowiec",
+    "actVeryActiveSub": "Ciężkie treningi dwa razy dziennie lub sport zawodowy",
     "dietTitle": "Rodzaj Diety",
     "dietSubtitle": "Dopasujemy optymalny podział makroskładników.",
     "dietBalanced": "Zbalansowana",
@@ -114,6 +116,21 @@
     "carbsTarget": "WĘGLOWODANY",
     "fatTarget": "TŁUSZCZE",
     "finish": "ZACZNIJ ŚLEDZENIE",
+    "howItWorksTitle": "Jak działa Kalori",
+    "howItWorksSubtitle": "Grywalizacja w śledzeniu diety, która motywuje i buduje regularność.",
+    "gameEarnXpTitle": "Zapisuj posiłki i zdobywaj XP",
+    "gameEarnXpBody": "Każdy dodany posiłek daje XP do awansu na wyższy poziom.",
+    "gameStreakTitle": "Buduj swoją serię",
+    "gameStreakBody": "Loguj się codziennie, aby wydłużać serię i odblokowywać kolory płomieni.",
+    "gameQuestsTitle": "Wykonuj codzienne zadania",
+    "gameQuestsBody": "Podejmuj wyzwania dietetyczne, aby zdobywać dodatkowe monety.",
+    "gameCoinsTitle": "Wydawaj monety w sklepie",
+    "gameCoinsBody": "Odblokowuj unikalne awatary, motywy oraz osłony serii w sklepie.",
+    "doneTitle": "Wszystko gotowe, {{name}}!",
+    "doneSubtitle": "Twój spersonalizowany plan jest gotowy. Zacznijmy budować zdrowe nawyki.",
+    "calorieGoal": "Cel Kalorii",
+    "waterGoal": "Cel Wody",
+    "level": "Poziom",
     "required": "To pole jest wymagane",
     "errorSex": "Wybierz płeć biologiczną",
     "errorAge": "Wiek musi wynosić od 13 do 120 lat",
@@ -123,6 +140,7 @@
     "errorHeightFt": "Wzrost musi wynosić od 3.3 do 8.2 ft"
   },
   "home": {
+    "calories": "Kalorie",
     "caloriesRemaining": "POZOSTAŁO KCAL",
     "caloriesOver": "PONAD LIMIT KCAL",
     "eaten": "Zjedzone",
@@ -145,7 +163,8 @@
     "editMeal": "Edytuj Posiłek",
     "deleteMeal": "Usuń Posiłek",
     "recentMeals": "Ostatnie Posiłki",
-    "customWaterPlaceholder": "+ Własna"
+    "customWaterPlaceholder": "+ Własna",
+    "return": "WRÓĆ"
   },
   "meal": {
     "confirmMeal": "Zatwierdź Posiłek",
@@ -305,16 +324,22 @@
     "deleteItemProgress": "Postęp w grze i punkty XP",
     "deleteItemStats": "Pomiary ciała i cele",
     "deleteItemAccount": "Konto i profil",
-    "typeDeleteToConfirm": "Wpisz USUŃ lub DELETE aby potwierdzić",
+    "typeDeleteToConfirm": "Wpisz DELETE, aby potwierdzić",
     "deleteButton": "USUŃ KONTO",
     "deleting": "USUWANIE...",
     "saveChanges": "ZAPISZ ZMIANY",
     "saving": "ZAPISYWANIE...",
     "saveTimezone": "ZAPISZ STREFĘ",
-    "saveSystem": "ZAPISZ JEDNOSTKI"
+    "saveSystem": "ZAPISZ JEDNOSTKI",
+    "name": "Imię",
+    "age": "Wiek",
+    "email": "Email",
+    "metric": "Metryczny",
+    "imperial": "Imperialny"
   },
   "stats": {
     "title": "Statystyki",
+    "goal": "Cel",
     "overview": "Przegląd",
     "weightLog": "Dziennik Wagi",
     "calorieIntake": "Spożycie Kalorii",
@@ -379,7 +404,7 @@
     "20": { "name": "Codzienny posiłek", "desc": "Zapisz dowolny posiłek dzisiaj." },
     "21": { "name": "Poranne nawodnienie", "desc": "Zapisz wodę przed południem." },
     "23": { "name": "Tydzień posiłków", "desc": "Zapisuj posiłek każdego dnia przez tydzień." },
-    "24": { "name": "Tydzień wody", "desc": "Track your water intake every day for a week." },
+    "24": { "name": "Tydzień wody", "desc": "Zapisuj wodę każdego dnia przez tydzień." },
     "25": { "name": "Tydzień białka", "desc": "Osiągaj cel białka każdego dnia przez tydzień." },
     "27": { "name": "Planowanie posiłków", "desc": "Zapisz 10 posiłków w tym tygodniu." },
     "28": { "name": "Planowanie nawodnienia", "desc": "Zapisz wodę 10 razy w tym tygodniu." },
@@ -428,6 +453,40 @@
     "insufficientCoins": "Niewystarczająca liczba monet",
     "getCoins": "Zdobądź Monety"
   },
+  "shop_items": {
+    "avatars": {
+      "initial": { "name": "Twój Piksel" },
+      "spark": { "name": "Błyskawica" },
+      "avocado": { "name": "Glutek Pip" },
+      "tiger": { "name": "Tygrys" },
+      "royal": { "name": "Korona" },
+      "rocket": { "name": "Rakieta" },
+      "diamond": { "name": "Diament" },
+      "dragon": { "name": "Smok" }
+    },
+    "flames": {
+      "orange": { "name": "Klasyczny Płomień" },
+      "blue": { "name": "Mroźny Błękit" },
+      "pink": { "name": "Neonowa Magenta" },
+      "gold": { "name": "Złote Słońce" },
+      "green": { "name": "Szmaragdowa Iskra" },
+      "purple": { "name": "Kosmiczna Pustka" },
+      "crimson": { "name": "Krwawa Czerwień" }
+    },
+    "themes": {
+      "1": { "name": "Domyślny Ciemny" },
+      "2": { "name": "Północ" },
+      "3": { "name": "Las" },
+      "4": { "name": "Słoneczny Jasny" },
+      "5": { "name": "Czysty OLED" }
+    },
+    "upgrades": {
+      "expanded_quests": {
+        "name": "Dodatkowe Miejsca na Zadania",
+        "desc": "+1 dodatkowe miejsce na zadanie dzienne (3 dzienne + 1 tygodniowe)."
+      }
+    }
+  },
   "notifs": {
     "targetReached": "Cel Osiągnięty",
     "questComplete": "Zadanie Ukończone",
@@ -471,6 +530,8 @@
     "optionsDescribeSub": "Wpisz lub podyktuj posiłek",
     "optionsPhoto": "Skan ze zdjęcia",
     "optionsPhotoSub": "Zrób zdjęcie posiłku",
+    "optionsAlbum": "Wybierz z Galerii",
+    "optionsAlbumSub": "Wgraj zdjęcie ze swojej galerii",
     "optionsManual": "Wpis ręczny",
     "optionsManualSub": "Wpisz kalorie i makro samemu"
   },
@@ -489,7 +550,30 @@
     "noAccount": "Nie masz jeszcze konta?",
     "haveAccount": "Masz już konto?",
     "resetPassword": "Zresetuj hasło",
-    "sendResetLink": "WYŚLIJ LINK"
+    "sendResetLink": "WYŚLIJ LINK",
+    "taglineLogin": "ŚLEDŹ · ZDOBYWAJ POZIOMY · ROZWIJAJ SIĘ",
+    "taglineSignup": "ROZPOCZNIJ SWOJĄ PODRÓŻ",
+    "taglineForgot": "ODZYSKAJ SWOJE KONTO",
+    "taglineReset": "USTAW NOWE HASŁO",
+    "resetPasswordSub": "Wpisz poniżej swoje nowe hasło.",
+    "newPassword": "Nowe Hasło",
+    "confirmNewPassword": "Potwierdź Nowe Hasło",
+    "updatePassword": "ZAKTUALIZUJ HASŁO",
+    "passwordUpdated": "Hasło zostało pomyślnie zaktualizowane! Przekierowywanie...",
+    "or": "LUB",
+    "continueWithGoogle": "Kontynuuj z Google",
+    "backToLogin": "← WRÓĆ DO LOGOWANIA",
+    "termsNotice": "Rejestrując się, akceptujesz nasz",
+    "and": "oraz",
+    "minPassword": "Min. 6 znaków",
+    "required": "Wymagane",
+    "invalidEmail": "Nieprawidłowy email",
+    "passwordsDoNotMatch": "Hasła nie są identyczne",
+    "checkEmailConfirmation": "Sprawdź swoją skrzynkę pocztową, aby potwierdzić konto.",
+    "passwordResetSent": "Link do zresetowania hasła został wysłany — sprawdź email.",
+    "errorUserAlreadyRegistered": "Użytkownik z tym adresem email jest już zarejestrowany.",
+    "errorInvalidCredentials": "Nieprawidłowy adres email lub hasło.",
+    "errorPasswordLength": "Hasło musi mieć co najmniej 6 znaków."
   },
   "tutorial": {
     "skip": "Pomiń samouczek",

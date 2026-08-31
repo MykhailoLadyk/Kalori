@@ -36,7 +36,12 @@ export default function ShopUpgradesModal({ upgrades = [], coins, user }) {
       }
       await refreshUser();
       await refreshGameData();
-      addNotification({ type: "success", name: t("notifs.unlockedItem", { name: upgrade.name }) });
+      addNotification({
+        type: "success",
+        name: t("notifs.unlockedItem", {
+          name: t("shop_items.upgrades." + upgrade.id + ".name", { defaultValue: upgrade.name }),
+        }),
+      });
     } catch (err) {
       addNotification({ type: "error", name: err.message || t("notifs.purchaseFailed") });
     } finally {
@@ -51,47 +56,51 @@ export default function ShopUpgradesModal({ upgrades = [], coins, user }) {
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        {upgrades.map((upgrade) => (
-          <div
-            key={upgrade.id}
-            style={{
-              background: upgrade.owned ? alpha(C.accent, 8) : C.card,
-              border: `1px solid ${upgrade.owned ? alpha(C.accent, 30) : C.border}`,
-              borderRadius: 16,
-              padding: "16px",
-              display: "flex",
-              flexDirection: "column",
-              gap: 12,
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
-              <div
-                style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: 12,
-                  background: upgrade.owned ? alpha(C.accent, 15) : alpha(C.border, 40),
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexShrink: 0,
-                }}
-              >
-                <IconTarget size={24} color={upgrade.owned ? C.accent : C.muted} />
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                  <span style={{ fontFamily: F.head, fontSize: 16, fontWeight: 800, color: C.text }}>
-                    {upgrade.name}
-                  </span>
-                  {upgrade.lock && <Tag color={C.muted}>{upgrade.lock}</Tag>}
-                  {upgrade.owned && <Tag color={C.accent}>{t("shop.owned")}</Tag>}
+        {upgrades.map((upgrade) => {
+          const displayName = t("shop_items.upgrades." + upgrade.id + ".name", { defaultValue: upgrade.name });
+          const displayDesc = t("shop_items.upgrades." + upgrade.id + ".desc", { defaultValue: upgrade.desc });
+
+          return (
+            <div
+              key={upgrade.id}
+              style={{
+                background: upgrade.owned ? alpha(C.accent, 8) : C.card,
+                border: `1px solid ${upgrade.owned ? alpha(C.accent, 30) : C.border}`,
+                borderRadius: 16,
+                padding: "16px",
+                display: "flex",
+                flexDirection: "column",
+                gap: 12,
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+                <div
+                  style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: 12,
+                    background: upgrade.owned ? alpha(C.accent, 15) : alpha(C.border, 40),
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                  }}
+                >
+                  <IconTarget size={24} color={upgrade.owned ? C.accent : C.muted} />
                 </div>
-                <div style={{ fontFamily: F.body, fontSize: 12, color: C.soft, lineHeight: 1.4 }}>
-                  {upgrade.desc}
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                    <span style={{ fontFamily: F.head, fontSize: 16, fontWeight: 800, color: C.text }}>
+                      {displayName}
+                    </span>
+                    {upgrade.lock && <Tag color={C.muted}>{upgrade.lock}</Tag>}
+                    {upgrade.owned && <Tag color={C.accent}>{t("shop.owned")}</Tag>}
+                  </div>
+                  <div style={{ fontFamily: F.body, fontSize: 12, color: C.soft, lineHeight: 1.4 }}>
+                    {displayDesc}
+                  </div>
                 </div>
               </div>
-            </div>
 
             <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", marginTop: 4 }}>
               {upgrade.owned ? (
@@ -129,7 +138,8 @@ export default function ShopUpgradesModal({ upgrades = [], coins, user }) {
               )}
             </div>
           </div>
-        ))}
+        );
+      })}
       </div>
     </div>
   );

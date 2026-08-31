@@ -160,7 +160,7 @@ export default function BodyStatsModal({ handleClose }) {
       </div>
 
       <div style={{ marginBottom: 16 }}>
-        <Mono size={8} color={C.mutedLight}>{t("onboarding.stepSex")}</Mono>
+        <Mono size={8} color={C.mutedLight}>{t("onboarding.sexLabel")}</Mono>
         <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
           {["male", "female"].map((s) => (
             <div
@@ -181,7 +181,7 @@ export default function BodyStatsModal({ handleClose }) {
                 textTransform: "capitalize",
               }}
             >
-              {s === "male" ? t("onboarding.sexMale") : t("onboarding.sexFemale")}
+              {s === "male" ? t("onboarding.male") : t("onboarding.female")}
             </div>
           ))}
         </div>

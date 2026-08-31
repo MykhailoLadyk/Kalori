@@ -119,7 +119,7 @@ export default function ThemeModal({ handleClose }) {
                       color: C.text,
                     }}
                   >
-                    {theme.name}
+                    {t("shop_items.themes." + theme.id + ".name", { defaultValue: theme.name })}
                   </div>
                 </div>
 

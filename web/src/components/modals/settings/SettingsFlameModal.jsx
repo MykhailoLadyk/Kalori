@@ -110,7 +110,7 @@ export default function SettingsFlameModal({ handleClose }) {
                     color: C.text,
                   }}
                 >
-                  {flame.name}
+                  {t("shop_items.flames." + flame.id + ".name", { defaultValue: flame.name })}
                 </div>
               </div>
 

@@ -81,7 +81,7 @@ export function MealEditModal({ meal, handleClose }) {
     await updateMeal(meal.id, payload);
     const isToday = !meal?.date || meal.date === getLocalYMD(new Date());
     if (isToday) {
-      await syncProgress(meal.date || getLocalYMD(new Date()), true);
+      await syncProgress(meal.date || getLocalYMD(new Date()), false);
     }
     handleClose();
   };

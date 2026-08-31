@@ -40,7 +40,12 @@ export default function ShopThemesModal({ themes = [], currentTheme, coins }) {
       await updateUser({ settings: { theme: theme.id } });
       await refreshGameData();
 
-      addNotification({ type: "success", name: t("notifs.unlockedTheme", { name: theme.name }) });
+      addNotification({
+        type: "success",
+        name: t("notifs.unlockedTheme", {
+          name: t("shop_items.themes." + theme.id + ".name", { defaultValue: theme.name }),
+        }),
+      });
     } catch (err) {
       addNotification({ type: "error", name: err.message || t("notifs.purchaseFailed") });
     } finally {
@@ -71,6 +76,8 @@ export default function ShopThemesModal({ themes = [], currentTheme, coins }) {
         const isCurrent = String(id) === String(currentTheme);
         const isOwned = Boolean(owned);
         const isLocked = Boolean(lock);
+        const displayName = t("shop_items.themes." + id + ".name", { defaultValue: name });
+
         return (
           <div
             key={id ?? name}
@@ -95,7 +102,7 @@ export default function ShopThemesModal({ themes = [], currentTheme, coins }) {
               style={{ padding: "10px 14px", display: "flex", justifyContent: "space-between", alignItems: "center" }}
             >
               <div>
-                <div style={{ fontFamily: F.body, fontSize: 13, fontWeight: 600, color: C.text }}>{name}</div>
+                <div style={{ fontFamily: F.body, fontSize: 13, fontWeight: 600, color: C.text }}>{displayName}</div>
                 {lock && <Tag color={C.gold}>{t("shop.lvlRequired", { lock })}</Tag>}
               </div>
               {isCurrent ? (

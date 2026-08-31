@@ -101,6 +101,8 @@ function useJoyrideStyles() {
       padding: "18px 18px 14px",
       border: "1px solid var(--c-border)",
       boxShadow: `0 8px 32px ${alpha("var(--c-accent)", 16)}, 0 4px 16px rgba(0,0,0,0.5)`,
+      maxWidth: "calc(100vw - 32px)",
+      boxSizing: "border-box",
     },
     tooltipTitle: {
       fontFamily: "'Nunito', sans-serif",

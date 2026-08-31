@@ -11,7 +11,7 @@ export default function DeleteAccountModal({ handleClose }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const isConfirmed = confirm === "DELETE" || confirm === "USUŃ";
+  const isConfirmed = confirm === "DELETE";
 
   const handleDelete = async () => {
     try {

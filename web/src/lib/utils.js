@@ -1,10 +1,16 @@
 import i18n from "./i18n";
 import { MONTHS } from "./constants.js";
 
+function capitalize(str) {
+  if (!str || typeof str !== "string") return "";
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 export function getDayName(date, lang) {
   const currentLang = lang || (i18n?.language?.startsWith("pl") ? "pl-PL" : "en-US");
   try {
-    return new Intl.DateTimeFormat(currentLang, { weekday: "long" }).format(date);
+    const formatted = new Intl.DateTimeFormat(currentLang, { weekday: "long" }).format(date);
+    return capitalize(formatted);
   } catch {
     switch (date.getDay()) {
       case 0: return "Sunday";
@@ -24,7 +30,8 @@ export function getMonthName(date, lang) {
   const targetDate = typeof date === "number" ? new Date(2026, date, 1) : date instanceof Date ? date : null;
   if (!targetDate) return "";
   try {
-    return new Intl.DateTimeFormat(currentLang, { month: "long" }).format(targetDate);
+    const formatted = new Intl.DateTimeFormat(currentLang, { month: "long" }).format(targetDate);
+    return capitalize(formatted);
   } catch {
     const index = typeof date === "number" ? date : date instanceof Date ? date.getMonth() : -1;
     return MONTHS[index] || "";

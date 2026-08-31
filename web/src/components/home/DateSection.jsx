@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { C, F, flameColorsDefinitions } from "../../lib/constants";
 import { IconCalendar, IconFire } from "../../components/shared/DuoIcon";
 import { getDayName, getMonthName } from "../../lib/utils";
@@ -7,6 +8,7 @@ import { useMeals } from "../../hooks/useMeals";
 import { getLocalYMD, getTodayDateString } from "../../lib/dateUtils";
 
 export function DateSection({ setModal, date }) {
+  const { t } = useTranslation();
   const day = getDayName(date);
   const month = getMonthName(date);
   const { gameData } = useGameStats();
@@ -83,7 +85,7 @@ export function DateSection({ setModal, date }) {
                 letterSpacing: 1,
               }}
             >
-              RETURN
+              {t("home.return")}
             </span>
           </div>
         )}

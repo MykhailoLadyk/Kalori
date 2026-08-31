@@ -234,7 +234,7 @@ export default function Settings() {
 
       <div style={{ textAlign: "center", marginTop: 8, animation: "fadeIn 0.4s ease 0.6s both" }}>
         <Mono size={8} color={C.muted}>
-          Kalori v1.4.2
+          Kalori v1.4.3
         </Mono>
       </div>
       <Modal id={modal} close={() => setModal(null)}>

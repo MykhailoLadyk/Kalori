@@ -28,6 +28,13 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+html,
+body {
+  overflow-x: hidden;
+  max-width: 100vw;
+  overscroll-behavior-x: none;
+}
+
 body {
   background: var(--c-bg);
   color: var(--c-text);
@@ -44,6 +51,7 @@ body.photo-div {
   min-height: 100vh;
   box-shadow: 0 0 40px rgba(0,0,0,0.3); /* optional: gives a slight shadow to distinguish on large screens */
   background: var(--c-bg); /* ensure it matches the background in case body has a different one, though body is already --c-bg */
+  overflow-x: hidden;
 }
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

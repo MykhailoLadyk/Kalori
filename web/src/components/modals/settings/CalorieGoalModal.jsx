@@ -17,11 +17,11 @@ export default function CalorieGoalModal({ handleClose }) {
     { key: "gain", label: t("onboarding.goalGain") },
   ];
   const ACTIVITY_LEVELS = [
-    { key: "sedentary", label: t("onboarding.activitySedentary"), sub: t("onboarding.activitySedentarySub") },
-    { key: "light", label: t("onboarding.activityLight"), sub: t("onboarding.activityLightSub") },
-    { key: "moderate", label: t("onboarding.activityModerate"), sub: t("onboarding.activityModerateSub") },
-    { key: "active", label: t("onboarding.activityActive"), sub: t("onboarding.activityActiveSub") },
-    { key: "very_active", label: t("onboarding.activityVeryActive"), sub: t("onboarding.activityVeryActiveSub") },
+    { key: "sedentary", label: t("onboarding.actSedentary"), sub: t("onboarding.actSedentarySub") },
+    { key: "light", label: t("onboarding.actLight"), sub: t("onboarding.actLightSub") },
+    { key: "moderate", label: t("onboarding.actModerate"), sub: t("onboarding.actModerateSub") },
+    { key: "active", label: t("onboarding.actActive"), sub: t("onboarding.actActiveSub") },
+    { key: "very_active", label: t("onboarding.actVeryActive"), sub: t("onboarding.actVeryActiveSub") },
   ];
 
   const [calorieGoal, setCalorieGoal] = useState(user?.targets?.calories || 2000);
@@ -154,7 +154,7 @@ export default function CalorieGoalModal({ handleClose }) {
           </div>
         </div>
         <div className="font-head font-black text-primary" style={{ fontSize: 20, marginBottom: 24 }}>
-          {t("onboarding.stepActivity")}
+          {t("onboarding.activityTitle")}
         </div>
       </div>
       {/* activity level */}

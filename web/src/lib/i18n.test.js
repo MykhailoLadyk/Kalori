@@ -92,6 +92,42 @@ describe("i18n Internationalization", () => {
     expect(i18n.t("settings.termsOfService")).toBe("Regulamin Usługi");
   });
 
+  it("translates newly added auth, onboarding, stats, shop items and settings keys in Polish", async () => {
+    await i18n.changeLanguage("pl");
+    // Auth
+    expect(i18n.t("auth.taglineLogin")).toBe("ŚLEDŹ · ZDOBYWAJ POZIOMY · ROZWIJAJ SIĘ");
+    expect(i18n.t("auth.taglineSignup")).toBe("ROZPOCZNIJ SWOJĄ PODRÓŻ");
+    expect(i18n.t("auth.taglineForgot")).toBe("ODZYSKAJ SWOJE KONTO");
+    expect(i18n.t("auth.taglineReset")).toBe("USTAW NOWE HASŁO");
+    expect(i18n.t("auth.or")).toBe("LUB");
+    expect(i18n.t("auth.continueWithGoogle")).toBe("Kontynuuj z Google");
+    expect(i18n.t("auth.minPassword")).toBe("Min. 6 znaków");
+    expect(i18n.t("auth.errorUserAlreadyRegistered")).toBe("Użytkownik z tym adresem email jest już zarejestrowany.");
+
+    // Onboarding
+    expect(i18n.t("onboarding.actVeryActive")).toBe("Dwa razy dziennie / Sportowiec");
+    expect(i18n.t("onboarding.howItWorksTitle")).toBe("Jak działa Kalori");
+    expect(i18n.t("onboarding.doneSubtitle")).toBe("Twój spersonalizowany plan jest gotowy. Zacznijmy budować zdrowe nawyki.");
+
+    // Home & Stats
+    expect(i18n.t("home.calories")).toBe("Kalorie");
+    expect(i18n.t("home.return")).toBe("WRÓĆ");
+    expect(i18n.t("addMeal.optionsAlbum")).toBe("Wybierz z Galerii");
+    expect(i18n.t("stats.goal")).toBe("Cel");
+
+    // Shop Items
+    expect(i18n.t("shop_items.avatars.initial.name")).toBe("Twój Piksel");
+    expect(i18n.t("shop_items.avatars.dragon.name")).toBe("Smok");
+    expect(i18n.t("shop_items.flames.orange.name")).toBe("Klasyczny Płomień");
+    expect(i18n.t("shop_items.themes.1.name")).toBe("Domyślny Ciemny");
+    expect(i18n.t("shop_items.upgrades.expanded_quests.name")).toBe("Dodatkowe Miejsca na Zadania");
+
+    // Settings
+    expect(i18n.t("settings.name")).toBe("Imię");
+    expect(i18n.t("settings.age")).toBe("Wiek");
+    expect(i18n.t("settings.typeDeleteToConfirm")).toBe("Wpisz DELETE, aby potwierdzić");
+  });
+
   it("falls back to English for missing keys in unsupported languages", async () => {
     await i18n.changeLanguage("de");
     expect(i18n.t("nav.home")).toBe("HOME");

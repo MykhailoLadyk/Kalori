@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { C, F, alpha } from "../lib/constants";
 import { Mono } from "../components/shared/Primitives";
 import { supabase } from "../services/supabase";
@@ -28,6 +29,7 @@ const KaloriMark = () => (
 );
 
 export default function ResetPassword() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -50,10 +52,10 @@ export default function ResetPassword() {
 
   const validate = () => {
     const e = {};
-    if (!password) e.password = "Required";
-    else if (password.length < 6) e.password = "Min 6 characters";
-    if (!confirmPassword) e.confirmPassword = "Required";
-    else if (password !== confirmPassword) e.confirmPassword = "Passwords do not match";
+    if (!password) e.password = t("auth.required");
+    else if (password.length < 6) e.password = t("auth.minPassword");
+    if (!confirmPassword) e.confirmPassword = t("auth.required");
+    else if (password !== confirmPassword) e.confirmPassword = t("auth.passwordsDoNotMatch");
     return e;
   };
 
@@ -76,7 +78,12 @@ export default function ResetPassword() {
         navigate("/");
       }, 2000);
     } catch (err) {
-      setAuthError(err.message || "Failed to update password");
+      const msg = err.message || "";
+      if (msg.toLowerCase().includes("at least 6 characters") || msg.toLowerCase().includes("password should be at least")) {
+        setAuthError(t("auth.errorPasswordLength"));
+      } else {
+        setAuthError(err.message || "Failed to update password");
+      }
     } finally {
       setLoading(false);
     }
@@ -130,7 +137,7 @@ export default function ResetPassword() {
             Kalori
           </div>
           <Mono size={8} color={C.muted} style={{ marginTop: 4, animation: "fadeUp 0.4s ease 0.15s both" }}>
-            SET NEW PASSWORD
+            {t("auth.taglineReset")}
           </Mono>
         </div>
 
@@ -146,10 +153,10 @@ export default function ResetPassword() {
         >
           <div style={{ marginBottom: 20 }}>
             <div style={{ fontFamily: F.head, fontSize: 18, fontWeight: 900, color: C.text }}>
-              Reset Password
+              {t("auth.resetPassword")}
             </div>
             <div style={{ fontFamily: F.body, fontSize: 13, color: C.soft, marginTop: 4 }}>
-              Enter a new secure password for your account.
+              {t("auth.resetPasswordSub")}
             </div>
           </div>
 
@@ -169,7 +176,7 @@ export default function ResetPassword() {
             >
               <span className="flex" style={{ color: C.accent }}><IconCheck size={16} /></span>
               <span style={{ fontFamily: F.body, fontSize: 13, color: C.accent }}>
-                Password updated! Redirecting into Kalori...
+                {t("auth.passwordUpdated")}
               </span>
             </div>
           )}
@@ -198,7 +205,7 @@ export default function ResetPassword() {
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <Mono size={8} color={C.mutedLight}>
-                    New Password
+                    {t("auth.newPassword")}
                   </Mono>
                   {errors.password && (
                     <Mono size={8} color={C.red}>
@@ -210,7 +217,7 @@ export default function ResetPassword() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Min 6 characters"
+                  placeholder={t("auth.minPassword")}
                   autoComplete="new-password"
                   className="w-full input-field bg-card"
                   style={{
@@ -227,7 +234,7 @@ export default function ResetPassword() {
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <Mono size={8} color={C.mutedLight}>
-                    Confirm Password
+                    {t("auth.confirmNewPassword")}
                   </Mono>
                   {errors.confirmPassword && (
                     <Mono size={8} color={C.red}>
@@ -239,7 +246,7 @@ export default function ResetPassword() {
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Re-enter password"
+                  placeholder={t("auth.passwordPlaceholder")}
                   autoComplete="new-password"
                   className="w-full input-field bg-card"
                   style={{
@@ -268,7 +275,7 @@ export default function ResetPassword() {
                 }}
               >
                 <span className="font-mono font-bold" style={{ fontSize: 11, color: loading ? C.accent : "#000" }}>
-                  {loading ? "UPDATING PASSWORD..." : "UPDATE PASSWORD"}
+                  {loading ? t("common.loading") : t("auth.updatePassword")}
                 </span>
               </div>
             </div>
@@ -280,7 +287,7 @@ export default function ResetPassword() {
               className="press"
               style={{ fontFamily: F.mono, fontSize: 8, color: C.mutedLight, cursor: "pointer", letterSpacing: 1 }}
             >
-              ← BACK TO LOG IN
+              {t("auth.backToLogin")}
             </span>
           </div>
         </div>

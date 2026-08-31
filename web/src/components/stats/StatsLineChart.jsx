@@ -1,13 +1,24 @@
 import { Mono } from "../shared/Primitives";
 import { C, F, alpha } from "../../lib/constants";
 import { useState } from "react";
-
-const MONTH_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+import { useTranslation } from "react-i18next";
 
 export default function StatsLineChart({ label, data, dates, color, goalV, unit, period, i }) {
+  const { t, i18n } = useTranslation();
   const [selectedPoint, setSelectedPoint] = useState(null);
 
   if (!data || data.length === 0) return null;
+
+  const currentLang = i18n?.language?.startsWith("pl") ? "pl-PL" : "en-US";
+  const formatShortMonth = (monthIdx) => {
+    try {
+      const d = new Date(2026, monthIdx, 1);
+      const str = new Intl.DateTimeFormat(currentLang, { month: "short" }).format(d);
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    } catch {
+      return "";
+    }
+  };
 
   const padTop = 28;
   const padBottom = 24;
@@ -58,7 +69,7 @@ export default function StatsLineChart({ label, data, dates, color, goalV, unit,
       }
     });
     monthsSet.forEach((idx, m) => {
-      xLabels.push({ text: MONTH_SHORT[m], x: toX(idx) });
+      xLabels.push({ text: formatShortMonth(m), x: toX(idx) });
     });
   } else {
     // 5 evenly spaced date labels for month view
@@ -67,7 +78,7 @@ export default function StatsLineChart({ label, data, dates, color, goalV, unit,
       const idx = Math.round((k / (count - 1)) * (data.length - 1));
       const d = new Date(dates[idx] + "T00:00:00");
       xLabels.push({
-        text: `${MONTH_SHORT[d.getMonth()]} ${d.getDate()}`,
+        text: `${formatShortMonth(d.getMonth())} ${d.getDate()}`,
         x: toX(idx),
       });
     }
@@ -111,7 +122,7 @@ export default function StatsLineChart({ label, data, dates, color, goalV, unit,
         </Mono>
         {!isWeight && goalV != null && (
           <Mono size={8} color={C.soft}>
-            Goal: {unit === "L" ? `${(goalV / 1000).toFixed(1)} L` : (goalV || 0).toLocaleString()}
+            {t("stats.goal")}: {unit === "L" ? `${(goalV / 1000).toFixed(1)} L` : (goalV || 0).toLocaleString()}
           </Mono>
         )}
       </div>

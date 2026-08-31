@@ -1,16 +1,16 @@
 import { Mono } from "../shared/Primitives";
 import { C, F, alpha } from "../../lib/constants";
 import { useEffect, useState } from "react";
-
-const SHORT_DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+import { useTranslation } from "react-i18next";
 
 export default function StatsBarChart({ label, data, dates, max, color, goalV, unit, i }) {
+  const { t, i18n } = useTranslation();
   const [barsVisible, setBarsVisible] = useState(false);
   const [selectedBar, setSelectedBar] = useState(null);
 
   useEffect(() => {
-    const t = setTimeout(() => setBarsVisible(true), 300);
-    return () => clearTimeout(t);
+    const timer = setTimeout(() => setBarsVisible(true), 300);
+    return () => clearTimeout(timer);
   }, []);
 
   // Reset selection when data changes
@@ -32,8 +32,16 @@ export default function StatsBarChart({ label, data, dates, max, color, goalV, u
   };
 
   // Build day labels from dates array
+  const currentLang = i18n?.language?.startsWith("pl") ? "pl-PL" : "en-US";
   const dayLabels = dates
-    ? dates.map((d) => SHORT_DAYS[new Date(d + "T00:00:00").getDay()])
+    ? dates.map((d) => {
+        try {
+          const str = new Intl.DateTimeFormat(currentLang, { weekday: "short" }).format(new Date(d + "T00:00:00"));
+          return str.charAt(0).toUpperCase() + str.slice(1);
+        } catch {
+          return d;
+        }
+      })
     : data.map((_, idx) => idx);
 
   // Bar area height in px
@@ -63,7 +71,7 @@ export default function StatsBarChart({ label, data, dates, max, color, goalV, u
         </Mono>
         {!isWeight && goalV != null && (
           <Mono size={8} color={C.soft}>
-            Goal: {unit === "L" ? `${(goalV / 1000).toFixed(1)} L` : goalV.toLocaleString()}
+            {t("stats.goal")}: {unit === "L" ? `${(goalV / 1000).toFixed(1)} L` : goalV.toLocaleString()}
           </Mono>
         )}
       </div>

@@ -90,6 +90,8 @@
     "actModerateSub": "Moderate exercise or sports 3-5 days/week",
     "actActive": "Very Active",
     "actActiveSub": "Hard exercise 6-7 days/week or physical job",
+    "actVeryActive": "Twice a Day / Athlete",
+    "actVeryActiveSub": "Heavy exercise 2x per day or competitive training",
     "dietTitle": "Diet Type",
     "dietSubtitle": "We'll tailor your recommended macronutrient split.",
     "dietBalanced": "Balanced",
@@ -108,6 +110,21 @@
     "carbsTarget": "CARBS",
     "fatTarget": "FAT",
     "finish": "START TRACKING",
+    "howItWorksTitle": "How Kalori Works",
+    "howItWorksSubtitle": "Gamified nutrition tracking designed to keep you consistent and motivated.",
+    "gameEarnXpTitle": "Log Meals & Earn XP",
+    "gameEarnXpBody": "Every meal logged earns XP to level up your profile.",
+    "gameStreakTitle": "Build Your Streak",
+    "gameStreakBody": "Log daily to grow your streak and unlock unique flame colors.",
+    "gameQuestsTitle": "Complete Daily Quests",
+    "gameQuestsBody": "Take on fun nutrition challenges for extra coin rewards.",
+    "gameCoinsTitle": "Spend Coins in the Shop",
+    "gameCoinsBody": "Use coins to unlock exclusive avatars, themes, and streak shields.",
+    "doneTitle": "You're All Set, {{name}}!",
+    "doneSubtitle": "Your personalized plan is ready. Let's build healthy habits together.",
+    "calorieGoal": "Calorie Goal",
+    "waterGoal": "Water Goal",
+    "level": "Level",
     "required": "This field is required",
     "errorSex": "Please select your biological sex",
     "errorAge": "Age must be between 13 and 120",
@@ -117,6 +134,7 @@
     "errorHeightFt": "Height must be between 3.3 and 8.2 ft"
   },
   "home": {
+    "calories": "Calories",
     "caloriesRemaining": "KCAL REMAINING",
     "caloriesOver": "KCAL OVER",
     "eaten": "Eaten",
@@ -139,7 +157,8 @@
     "editMeal": "Edit Meal",
     "deleteMeal": "Delete Meal",
     "recentMeals": "Recent Meals",
-    "customWaterPlaceholder": "+ Custom"
+    "customWaterPlaceholder": "+ Custom",
+    "return": "RETURN"
   },
   "meal": {
     "confirmMeal": "Confirm Meal",
@@ -305,10 +324,16 @@
     "saveChanges": "SAVE CHANGES",
     "saving": "SAVING...",
     "saveTimezone": "SAVE TIMEZONE",
-    "saveSystem": "SAVE SYSTEM"
+    "saveSystem": "SAVE SYSTEM",
+    "name": "Name",
+    "age": "Age",
+    "email": "Email",
+    "metric": "Metric",
+    "imperial": "Imperial"
   },
   "stats": {
     "title": "Stats",
+    "goal": "Goal",
     "overview": "Overview",
     "weightLog": "Weight Log",
     "calorieIntake": "Calorie Intake",
@@ -422,6 +447,40 @@
     "insufficientCoins": "Insufficient Coins",
     "getCoins": "Get Coins"
   },
+  "shop_items": {
+    "avatars": {
+      "initial": { "name": "Pixel You" },
+      "spark": { "name": "Bolt" },
+      "avocado": { "name": "Pip the Slime" },
+      "tiger": { "name": "Tiger" },
+      "royal": { "name": "Crown" },
+      "rocket": { "name": "Rocket" },
+      "diamond": { "name": "Gem" },
+      "dragon": { "name": "Dragon" }
+    },
+    "flames": {
+      "orange": { "name": "Classic Blaze" },
+      "blue": { "name": "Frostfire Blue" },
+      "pink": { "name": "Neon Magenta" },
+      "gold": { "name": "Golden Solar" },
+      "green": { "name": "Emerald Spark" },
+      "purple": { "name": "Cosmic Void" },
+      "crimson": { "name": "Blood Crimson" }
+    },
+    "themes": {
+      "1": { "name": "Default Dark" },
+      "2": { "name": "Midnight" },
+      "3": { "name": "Forest" },
+      "4": { "name": "Solarized Light" },
+      "5": { "name": "OLED Pure" }
+    },
+    "upgrades": {
+      "expanded_quests": {
+        "name": "Expanded Quest Slots",
+        "desc": "+1 Daily Quest slot (3 daily + 1 weekly)."
+      }
+    }
+  },
   "notifs": {
     "targetReached": "Target Reached",
     "questComplete": "Quest Complete",
@@ -463,6 +522,8 @@
     "optionsDescribeSub": "Type or dictate what you ate",
     "optionsPhoto": "Photo Scan",
     "optionsPhotoSub": "Snap a photo of your meal",
+    "optionsAlbum": "Album / Gallery",
+    "optionsAlbumSub": "Upload photo from gallery",
     "optionsManual": "Manual Entry",
     "optionsManualSub": "Enter calories & macros yourself"
   },
@@ -481,7 +542,30 @@
     "noAccount": "Don't have an account?",
     "haveAccount": "Already have an account?",
     "resetPassword": "Reset Password",
-    "sendResetLink": "SEND RESET LINK"
+    "sendResetLink": "SEND RESET LINK",
+    "taglineLogin": "TRACK · LEVEL UP · IMPROVE",
+    "taglineSignup": "START YOUR JOURNEY",
+    "taglineForgot": "RECOVER YOUR ACCOUNT",
+    "taglineReset": "SET NEW PASSWORD",
+    "resetPasswordSub": "Enter your new password below.",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "updatePassword": "UPDATE PASSWORD",
+    "passwordUpdated": "Password updated successfully! Redirecting...",
+    "or": "OR",
+    "continueWithGoogle": "Continue with Google",
+    "backToLogin": "← BACK TO LOG IN",
+    "termsNotice": "By signing up you agree to our",
+    "and": "and",
+    "minPassword": "Min 6 characters",
+    "required": "Required",
+    "invalidEmail": "Invalid email",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "checkEmailConfirmation": "Check your email to confirm your account.",
+    "passwordResetSent": "Password reset link sent — check your email.",
+    "errorUserAlreadyRegistered": "User with this email is already registered.",
+    "errorInvalidCredentials": "Invalid email or password.",
+    "errorPasswordLength": "Password must be at least 6 characters."
   },
   "tutorial": {
     "skip": "Skip tour",

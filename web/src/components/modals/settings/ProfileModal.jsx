@@ -80,9 +80,9 @@ export default function ProfileModal({ handleClose }) {
       {/* fields */}
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {[
-          { key: "name", label: t("meal.name"), type: "text" },
+          { key: "name", label: t("settings.name"), type: "text" },
           { key: "email", label: "Email", type: "email" },
-          { key: "age", label: t("onboarding.stepAge"), type: "number" },
+          { key: "age", label: t("settings.age"), type: "number" },
         ].map(({ key, label, type }) => (
           <div key={key}>
             <Mono size={8} color={C.mutedLight}>

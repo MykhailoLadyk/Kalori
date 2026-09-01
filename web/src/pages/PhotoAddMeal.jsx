@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { C, F, alpha } from "../lib/constants";
 import { Mono, Tag } from "../components/shared/Primitives";
 import analyzeFood from "../services/analyzeFood";
@@ -10,6 +10,12 @@ import { IconSparkles, IconCoin, IconCrown } from "../components/shared/DuoIcon"
 import { Modal } from "../components/modals/Modal";
 import InsufficientCoinsModal from "../components/modals/home/InsufficientCoinsModal";
 import { AI_COIN_COST } from "../services/subscriptionService";
+import {
+  isNativeMobile,
+  capturePhotoFromCamera,
+  pickPhotoFromGallery,
+  photoToDataUrl,
+} from "../services/cameraService";
 
 const ChevronLeft = () => (
   <svg
@@ -52,6 +58,7 @@ const Spinner = ({ color = "#000", size = 16 }) => (
 
 export default function PhotoAddMeal() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { isPro } = useUser();
   const { gameData, refreshGameData } = useGameStats();
   const { addNotification } = useNotifications();
@@ -59,8 +66,12 @@ export default function PhotoAddMeal() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
+  const cameraInputRef = useRef(null);
+  const galleryInputRef = useRef(null);
 
-  const [photo, setPhoto] = useState(null);
+  const [photo, setPhoto] = useState(() => {
+    return location.state?.photoData || sessionStorage.getItem("kalori_captured_photo") || null;
+  });
   const [analyzing, setAnalyzing] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
@@ -94,22 +105,34 @@ export default function PhotoAddMeal() {
   }, [analyzing]);
 
   useEffect(() => {
+    if (location.state?.photoData) {
+      setPhoto(location.state.photoData);
+      sessionStorage.setItem("kalori_captured_photo", location.state.photoData);
+    }
+  }, [location.state]);
+
+
+
+  useEffect(() => {
     document.body.classList.add("photo-div");
 
     let active = true;
-    async function startCamera() {
-      try {
-        const s = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: "environment" },
-        });
-        if (!active) return;
-        streamRef.current = s;
-        if (videoRef.current) videoRef.current.srcObject = s;
-      } catch (err) {
-        setError("Camera access denied or unavailable.");
+
+    if (!isNativeMobile()) {
+      async function startCamera() {
+        try {
+          const s = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "environment" },
+          });
+          if (!active) return;
+          streamRef.current = s;
+          if (videoRef.current) videoRef.current.srcObject = s;
+        } catch {
+          setError("Camera access denied or unavailable.");
+        }
       }
+      startCamera();
     }
-    startCamera();
 
     return () => {
       document.body.classList.remove("photo-div");
@@ -118,7 +141,25 @@ export default function PhotoAddMeal() {
     };
   }, []);
 
-  const handleCapture = () => {
+  const handleCapture = async () => {
+    if (isNativeMobile()) {
+      try {
+        setError(null);
+        const dataUrl = await capturePhotoFromCamera();
+        if (dataUrl) {
+          setPhoto(dataUrl);
+          sessionStorage.setItem("kalori_captured_photo", dataUrl);
+          setError(null);
+          return;
+        }
+      } catch (err) {
+        console.warn("Native camera failed, falling back to direct input", err);
+      }
+      // Fallback directly to native camera chooser input
+      cameraInputRef.current?.click();
+      return;
+    }
+
     const video = videoRef.current;
     const canvas = canvasRef.current;
     if (!video || !canvas) return;
@@ -130,6 +171,7 @@ export default function PhotoAddMeal() {
 
     const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
     setPhoto(dataUrl);
+    sessionStorage.setItem("kalori_captured_photo", dataUrl);
 
     streamRef.current?.getTracks().forEach((t) => t.stop());
   };
@@ -138,6 +180,23 @@ export default function PhotoAddMeal() {
     setPhoto(null);
     setResult(null);
     setError(null);
+    sessionStorage.removeItem("kalori_captured_photo");
+
+    if (isNativeMobile()) {
+      try {
+        const dataUrl = await capturePhotoFromCamera();
+        if (dataUrl) {
+          setPhoto(dataUrl);
+          sessionStorage.setItem("kalori_captured_photo", dataUrl);
+          return;
+        }
+      } catch {
+        // User cancelled or retake fallback
+      }
+      cameraInputRef.current?.click();
+      return;
+    }
+
     try {
       const s = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: "environment" },
@@ -149,15 +208,35 @@ export default function PhotoAddMeal() {
     }
   };
 
+  const handleGalleryClick = async () => {
+    if (isNativeMobile()) {
+      try {
+        const dataUrl = await pickPhotoFromGallery();
+        if (dataUrl) {
+          setPhoto(dataUrl);
+          sessionStorage.setItem("kalori_captured_photo", dataUrl);
+          setError(null);
+          return;
+        }
+      } catch (err) {
+        console.warn("Gallery error:", err);
+      }
+    }
+    galleryInputRef.current?.click();
+  };
+
   const handleFileUpload = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (event) => {
-      setPhoto(event.target.result);
+      const dataUrl = event.target.result;
+      setPhoto(dataUrl);
+      sessionStorage.setItem("kalori_captured_photo", dataUrl);
       setError(null);
     };
     reader.readAsDataURL(file);
+    e.target.value = "";
   };
 
   const handleAnalyze = async () => {
@@ -178,6 +257,7 @@ export default function PhotoAddMeal() {
         addNotification({ type: "coins_deducted", amount: -AI_COIN_COST, name: `-${AI_COIN_COST} coins (AI Photo Scan)` });
       }
 
+      sessionStorage.removeItem("kalori_captured_photo");
       navigate("/add-meal/confirm", {
         state: {
           meal: parsed,
@@ -289,38 +369,63 @@ export default function PhotoAddMeal() {
         }}
       >
         {error ? (
-          <div style={{ padding: "0 40px", textAlign: "center", display: "flex", flexDirection: "column", gap: "24px", alignItems: "center" }}>
+          <div style={{ padding: "0 40px", textAlign: "center", display: "flex", flexDirection: "column", gap: "16px", alignItems: "center" }}>
             <Mono size={9} color={C.red}>
               {error}
             </Mono>
-            <label
-              className="hover-btn press"
-              style={{
-                background: C.card,
-                border: `1px solid ${C.border}`,
-                borderRadius: 14,
-                padding: "16px 24px",
-                cursor: "pointer",
-                display: "inline-block",
-              }}
-            >
-              <input
-                type="file"
-                accept="image/*"
-                style={{ display: "none" }}
-                onChange={handleFileUpload}
-              />
-              <span
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
+              {isNativeMobile() && (
+                <div
+                  onClick={handleCapture}
+                  className="hover-btn press"
+                  style={{
+                    background: C.accent,
+                    borderRadius: 14,
+                    padding: "14px 20px",
+                    cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 8,
+                  }}
+                >
+                  <span
+                    style={{
+                      fontFamily: F.mono,
+                      fontSize: 11,
+                      fontWeight: 700,
+                      color: "#000",
+                    }}
+                  >
+                    OPEN CAMERA
+                  </span>
+                </div>
+              )}
+              <div
+                onClick={handleGalleryClick}
+                className="hover-btn press"
                 style={{
-                  fontFamily: F.mono,
-                  fontSize: 11,
-                  fontWeight: 700,
-                  color: C.soft,
+                  background: C.card,
+                  border: `1px solid ${C.border}`,
+                  borderRadius: 14,
+                  padding: "14px 20px",
+                  cursor: "pointer",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
                 }}
               >
-                UPLOAD FROM GALLERY
-              </span>
-            </label>
+                <span
+                  style={{
+                    fontFamily: F.mono,
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: C.soft,
+                  }}
+                >
+                  CHOOSE FROM GALLERY
+                </span>
+              </div>
+            </div>
           </div>
         ) : photo ? (
           <img
@@ -328,6 +433,56 @@ export default function PhotoAddMeal() {
             alt="captured meal"
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
+        ) : isNativeMobile() ? (
+          <div
+            onClick={handleCapture}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 16,
+              padding: 32,
+              cursor: "pointer",
+              textAlign: "center",
+            }}
+          >
+            <div
+              style={{
+                width: 72,
+                height: 72,
+                borderRadius: "50%",
+                background: alpha(C.accent, 15),
+                border: `1px solid ${alpha(C.accent, 30)}`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <svg width="32" height="32" viewBox="0 0 256 256" fill="none">
+                <path
+                  d="M208,56H180.28L166.65,35.56A8,8,0,0,0,160,32H96a8,8,0,0,0-6.65,3.56L75.72,56H48A24,24,0,0,0,24,80V192a24,24,0,0,0,24,24H208a24,24,0,0,0,24-24V80A24,24,0,0,0,208,56Z"
+                  fill={C.accent}
+                  opacity="0.2"
+                />
+                <circle cx="128" cy="132" r="36" fill={C.accent} opacity="0.2" />
+                <path
+                  d="M208,56H180.28L166.65,35.56A8,8,0,0,0,160,32H96a8,8,0,0,0-6.65,3.56L75.72,56H48A24,24,0,0,0,24,80V192a24,24,0,0,0,24,24H208a24,24,0,0,0,24-24V80A24,24,0,0,0,208,56Zm8,136a8,8,0,0,1-8,8H48a8,8,0,0,1-8-8V80a8,8,0,0,1,8-8H80a8,8,0,0,0,6.65-3.56L100.28,48h55.44l13.63,20.44A8,8,0,0,0,176,72h32a8,8,0,0,1,8,8Z"
+                  fill={C.accent}
+                />
+                <path
+                  d="M128,84a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,84Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,164Z"
+                  fill={C.accent}
+                />
+              </svg>
+            </div>
+            <div style={{ fontFamily: F.head, fontSize: 16, fontWeight: 700, color: "#fff" }}>
+              Tap to Open Camera
+            </div>
+            <div style={{ fontFamily: F.mono, fontSize: 10, color: alpha("#fff", 60) }}>
+              Or use the button below
+            </div>
+          </div>
         ) : (
           <video
             ref={videoRef}
@@ -338,6 +493,21 @@ export default function PhotoAddMeal() {
           />
         )}
         <canvas ref={canvasRef} style={{ display: "none" }} />
+        <input
+          ref={cameraInputRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          style={{ display: "none" }}
+          onChange={handleFileUpload}
+        />
+        <input
+          ref={galleryInputRef}
+          type="file"
+          accept="image/*"
+          style={{ display: "none" }}
+          onChange={handleFileUpload}
+        />
       </div>
 
       {/* Bottom Controls */}

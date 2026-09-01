@@ -116,6 +116,8 @@
     "carbsTarget": "WĘGLOWODANY",
     "fatTarget": "TŁUSZCZE",
     "finish": "ZACZNIJ ŚLEDZENIE",
+    "startTracking": "ZACZNIJ ŚLEDZENIE",
+    "settingUp": "KONFIGUROWANIE...",
     "howItWorksTitle": "Jak działa Kalori",
     "howItWorksSubtitle": "Grywalizacja w śledzeniu diety, która motywuje i buduje regularność.",
     "gameEarnXpTitle": "Zapisuj posiłki i zdobywaj XP",
@@ -194,7 +196,10 @@
     "deleteUndone": "Ta akcja jest nieodwracalna.",
     "saveChanges": "ZAPISZ ZMIANY",
     "favorites": "Ulubione",
-    "recentlyAdded": "Ostatnio Dodane"
+    "recentlyAdded": "Ostatnio Dodane",
+    "failedAddMeal": "Nie udało się dodać posiłku",
+    "failedDeleteMeal": "Nie udało się usunąć posiłku",
+    "failedEditMeal": "Nie udało się edytować posiłku"
   },
   "pro": {
     "upgradeToPro": "Przejdź na Kalori Pro",
@@ -385,7 +390,11 @@
     "questsLockedSub": "Osiągnij Poziom 2, aby odblokować zadania dzienne i tygodniowe",
     "daily": "Dzienne",
     "weekly": "Tygodniowe",
-    "rerollTitle": "Wylosuj nowe zadanie za {{cost}} monet"
+    "rerollTitle": "Wylosuj nowe zadanie za {{cost}} monet",
+    "rerollNeedCoins": "Potrzebujesz {{cost}} monet, aby wylosować nowe zadanie!",
+    "rerolledSuccess": "Nowe zadanie: {{name}} (-{{cost}} monet)",
+    "rerollFailed": "Nie udało się wylosować nowego zadania",
+    "newQuest": "Nowe Zadanie"
   },
   "quests_data": {
     "1": { "name": "Zapisz 3 posiłki dzisiaj", "desc": "Zapisz co najmniej 3 posiłki z kaloriami dzisiaj." },

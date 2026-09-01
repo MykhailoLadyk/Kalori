@@ -27,6 +27,7 @@ import { ThemeProvider } from "./context/ThemeContext";
 import { FavoriteProvider } from "./context/FavoriteContext";
 import { TutorialProvider } from "./context/TutorialContext";
 import AppTutorial from "./components/shared/AppTutorial";
+import ScrollToTop from "./components/shared/ScrollToTop";
 import { C, alpha } from "./lib/constants";
 
 // Global loading screen component
@@ -99,6 +100,7 @@ function App() {
           <StatsProvider>
           <GameProvider>
             <BrowserRouter>
+              <ScrollToTop />
               <TutorialProvider>
               <AuthLoader>
                 <AppTutorial />

@@ -90,7 +90,7 @@ export default function Settings() {
   );
 
   return (
-    <div style={{ padding: "16px 22px 16px" }}>
+    <div style={{ padding: "16px 22px calc(96px + env(safe-area-inset-bottom))" }}>
       <div
         style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20, animation: "fadeUp 0.4s ease both" }}
       >
@@ -232,9 +232,9 @@ export default function Settings() {
         </div>
       </div>
 
-      <div style={{ textAlign: "center", marginTop: 8, animation: "fadeIn 0.4s ease 0.6s both" }}>
+      <div style={{ textAlign: "center", marginTop: 18, marginBottom: 8, animation: "fadeIn 0.4s ease 0.6s both" }}>
         <Mono size={8} color={C.muted}>
-          Kalori v1.4.3
+          Kalori v1.4.4
         </Mono>
       </div>
       <Modal id={modal} close={() => setModal(null)}>

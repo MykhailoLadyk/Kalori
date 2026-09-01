@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { C, F, alpha } from "../../lib/constants";
+import { C, F, alpha, achievements as achievementDefinitions, quests as questDefinitions } from "../../lib/constants";
 import { Mono } from "./Primitives";
 import {
   IconLightning,
@@ -55,6 +55,15 @@ function ToastContent({ notification }) {
     if (n === "User already registered") return t("auth.errorUserAlreadyRegistered");
     if (n === "Invalid login credentials") return t("auth.errorInvalidCredentials");
     if (n.includes("at least 6 characters")) return t("auth.errorPasswordLength");
+    if (n === "Failed to add meal") return t("meal.failedAddMeal", { defaultValue: "Failed to add meal" });
+    if (n === "Failed to delete meal") return t("meal.failedDeleteMeal", { defaultValue: "Failed to delete meal" });
+    if (n === "Failed to edit meal") return t("meal.failedEditMeal", { defaultValue: "Failed to edit meal" });
+    if (n === "Failed to reroll quest") return t("quests.rerollFailed", { defaultValue: "Failed to reroll quest" });
+    if (typeof n === "string" && n.startsWith("Need ") && n.includes("coins to reroll")) {
+      const match = n.match(/\d+/);
+      const cost = match ? match[0] : 20;
+      return t("quests.rerollNeedCoins", { cost });
+    }
     return t(n, { defaultValue: n });
   };
 
@@ -143,7 +152,12 @@ function ToastContent({ notification }) {
 
   // medium card for quest
   if (type === "quest") {
-    const questName = id ? t("quests_data." + id + ".name", { defaultValue: name }) : name;
+    let questId = id;
+    if (!questId && name) {
+      const matched = questDefinitions.find((q) => q.name === name || q.description === name);
+      if (matched) questId = matched.id;
+    }
+    const questName = questId ? t("quests_data." + questId + ".name", { defaultValue: name }) : name;
     return (
       <div
         className="bg-panel"
@@ -180,7 +194,12 @@ function ToastContent({ notification }) {
 
   // larger card for achievement
   if (type === "achievement") {
-    const achievementName = id ? t("achievements_data." + id + ".name", { defaultValue: name }) : name;
+    let achId = id;
+    if (!achId && name) {
+      const matched = achievementDefinitions.find((a) => a.name === name || a.description === name);
+      if (matched) achId = matched.id;
+    }
+    const achievementName = achId ? t("achievements_data." + achId + ".name", { defaultValue: name }) : name;
     return (
       <div
         className="bg-panel"

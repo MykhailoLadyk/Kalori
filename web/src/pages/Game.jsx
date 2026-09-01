@@ -71,7 +71,7 @@ export default function Game() {
 
   return (
     <>
-      <div style={{ padding: "16px 22px 80px" }}>
+      <div style={{ padding: "16px 22px calc(96px + env(safe-area-inset-bottom))" }}>
         <div
           style={{
             textAlign: "center",

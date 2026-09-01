@@ -150,7 +150,7 @@ export default function Shop() {
   };
 
   return (
-    <div style={{ padding: "16px 22px 16px" }}>
+    <div style={{ padding: "16px 22px calc(96px + env(safe-area-inset-bottom))" }}>
       <div
         style={{ display: "flex", justifyContent: "flex-end", marginBottom: 14, animation: "fadeUp 0.4s ease both" }}
       >

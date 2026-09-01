@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect, useRef, useMemo, useCallback } from "react";
+import i18n from "../lib/i18n";
 import { useNotifications } from "./NotificationContext";
 import { fetchGameData, syncGameProgress, applyStreakDecay, deductCoins as deductCoinsService } from "../services/gameService";
 import { achievements as achievementDefinitions, quests as questDefinitions } from "../lib/constants";
@@ -187,13 +188,15 @@ export function GameProvider({ children }) {
       }
       (result.notifications || []).forEach((notif) => {
         if (notif.type === "quest") {
-          const def = questDefinitions.find((q) => q.id === notif.id);
-          addNotification({ ...def, type: "quest", coins: notif.reward });
+          const questId = notif.id ?? notif.quest_id;
+          const def = questDefinitions.find((q) => q.id === questId || q.name === notif.name);
+          addNotification({ ...def, ...notif, id: def?.id ?? questId, type: "quest", coins: notif.reward || notif.coins });
         } else if (notif.type === "target") {
           addNotification({ type: "target", name: notif.name, xp: notif.xp, coins: notif.coins });
         } else if (notif.type === "achievement") {
-          const def = achievementDefinitions.find((a) => a.id === notif.id);
-          addNotification({ ...def, type: "achievement", xp: notif.xp });
+          const achId = notif.id ?? notif.achievement_id;
+          const def = achievementDefinitions.find((a) => a.id === achId || a.name === notif.name);
+          addNotification({ ...def, ...notif, id: def?.id ?? achId, type: "achievement", xp: notif.xp });
         }
       });
     } catch (e) {}
@@ -203,7 +206,10 @@ export function GameProvider({ children }) {
 
   const rerollQuest = useCallback(async (questId, cost = 20) => {
     if (gameData.coins < cost) {
-      addNotification({ type: "error", name: `Need ${cost} coins to reroll quest!` });
+      addNotification({
+        type: "error",
+        name: i18n.t("quests.rerollNeedCoins", { cost, defaultValue: `Need ${cost} coins to reroll quest!` }),
+      });
       return false;
     }
 
@@ -218,17 +224,33 @@ export function GameProvider({ children }) {
       setGameData((prev) => ({ ...prev, coins: data.coins }));
       gameDataRef.current = { ...gameDataRef.current, coins: data.coins };
       const replacement = questDefinitions.find((q) => q.id === data.replacement_id);
-      addNotification({ type: "success", name: `Rerolled: ${replacement?.name || "New Quest"} (-20 coins)` });
+      const replacementName = replacement?.id
+        ? i18n.t("quests_data." + replacement.id + ".name", { defaultValue: replacement.name })
+        : (replacement?.name || i18n.t("quests.newQuest", { defaultValue: "New Quest" }));
+      addNotification({
+        type: "success",
+        name: i18n.t("quests.rerolledSuccess", {
+          name: replacementName,
+          cost: 20,
+          defaultValue: `Rerolled: ${replacementName} (-20 coins)`,
+        }),
+      });
       return true;
     } catch (err) {
-      addNotification({ type: "error", name: err.message || "Failed to reroll quest" });
+      addNotification({
+        type: "error",
+        name: err.message || i18n.t("quests.rerollFailed", { defaultValue: "Failed to reroll quest" }),
+      });
       return false;
     }
   }, [gameData, addNotification]);
 
   const deductCoins = useCallback(async (amount = 50, reason = "AI Meal Scan") => {
     if ((gameData.coins || 0) < amount) {
-      addNotification({ type: "error", name: `Need ${amount} coins for ${reason}!` });
+      addNotification({
+        type: "error",
+        name: i18n.t("insufficientCoins.title", { count: amount, defaultValue: `Need ${amount} coins!` }),
+      });
       return false;
     }
 
@@ -237,7 +259,11 @@ export function GameProvider({ children }) {
       const updatedCoins = typeof remainingCoins === "number" ? remainingCoins : Math.max(0, (gameData.coins || 0) - amount);
       setGameData((prev) => ({ ...prev, coins: updatedCoins }));
       gameDataRef.current = { ...gameDataRef.current, coins: updatedCoins };
-      addNotification({ type: "coins_deducted", amount: -amount, name: `-${amount} coins (${reason})` });
+      addNotification({
+        type: "coins_deducted",
+        amount: -amount,
+        name: `-${amount} ${i18n.t("common.coins").toLowerCase()}`,
+      });
       return true;
     } catch (err) {
       addNotification({ type: "error", name: err.message || "Failed to deduct coins" });

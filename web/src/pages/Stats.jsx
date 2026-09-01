@@ -100,7 +100,7 @@ export default function Stats() {
 
   return (
     <>
-      <div style={{ padding: "16px 22px 16px" }}>
+      <div style={{ padding: "16px 22px calc(96px + env(safe-area-inset-bottom))" }}>
         <div
           style={{
             display: "flex",

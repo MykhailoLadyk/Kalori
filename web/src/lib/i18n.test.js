@@ -108,6 +108,8 @@ describe("i18n Internationalization", () => {
     expect(i18n.t("onboarding.actVeryActive")).toBe("Dwa razy dziennie / Sportowiec");
     expect(i18n.t("onboarding.howItWorksTitle")).toBe("Jak działa Kalori");
     expect(i18n.t("onboarding.doneSubtitle")).toBe("Twój spersonalizowany plan jest gotowy. Zacznijmy budować zdrowe nawyki.");
+    expect(i18n.t("onboarding.startTracking")).toBe("ZACZNIJ ŚLEDZENIE");
+    expect(i18n.t("onboarding.settingUp")).toBe("KONFIGUROWANIE...");
 
     // Home & Stats
     expect(i18n.t("home.calories")).toBe("Kalorie");
@@ -126,6 +128,16 @@ describe("i18n Internationalization", () => {
     expect(i18n.t("settings.name")).toBe("Imię");
     expect(i18n.t("settings.age")).toBe("Wiek");
     expect(i18n.t("settings.typeDeleteToConfirm")).toBe("Wpisz DELETE, aby potwierdzić");
+
+    // Quests & Rerolls
+    expect(i18n.t("quests.rerollNeedCoins", { cost: 20 })).toBe("Potrzebujesz 20 monet, aby wylosować nowe zadanie!");
+    expect(i18n.t("quests.rerolledSuccess", { name: "Zapisz śniadanie", cost: 20 })).toBe("Nowe zadanie: Zapisz śniadanie (-20 monet)");
+    expect(i18n.t("quests.rerollFailed")).toBe("Nie udało się wylosować nowego zadania");
+
+    // Meal errors
+    expect(i18n.t("meal.failedAddMeal")).toBe("Nie udało się dodać posiłku");
+    expect(i18n.t("meal.failedDeleteMeal")).toBe("Nie udało się usunąć posiłku");
+    expect(i18n.t("meal.failedEditMeal")).toBe("Nie udało się edytować posiłku");
   });
 
   it("falls back to English for missing keys in unsupported languages", async () => {

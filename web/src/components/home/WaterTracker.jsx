@@ -35,7 +35,7 @@ export function WaterTracker() {
 
   const pct = Math.min((current / goal) * 100, 100);
   return (
-    <div style={{ padding: "12px 22px 24px", animation: "fadeUp 0.4s ease 0.7s both" }}>
+    <div style={{ padding: "12px 22px calc(96px + env(safe-area-inset-bottom))", animation: "fadeUp 0.4s ease 0.7s both" }}>
       <div
         data-tour="water-tracker"
         className="hover-card"

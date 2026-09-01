@@ -26,20 +26,55 @@
   --c-muted-light: #585878;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+html,
+body,
+#root,
+* {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+#root::-webkit-scrollbar,
+*::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
 
 html,
 body {
   overflow-x: hidden;
   max-width: 100vw;
   overscroll-behavior-x: none;
+  background: var(--c-bg);
+  color: var(--c-text);
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+input,
+textarea {
+  -webkit-user-select: text;
+  user-select: text;
 }
 
 body {
-  background: var(--c-bg);
-  color: var(--c-text);
   padding-bottom: 80px;
 }
+
 body.photo-div {
   padding-bottom: 0;
 }
@@ -49,9 +84,15 @@ body.photo-div {
   margin: 0 auto;
   position: relative;
   min-height: 100vh;
-  box-shadow: 0 0 40px rgba(0,0,0,0.3); /* optional: gives a slight shadow to distinguish on large screens */
-  background: var(--c-bg); /* ensure it matches the background in case body has a different one, though body is already --c-bg */
+  min-height: 100dvh;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.3);
+  background: var(--c-bg);
   overflow-x: hidden;
+  padding-top: env(safe-area-inset-top);
+}
+
+body.photo-div #root {
+  padding-top: 0;
 }
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

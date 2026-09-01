@@ -1,5 +1,9 @@
 {
   "appId": "com.kalori.app",
   "appName": "Kalori",
-  "webDir": "dist"
+  "webDir": "dist",
+  "backgroundColor": "#0B0B12",
+  "android": {
+    "backgroundColor": "#0B0B12"
+  }
 }

@@ -1,6 +1,10 @@
+import { useTranslation } from "react-i18next";
 import { C, F } from "../../lib/constants";
 import { IconShield, IconCoin } from "../shared/DuoIcon";
+
 export default function ShopItemOther({ price = 150 }) {
+  const { t } = useTranslation();
+
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
       <div style={{ animation: "float 2s ease infinite" }}>
@@ -15,7 +19,7 @@ export default function ShopItemOther({ price = 150 }) {
             color: C.text,
           }}
         >
-          Streak Shield
+          {t("shop.streakShield")}
         </div>
       </div>
       <div

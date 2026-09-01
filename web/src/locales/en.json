@@ -110,6 +110,8 @@
     "carbsTarget": "CARBS",
     "fatTarget": "FAT",
     "finish": "START TRACKING",
+    "startTracking": "START TRACKING",
+    "settingUp": "SETTING UP...",
     "howItWorksTitle": "How Kalori Works",
     "howItWorksSubtitle": "Gamified nutrition tracking designed to keep you consistent and motivated.",
     "gameEarnXpTitle": "Log Meals & Earn XP",
@@ -188,7 +190,10 @@
     "deleteUndone": "This action cannot be undone.",
     "saveChanges": "SAVE CHANGES",
     "favorites": "Favorites",
-    "recentlyAdded": "Recently Added"
+    "recentlyAdded": "Recently Added",
+    "failedAddMeal": "Failed to add meal",
+    "failedDeleteMeal": "Failed to delete meal",
+    "failedEditMeal": "Failed to edit meal"
   },
   "pro": {
     "upgradeToPro": "Upgrade to Kalori Pro",
@@ -379,7 +384,11 @@
     "questsLockedSub": "Reach Level 2 to unlock daily & weekly quests",
     "daily": "Daily",
     "weekly": "Weekly",
-    "rerollTitle": "Reroll quest for {{cost}} coins"
+    "rerollTitle": "Reroll quest for {{cost}} coins",
+    "rerollNeedCoins": "Need {{cost}} coins to reroll quest!",
+    "rerolledSuccess": "Rerolled: {{name}} (-{{cost}} coins)",
+    "rerollFailed": "Failed to reroll quest",
+    "newQuest": "New Quest"
   },
   "quests_data": {
     "1": { "name": "Log 3 meals today", "desc": "Log at least 3 meals with calories today." },

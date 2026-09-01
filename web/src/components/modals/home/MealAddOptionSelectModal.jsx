@@ -11,6 +11,7 @@ import { useNotifications } from "../../../context/NotificationContext";
 import { IconStar, IconStarOutline, IconSparkles, IconCoin, IconCrown } from "../../shared/DuoIcon";
 import InsufficientCoinsModal from "./InsufficientCoinsModal";
 import { AI_COIN_COST } from "../../../services/subscriptionService";
+import { isNativeMobile, pickPhotoFromGallery, capturePhotoFromCamera } from "../../../services/cameraService";
 
 const OPTIONS = [
   {
@@ -135,14 +136,68 @@ export function MealAddOptionSelectModal({ handleClose, setPreventClose }) {
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [albumLoading]);
 
-  const handleOptionClick = (key, isAi) => {
+  const processPhoto = async (photoDataUrl) => {
+    if (!photoDataUrl) return;
+
+    if (!isPro && userCoins < AI_COIN_COST) {
+      setShowCoinGate(true);
+      return;
+    }
+
+    setAlbumLoading(true);
+    setError(null);
+
+    try {
+      const parsed = await analyzeFood(photoDataUrl);
+
+      // Server already deducted coins atomically for free users
+      await refreshGameData();
+      if (!isPro) {
+        addNotification({ type: "coins_deducted", amount: -AI_COIN_COST, name: `-${AI_COIN_COST} coins (Photo Album Scan)` });
+      }
+
+      navigate("/add-meal/confirm", { state: { meal: parsed, photoData: photoDataUrl, isAlbum: true } });
+    } catch (err) {
+      if (err.code === "RATE_LIMITED") {
+        setError("Daily AI limit reached. Try again tomorrow.");
+      } else if (err.code === "INSUFFICIENT_COINS") {
+        setShowCoinGate(true);
+      } else {
+        setError(err.code === "NO_FOOD_DETECTED" ? (err.message || "No food detected in photo.") : "Couldn't analyze the photo. Try again.");
+        await refreshGameData();
+        if (!isPro) {
+          addNotification({ type: "coins_deducted", amount: -AI_COIN_COST, name: `-${AI_COIN_COST} coins (Photo Album Scan)` });
+        }
+      }
+    } finally {
+      setAlbumLoading(false);
+    }
+  };
+
+  const handleOptionClick = async (key, isAi) => {
     if (albumLoading) return;
     if (isAi && !isPro && userCoins < AI_COIN_COST) {
       setShowCoinGate(true);
       return;
     }
 
+    if (key === "photo") {
+      navigate("/add-meal/photo");
+      return;
+    }
+
     if (key === "album") {
+      if (isNativeMobile()) {
+        try {
+          const photoData = await pickPhotoFromGallery();
+          if (photoData) {
+            navigate("/add-meal/photo", { state: { photoData } });
+          }
+        } catch {
+          setError("Couldn't open photo gallery.");
+        }
+        return;
+      }
       fileInputRef.current?.click();
       return;
     }
@@ -153,43 +208,9 @@ export function MealAddOptionSelectModal({ handleClose, setPreventClose }) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!isPro && userCoins < AI_COIN_COST) {
-      setShowCoinGate(true);
-      e.target.value = "";
-      return;
-    }
-
-    setAlbumLoading(true);
-    setError(null);
-
     const reader = new FileReader();
     reader.onload = async () => {
-      try {
-        const photoDataUrl = reader.result;
-        const parsed = await analyzeFood(photoDataUrl);
-
-        // Server already deducted coins atomically for free users
-        await refreshGameData();
-        if (!isPro) {
-          addNotification({ type: "coins_deducted", amount: -AI_COIN_COST, name: `-${AI_COIN_COST} coins (Photo Album Scan)` });
-        }
-
-        navigate("/add-meal/confirm", { state: { meal: parsed, photoData: photoDataUrl, isAlbum: true } });
-      } catch (err) {
-        if (err.code === "RATE_LIMITED") {
-          setError("Daily AI limit reached. Try again tomorrow.");
-        } else if (err.code === "INSUFFICIENT_COINS") {
-          setShowCoinGate(true);
-        } else {
-          setError(err.code === "NO_FOOD_DETECTED" ? (err.message || "No food detected in photo.") : "Couldn't analyze the photo. Try again.");
-          await refreshGameData();
-          if (!isPro) {
-            addNotification({ type: "coins_deducted", amount: -AI_COIN_COST, name: `-${AI_COIN_COST} coins (Photo Album Scan)` });
-          }
-        }
-      } finally {
-        setAlbumLoading(false);
-      }
+      await processPhoto(reader.result);
     };
     reader.readAsDataURL(file);
     e.target.value = "";

@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
 
 import Login from "./pages/Login";
 import ResetPassword from "./pages/ResetPassword";
@@ -29,6 +29,51 @@ import { TutorialProvider } from "./context/TutorialContext";
 import AppTutorial from "./components/shared/AppTutorial";
 import ScrollToTop from "./components/shared/ScrollToTop";
 import { C, alpha } from "./lib/constants";
+import { useBackButton } from "./hooks/useBackButton";
+import { Capacitor } from "@capacitor/core";
+import { App as CapApp } from "@capacitor/app";
+
+// Root-level Android back button handler (priority 10 — fallback)
+function BackButtonHandler() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useBackButton(() => {
+    const path = location.pathname;
+
+    // Root / auth pages: minimize the app
+    if (path === "/" || path === "/login" || path === "/onboarding") {
+      if (Capacitor.isNativePlatform()) {
+        CapApp.minimizeApp();
+      }
+      return;
+    }
+
+    // Confirm-meal: go back to the previous add-meal step
+    if (path === "/add-meal/confirm") {
+      const state = location.state;
+      if (state?.description) {
+        navigate("/add-meal/describe");
+      } else if (state?.photoData) {
+        navigate("/add-meal/photo");
+      } else {
+        navigate("/");
+      }
+      return;
+    }
+
+    // Other add-meal sub-pages: back to home
+    if (path.startsWith("/add-meal/")) {
+      navigate("/");
+      return;
+    }
+
+    // All other pages (tabs, premium, terms, privacy, etc.): go to home
+    navigate("/");
+  }, 10);
+
+  return null;
+}
 
 // Global loading screen component
 function AuthLoader({ children }) {
@@ -101,6 +146,7 @@ function App() {
           <GameProvider>
             <BrowserRouter>
               <ScrollToTop />
+              <BackButtonHandler />
               <TutorialProvider>
               <AuthLoader>
                 <AppTutorial />

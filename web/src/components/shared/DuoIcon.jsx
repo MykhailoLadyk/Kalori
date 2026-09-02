@@ -511,3 +511,34 @@ export const IconFlagPoland = ({ size = 20, width, height, className = "" }) => 
   );
 };
 
+// Flag: Ukraine (Українська)
+export const IconFlagUkraine = ({ size = 20, width, height, className = "" }) => {
+  const w = width || Math.round(size * 1.33);
+  const h = height || size;
+  return (
+    <svg
+      width={w}
+      height={h}
+      viewBox="0 0 60 45"
+      className={className}
+      style={{
+        borderRadius: 4,
+        overflow: "hidden",
+        flexShrink: 0,
+        display: "inline-block",
+        verticalAlign: "middle",
+        boxShadow: "0 0 0 1px rgba(255,255,255,0.12)",
+      }}
+    >
+      <clipPath id="ua-flag-clip">
+        <rect width="60" height="45" rx="4" />
+      </clipPath>
+      <g clipPath="url(#ua-flag-clip)">
+        <rect width="60" height="22.5" fill="#0057B7" />
+        <rect y="22.5" width="60" height="22.5" fill="#FFD700" />
+      </g>
+    </svg>
+  );
+};
+
+

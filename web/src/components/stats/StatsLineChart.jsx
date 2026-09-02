@@ -9,7 +9,11 @@ export default function StatsLineChart({ label, data, dates, color, goalV, unit,
 
   if (!data || data.length === 0) return null;
 
-  const currentLang = i18n?.language?.startsWith("pl") ? "pl-PL" : "en-US";
+  const currentLang = i18n?.language?.startsWith("uk")
+    ? "uk-UA"
+    : i18n?.language?.startsWith("pl")
+    ? "pl-PL"
+    : "en-US";
   const formatShortMonth = (monthIdx) => {
     try {
       const d = new Date(2026, monthIdx, 1);

@@ -30,11 +30,17 @@ export function DateModal({ handleClose, date, setDate }) {
   const isSelectedFuture = selectedCandidate > todayStart;
 
   const monthName = new Date(currentYear, localMonth, 1).toLocaleDateString(
-    i18n.language?.startsWith("pl") ? "pl-PL" : "en-US",
+    i18n.language?.startsWith("uk")
+      ? "uk-UA"
+      : i18n.language?.startsWith("pl")
+      ? "pl-PL"
+      : "en-US",
     { month: "long" }
   );
   const capitalizedMonth = monthName.charAt(0).toUpperCase() + monthName.slice(1);
-  const dayInitials = i18n.language?.startsWith("pl")
+  const dayInitials = i18n.language?.startsWith("uk")
+    ? ["П", "В", "С", "Ч", "П", "С", "Н"]
+    : i18n.language?.startsWith("pl")
     ? ["P", "W", "Ś", "C", "P", "S", "N"]
     : ["M", "T", "W", "T", "F", "S", "S"];
 

@@ -19,7 +19,8 @@ import {
   IconParty,
   IconGlobe,
   IconFlagUK,
-  IconFlagPoland
+  IconFlagPoland,
+  IconFlagUkraine,
 } from "../components/shared/DuoIcon";
 
 // ── Step indicator ────────────────────────────────────────────
@@ -318,7 +319,11 @@ export default function OnboardingPage() {
     try {
       setSaving(true);
 
-      const activeLang = i18n.language?.startsWith("pl") ? "pl" : "en";
+      const activeLang = i18n.language?.startsWith("uk")
+        ? "uk"
+        : i18n.language?.startsWith("pl")
+        ? "pl"
+        : "en";
       await updateUser({
         name: form.name.trim(),
         age: Number(form.age),
@@ -1052,9 +1057,15 @@ export default function OnboardingPage() {
               cursor: "pointer",
             }}
           >
-            {i18n.language?.startsWith("pl") ? <IconFlagPoland size={13} /> : <IconFlagUK size={13} />}
+            {i18n.language?.startsWith("uk") ? (
+              <IconFlagUkraine size={13} />
+            ) : i18n.language?.startsWith("pl") ? (
+              <IconFlagPoland size={13} />
+            ) : (
+              <IconFlagUK size={13} />
+            )}
             <span style={{ fontFamily: F.mono, fontSize: 10, fontWeight: 700, color: C.text }}>
-              {i18n.language?.startsWith("pl") ? "PL" : "EN"}
+              {i18n.language?.startsWith("uk") ? "UA" : i18n.language?.startsWith("pl") ? "PL" : "EN"}
             </span>
           </div>
         </div>

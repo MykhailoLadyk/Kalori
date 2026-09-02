@@ -32,7 +32,11 @@ export default function StatsBarChart({ label, data, dates, max, color, goalV, u
   };
 
   // Build day labels from dates array
-  const currentLang = i18n?.language?.startsWith("pl") ? "pl-PL" : "en-US";
+  const currentLang = i18n?.language?.startsWith("uk")
+    ? "uk-UA"
+    : i18n?.language?.startsWith("pl")
+    ? "pl-PL"
+    : "en-US";
   const dayLabels = dates
     ? dates.map((d) => {
         try {

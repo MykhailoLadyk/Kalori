@@ -6,8 +6,15 @@ function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
+function getLocaleTag(lang) {
+  if (lang) return lang;
+  if (i18n?.language?.startsWith("uk")) return "uk-UA";
+  if (i18n?.language?.startsWith("pl")) return "pl-PL";
+  return "en-US";
+}
+
 export function getDayName(date, lang) {
-  const currentLang = lang || (i18n?.language?.startsWith("pl") ? "pl-PL" : "en-US");
+  const currentLang = getLocaleTag(lang);
   try {
     const formatted = new Intl.DateTimeFormat(currentLang, { weekday: "long" }).format(date);
     return capitalize(formatted);
@@ -26,7 +33,7 @@ export function getDayName(date, lang) {
 }
 
 export function getMonthName(date, lang) {
-  const currentLang = lang || (i18n?.language?.startsWith("pl") ? "pl-PL" : "en-US");
+  const currentLang = getLocaleTag(lang);
   const targetDate = typeof date === "number" ? new Date(2026, date, 1) : date instanceof Date ? date : null;
   if (!targetDate) return "";
   try {

@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { Capacitor } from "@capacitor/core";
+import { SocialLogin } from "@capgo/capacitor-social-login";
 import { C, F, alpha } from "../lib/constants";
 import { Mono } from "../components/shared/Primitives";
 import { supabase } from "../services/supabase";
@@ -190,15 +192,36 @@ export default function Login() {
     try {
       setLoading(true);
       setAuthError(null);
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/`,
-        },
-      });
-      if (error) throw error;
+
+      if (Capacitor.isNativePlatform()) {
+        // Native: use Google Sign-In SDK → ID token → Supabase
+        const result = await SocialLogin.login({
+          provider: "google",
+          options: {},
+        });
+
+        if (result?.result?.idToken) {
+          const { error } = await supabase.auth.signInWithIdToken({
+            provider: "google",
+            token: result.result.idToken,
+          });
+          if (error) throw error;
+        } else {
+          throw new Error("Google sign-in was cancelled or failed to return a token.");
+        }
+      } else {
+        // Web: keep the existing OAuth redirect flow
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: "google",
+          options: {
+            redirectTo: `${window.location.origin}/`,
+          },
+        });
+        if (error) throw error;
+      }
     } catch (err) {
       setAuthError(formatAuthError(err.message));
+    } finally {
       setLoading(false);
     }
   };

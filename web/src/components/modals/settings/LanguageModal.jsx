@@ -2,18 +2,19 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { C, F } from "../../../lib/constants";
 import { useUser } from "../../../hooks/useUser";
-import { IconFlagUK, IconFlagPoland } from "../../shared/DuoIcon";
+import { IconFlagUK, IconFlagPoland, IconFlagUkraine } from "../../shared/DuoIcon";
 
 const LANGUAGES = [
   { code: "en", label: "English", FlagIcon: IconFlagUK },
   { code: "pl", label: "Polski", FlagIcon: IconFlagPoland },
+  { code: "uk", label: "Українська", FlagIcon: IconFlagUkraine },
 ];
 
 export default function LanguageModal({ handleClose }) {
   const { i18n, t } = useTranslation();
   const { user, updateUser } = useUser();
   const [selected, setSelected] = useState(
-    i18n.language?.startsWith("pl") ? "pl" : "en"
+    i18n.language?.startsWith("uk") ? "uk" : i18n.language?.startsWith("pl") ? "pl" : "en"
   );
   const [loading, setLoading] = useState(false);
 

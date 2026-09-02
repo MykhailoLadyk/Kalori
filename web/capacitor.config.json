@@ -5,5 +5,12 @@
   "backgroundColor": "#0B0B12",
   "android": {
     "backgroundColor": "#0B0B12"
+  },
+  "plugins": {
+    "SocialLogin": {
+      "google": {
+        "webClientId": "1038591439156-7a615n7fqd6lsumnio4590sja7bgqk32.apps.googleusercontent.com"
+      }
+    }
   }
 }

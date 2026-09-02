@@ -71,7 +71,12 @@ export function UserProvider({ children }) {
   }, []);
 
   useEffect(() => {
-    if (user?.settings?.language && (user.settings.language === "en" || user.settings.language === "pl")) {
+    if (
+      user?.settings?.language &&
+      (user.settings.language === "en" ||
+        user.settings.language === "pl" ||
+        user.settings.language === "uk")
+    ) {
       if (i18n.language !== user.settings.language) {
         i18n.changeLanguage(user.settings.language);
       }

@@ -46,6 +46,7 @@ import {
   IconStar,
   IconFlagUK,
   IconFlagPoland,
+  IconFlagUkraine,
 } from "../components/shared/DuoIcon";
 import { Tag } from "../components/shared/Primitives";
 
@@ -155,8 +156,20 @@ export default function Settings() {
             label={t("settings.language")}
             sub={
               <span style={{ display: "inline-flex", alignItems: "center", gap: 6, marginTop: 2 }}>
-                {i18n.language?.startsWith("pl") ? <IconFlagPoland size={11} /> : <IconFlagUK size={11} />}
-                <span>{i18n.language?.startsWith("pl") ? "Polski" : "English"}</span>
+                {i18n.language?.startsWith("uk") ? (
+                  <IconFlagUkraine size={11} />
+                ) : i18n.language?.startsWith("pl") ? (
+                  <IconFlagPoland size={11} />
+                ) : (
+                  <IconFlagUK size={11} />
+                )}
+                <span>
+                  {i18n.language?.startsWith("uk")
+                    ? "Українська"
+                    : i18n.language?.startsWith("pl")
+                    ? "Polski"
+                    : "English"}
+                </span>
               </span>
             }
           />
@@ -234,7 +247,7 @@ export default function Settings() {
 
       <div style={{ textAlign: "center", marginTop: 18, marginBottom: 8, animation: "fadeIn 0.4s ease 0.6s both" }}>
         <Mono size={8} color={C.muted}>
-          Kalori v1.4.4
+          Kalori v1.4.5
         </Mono>
       </div>
       <Modal id={modal} close={() => setModal(null)}>

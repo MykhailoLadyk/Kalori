@@ -1,5 +1,6 @@
 import { useEffect, useState, cloneElement, isValidElement } from "react";
 import { C, alpha } from "../../lib/constants";
+import { useBackButton } from "../../hooks/useBackButton";
 export function Modal({ id, close, preventClose: propPreventClose, children }) {
   const [visible, setVisible] = useState(false);
   const [closing, setClosing] = useState(false);
@@ -32,6 +33,11 @@ export function Modal({ id, close, preventClose: propPreventClose, children }) {
       close();
     }, 280);
   };
+
+  // Android back button: close modal instead of navigating (priority 30)
+  useBackButton(() => {
+    handleClose();
+  }, 30, !!id);
 
   const renderedChildren = isValidElement(children)
     ? cloneElement(children, { handleClose, setPreventClose, isLocked })

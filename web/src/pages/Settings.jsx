@@ -167,8 +167,8 @@ export default function Settings() {
                   {i18n.language?.startsWith("uk")
                     ? "Українська"
                     : i18n.language?.startsWith("pl")
-                    ? "Polski"
-                    : "English"}
+                      ? "Polski"
+                      : "English"}
                 </span>
               </span>
             }
@@ -247,7 +247,7 @@ export default function Settings() {
 
       <div style={{ textAlign: "center", marginTop: 18, marginBottom: 8, animation: "fadeIn 0.4s ease 0.6s both" }}>
         <Mono size={8} color={C.muted}>
-          Kalori v1.4.5
+          Kalori v1.4.6
         </Mono>
       </div>
       <Modal id={modal} close={() => setModal(null)}>

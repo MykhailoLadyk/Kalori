@@ -1,4 +1,5 @@
 import { supabase } from "./supabase";
+import i18n from "../lib/i18n";
 
 /**
  * Analyzes a food description using the analyze-food-desc edge function.
@@ -7,9 +8,12 @@ import { supabase } from "./supabase";
  * Returns the parsed nutrition data object directly.
  * Throws an error with a `code` property for structured error handling.
  */
-export default async function analyzeFoodDesc(description, clarifications) {
+export default async function analyzeFoodDesc(description, clarifications, language) {
+  const selectedLanguage =
+    language || i18n?.language || (typeof localStorage !== "undefined" && localStorage.getItem("kalori_lang")) || "en";
+
   const { data, error } = await supabase.functions.invoke("analyze-food-desc", {
-    body: { description, clarifications },
+    body: { description, clarifications, language: selectedLanguage },
   });
 
   if (error) {

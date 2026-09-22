@@ -15,6 +15,7 @@ supabase/migrations/
 *.local
 .env
 .env.local
+supabase/remote_structure
 production_readiness_review.md
 # Editor directories and files
 .vscode/*

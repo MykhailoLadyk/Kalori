@@ -252,3 +252,5 @@ export function parseVertexResponse(
 
   return parsed;
 }
+
+export { resolveLanguage } from "./language.ts";

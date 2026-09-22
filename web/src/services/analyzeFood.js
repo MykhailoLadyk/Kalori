@@ -1,4 +1,5 @@
 import { supabase } from "./supabase";
+import i18n from "../lib/i18n";
 
 function resizeImage(dataUrl) {
   return new Promise((resolve, reject) => {
@@ -52,7 +53,7 @@ function fileToDataUrl(file) {
  * Returns the parsed nutrition data object directly.
  * Throws an error with a `code` property for structured error handling.
  */
-export default async function analyzeFood(imageInput, clarifications) {
+export default async function analyzeFood(imageInput, clarifications, language) {
   let dataUrl;
 
   if (typeof imageInput === "string" && imageInput.startsWith("data:")) {
@@ -66,8 +67,11 @@ export default async function analyzeFood(imageInput, clarifications) {
   // Resize and compress the image before uploading to reduce latency
   const { base64: imageBase64, mimeType } = await resizeImage(dataUrl);
 
+  const selectedLanguage =
+    language || i18n?.language || (typeof localStorage !== "undefined" && localStorage.getItem("kalori_lang")) || "en";
+
   const { data, error } = await supabase.functions.invoke("analyze-food", {
-    body: { imageBase64, mimeType, clarifications },
+    body: { imageBase64, mimeType, clarifications, language: selectedLanguage },
   });
 
   if (error) {
